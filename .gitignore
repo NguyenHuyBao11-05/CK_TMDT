@@ -1,0 +1,17 @@
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+
+target/
+build/
+*.class
+application-local.properties
+.env
