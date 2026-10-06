@@ -1,0 +1,48 @@
+<!--
+  Header dùng chung — được common.js chèn vào <div id="site-header"> của mọi trang.
+  Link viết bằng data-href (đường dẫn tính từ thư mục gốc web/), common.js tự đổi thành href đúng.
+  data-nav: khớp với <body data-nav="..."> của trang để tô sáng mục menu đang mở.
+-->
+<header class="site-header sticky-top">
+  <nav class="navbar navbar-expand-lg py-3">
+    <div class="container">
+      <a data-href="index.html" class="navbar-brand d-flex align-items-center gap-2">
+        <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
+        <span class="brand-name">Fw12</span>
+      </a>
+
+      <button class="navbar-toggler border-0 shadow-none" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav mx-lg-auto gap-2 my-3 my-lg-0">
+          <li class="nav-item"><a data-href="index.html" data-nav="home" class="nav-pill">Trang chủ</a></li>
+          <!-- KH01 -->
+          <li class="nav-item"><a data-href="shop/products.html" data-nav="products" class="nav-pill">Mẫu hoa có sẵn</a></li>
+          <!-- KH05 -->
+          <li class="nav-item"><a data-href="design/create-request.html" data-nav="design" class="nav-pill">Tạo yêu cầu cắm hoa</a></li>
+        </ul>
+
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+          <!-- KH01 - Tìm kiếm: common.js chuyển sang shop/products.html?q=... -->
+          <form class="header-search d-flex align-items-center gap-2" role="search" id="headerSearch">
+            <i class="fa-solid fa-magnifying-glass text-muted-fw"></i>
+            <input type="search" name="q" placeholder="Tìm hoa tươi, florist..." aria-label="Tìm kiếm bó hoa">
+          </form>
+
+          <div class="d-flex align-items-center gap-3">
+            <a data-href="shop/cart.html" class="cart-link" aria-label="Giỏ hàng">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span class="cart-badge" id="cartCount" hidden>0</span>
+            </a>
+            <a data-href="account/login.html" class="text-body fw-semibold text-decoration-none small">Đăng nhập</a>
+            <a data-href="account/register.html" class="btn btn-peach btn-sm px-3">Đăng ký</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
