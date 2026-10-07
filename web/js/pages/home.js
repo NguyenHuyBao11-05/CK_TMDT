@@ -1,4 +1,3 @@
-/* Trang chủ — đổ dữ liệu "Sản phẩm bán chạy" & "Mẫu hoa mới", lọc nhanh theo chất liệu (KH01) */
 (function () {
   'use strict'
 
@@ -9,7 +8,6 @@
   function renderList(containerId, products) {
     const box = document.getElementById(containerId)
     if (products.length === 0) {
-      // KH01 - luồng thay thế
       box.innerHTML = '<p class="text-muted-fw text-center py-5 mb-0">Không tìm thấy bó hoa phù hợp.</p>'
       return
     }

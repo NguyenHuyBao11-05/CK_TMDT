@@ -1,19 +1,8 @@
-/* =====================================================================
-   api.js — MỌI chỗ lấy dữ liệu đều đi qua đây.
-   Hiện tại trả DỮ LIỆU GIẢ. Khi có backend Spring Boot, chỉ cần sửa thân
-   từng hàm thành fetch('/api/...') — các trang không phải sửa gì.
-
-   Tên field bám theo docs/schema.sql: view v_best_seller_products / v_new_products
-   (id, name, material, price, discount_price, thumbnail_url, ...),
-   cộng partner_name & rating mà API sẽ join từ users / reviews.
-   Cần load SAU common.js (dùng FW.url).
-   ===================================================================== */
 (function () {
   'use strict'
 
   const img = (file) => FW.url(`images/flowers/${file}`)
 
-  // material khớp giá trị gợi ý trong schema: 'Hoa thật' | 'Hoa nhung' | 'Hoa giấy'
   const MATERIALS = ['Hoa thật', 'Hoa nhung', 'Hoa giấy']
 
   const BEST_SELLERS = [
@@ -34,20 +23,41 @@
     { id: 12, name: "Bó Hoa 'Hương Sắc Mùa Thu' — bản mini", material: 'Hoa thật', price: 890000, discount_price: null, thumbnail_url: img('autumn-bowl.jpg'), partner_name: "Atelier L'Amour", rating: 4.8, badge: 'new' },
   ]
 
-  // Giả lập độ trễ mạng để giao diện "đang tải" hiện ra giống thật
   const fake = (data) => new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), 150))
 
   window.FW_API = {
     MATERIALS,
 
-    // Sau này: return fetch('/api/products/best-sellers').then(r => r.json())
     getBestSellers() {
       return fake(BEST_SELLERS)
     },
 
-    // Sau này: return fetch('/api/products/new').then(r => r.json())
     getNewProducts() {
       return fake(NEW_PRODUCTS)
     },
   }
 })()
+
+const DESIGN_REQUEST_KEY = 'fw_design_requests'
+
+function getDesignRequests() {
+  try {
+    return JSON.parse(localStorage.getItem(DESIGN_REQUEST_KEY)) || []
+  } catch (e) {
+    return []
+  }
+}
+
+function saveDesignRequest(request) {
+  const list = getDesignRequests()
+  request.id = Date.now()
+  request.status = 'OPEN'
+  request.created_at = new Date().toISOString()
+  list.push(request)
+  try {
+    localStorage.setItem(DESIGN_REQUEST_KEY, JSON.stringify(list))
+    return true
+  } catch (e) {
+    return false
+  }
+}
