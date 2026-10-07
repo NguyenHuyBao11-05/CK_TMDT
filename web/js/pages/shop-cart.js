@@ -1,4 +1,3 @@
-// KH03 - Xem & chỉnh giỏ hàng, áp voucher
 (function () {
   'use strict'
   const $ = (id) => document.getElementById(id)
@@ -38,11 +37,11 @@
     const sub = subtotal()
     let discount = 0
     if (voucher) {
-      const r = await FW_API.validateVoucher(voucher, sub)  // đơn đổi → kiểm tra lại
+      const r = await FW_API.validateVoucher(voucher, sub)
       if (r.ok) discount = r.discount
       else { voucher = null; $('voucherMsg').className = 'small mb-3 text-rose'; $('voucherMsg').textContent = r.message }
     }
-    try { voucher ? localStorage.setItem('fw_voucher', voucher) : localStorage.removeItem('fw_voucher') } catch { /* bỏ qua */ }
+    try { voucher ? localStorage.setItem('fw_voucher', voucher) : localStorage.removeItem('fw_voucher') } catch {}
     $('subtotal').textContent = FW.formatVnd(sub)
     $('discount').textContent = discount ? '− ' + FW.formatVnd(discount) : '0 đ'
     $('total').textContent = FW.formatVnd(sub - discount)

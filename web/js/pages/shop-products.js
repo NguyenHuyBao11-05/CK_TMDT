@@ -1,4 +1,3 @@
-// KH01 - Xem danh sách mẫu hoa: Lọc (chất liệu, giá), Sắp xếp, Tìm kiếm
 (function () {
   'use strict'
   const form = document.getElementById('filterForm')
