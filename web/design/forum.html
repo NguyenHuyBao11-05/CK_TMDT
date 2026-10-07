@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diễn đàn yêu cầu thiết kế — Fw12 Floral</title>
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/design-forum.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="py-5">
+  <div class="container">
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item">Kênh Đối tác</li>
+        <li class="breadcrumb-item active" aria-current="page">Diễn đàn yêu cầu thiết kế</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+      <div>
+        <div class="eyebrow mb-2"><i class="fa-solid fa-circle-check me-1"></i>Dành cho Đối tác</div>
+        <h1 class="display-6 mb-2">Diễn đàn yêu cầu thiết kế hoa</h1>
+        <p class="text-muted-fw mb-0">Xem các yêu cầu khách hàng đang mở và gửi báo giá cho yêu cầu phù hợp với cửa hàng của bạn.</p>
+      </div>
+      <div class="partner-chip">
+        <i class="fa-solid fa-store me-1"></i>Đang đăng nhập: <strong>Florist Thảo Điền Atelier</strong>
+      </div>
+    </div>
+
+    <div class="filter-bar row g-2 mb-3">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input type="search" id="searchInput" class="form-control" placeholder="Tìm theo tiêu đề, tông màu, chất liệu...">
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="occasionFilter" class="form-select">
+          <option value="">Tất cả dịp tặng</option>
+          <option>Sinh nhật</option>
+          <option>Kỷ niệm / Tình yêu</option>
+          <option>Đám cưới</option>
+          <option>Khai trương</option>
+          <option>Chúc mừng / Tốt nghiệp</option>
+          <option>Chia buồn</option>
+          <option>Khác</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="sortSelect" class="form-select">
+          <option value="new">Mới đăng nhất</option>
+          <option value="deadline">Sắp đến hạn giao</option>
+          <option value="budget">Ngân sách cao nhất</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="small text-muted-fw mb-4">Đang hiển thị 5 yêu cầu đang mở</p>
+
+    <div class="row g-4" id="requestList"></div>
+  </div>
+</main>
+
+<div class="modal fade" id="quoteModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="modalTitle">Chi tiết yêu cầu &amp; gửi báo giá</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="row g-0">
+          <div class="col-lg-6 detail-side p-4" id="requestDetail"></div>
+
+          <div class="col-lg-6 p-4">
+            <h3 class="h4 mb-1">Gửi đề xuất báo giá</h3>
+            <p class="small text-muted-fw mb-4">Báo giá là tổng tiền cho toàn bộ yêu cầu của khách.</p>
+
+            <form id="quoteForm" novalidate>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                  <label for="quotePrice" class="form-label">1. Giá đề xuất (VNĐ) <span class="text-rose">*</span></label>
+                  <span class="small text-muted-fw" id="budgetHint"></span>
+                </div>
+                <input type="number" id="quotePrice" class="form-control" min="50000" step="10000" required>
+                <div class="invalid-feedback">Giá tối thiểu 50.000 đ.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="quoteDays" class="form-label">2. Số ngày hoàn thành <span class="text-rose">*</span></label>
+                <input type="number" id="quoteDays" class="form-control" min="1" max="30" required style="max-width: 160px">
+                <div class="invalid-feedback">Từ 1 đến 30 ngày.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="quoteDescription" class="form-label">3. Mô tả cách làm &amp; loại hoa sử dụng <span class="text-rose">*</span></label>
+                <textarea id="quoteDescription" class="form-control" rows="4" minlength="20" required
+                          placeholder="VD: Dùng 15 cành hồng Ohara, phối cúc ping pong, gói giấy lụa 3 lớp..."></textarea>
+                <div class="invalid-feedback">Mô tả ít nhất 20 ký tự.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="quoteImage" class="form-label">4. Ảnh mẫu shop từng làm (không bắt buộc)</label>
+                <input type="file" id="quoteImage" class="form-control" accept="image/png, image/jpeg">
+              </div>
+
+              <div class="form-check commit-box mb-4">
+                <input class="form-check-input" type="checkbox" id="quoteCommit" required>
+                <label class="form-check-label small" for="quoteCommit">
+                  Tôi cam kết gửi ảnh chụp bó hoa thật cho khách trước khi giao hàng.
+                </label>
+                <div class="invalid-feedback">Vui lòng xác nhận cam kết.</div>
+              </div>
+
+              <button type="submit" class="btn btn-forest w-100" id="quoteSubmit">
+                <i class="fa-solid fa-paper-plane me-1"></i>Gửi báo giá
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/pages/design-forum.js"></script>
+</body>
+</html>
