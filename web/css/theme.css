@@ -104,20 +104,133 @@ h1, h2, h3, .h1, .h2, .h3 {
 
 /* ---------- Sidebar ---------- */
 .sidebar {
-    padding-top: 16px;
     width: 250px;
     min-height: 100vh;
-    background: #ffffff;
+    background: var(--fw-cream-2);
     position: fixed;
     left: 0;
     top: 0;
     z-index: 1021;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar .box-logo {
+    margin: 8px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 64px;
+}
+
+.sidebar .box-logo .user-type {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 5px;
+    color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+    border-radius: 100px;
+}
+
+.sidebar .box-name {
+    margin: 8px 16px;
+    padding: 8px;
+    background: var(--fw-cream);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+}
+.sidebar .box-name > i {
+    height: 40px;
+    width: 40px;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    color: var(--fw-ink);
+    background: var(--fw-sage);
+}
+
+.sidebar .box-name .name-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8px;
+}
+.sidebar .box-name .name-container .username {
+    font-size: 14px;
+    color: var(--fw-ink);
+}
+.sidebar .box-name .name-container .user-rank {
+    font-size: 10px;
+    color: var(--fw-ink);
+}
+
+.sidebar .list-nav-items {
+    padding: 8px;
+}
+
+.sidebar .list-nav-items .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+}
+
+.sidebar .list-nav-items .nav-item a {
+    font-size: 12px;
+    display: inline-block;
+}
+
+.sidebar .list-nav-items .nav-item i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.sidebar .list-nav-items .nav-item .nav-item-texts {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.sidebar .list-nav-items .nav-item .nav-item-texts .states {
+    padding: 5px;
+    font-size: 10px;
+    border-radius: 100px;
+    color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+}
+
+.sidebar .list-nav-items .nav-item .nav-item-texts .states.delivery {
+    color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+}
+
+.sidebar .list-nav-items .nav-item .nav-item-texts .states.new-design {
+    color: #370E06;
+    background: #FFDAD3;
+}
+
+.sidebar .list-nav-items .nav-item.selected {
+    background: var(--fw-sage);
+}
+
+.sidebar .list-nav-items .nav-item.selected a {
+    color: var(--fw-ink);
+}
+
+.sidebar .box-logout {
+    margin-top: auto;
+    padding: 8px 16px;
+    font-size: 20px;
+}
+.sidebar .box-logout i, .sidebar .box-logout span {
+    color: #BA1A1A;
+}
+.sidebar .box-version {
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* ---------- Hero ---------- */

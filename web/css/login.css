@@ -1,0 +1,135 @@
+.login-header {
+    text-align: center;
+}
+
+.login-header .icon {
+    font-size: 44px;
+    color: var(--fw-sage);
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    width: 400px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    color: var(--fw-ink);
+    margin-bottom: 8px;
+}
+
+.form-group .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 400px;
+}
+
+.form-group .input-group > i {
+    position: absolute;
+    left: 15px;
+    color: var(--fw-muted);
+    z-index: 2;
+}
+
+.form-group .input-group .form-text-input {
+    height: 42px;
+    width: 100%;
+    padding: 0 45px;
+    border: 1px solid var(--fw-sage-soft);
+    border-radius: 10px;
+    outline: none;
+}
+
+.form-group .input-group .form-text-input:focus {
+    border: 2px solid var(--fw-forest);
+    box-shadow: var(--fw-shadow);
+}
+
+/* ----------- Password ----------- */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: var(--fw-forest);
+    cursor: pointer;
+}
+
+/* ----------- Login button ----------- */
+.login-button {
+    margin-top: 10px;
+    height: 48px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    color: var(--fw-cream);
+    background: var(--fw-forest);
+}
+
+/* ---------- Divider ---------- */
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0;
+    color: var(--fw-muted);
+    font-size: 14px;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--fw-line);
+}
+
+.login-divider span {
+    white-space: nowrap;
+}
+
+/* ---------- Google ---------- */
+.google-login-button {
+    height: 48px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid var(--fw-line);
+    border-radius: 10px;
+    background: var(--fw-cream-2);
+    color: var(--fw-ink);
+    font-weight: bold;
+}
+
+.google-login-button i {
+    font-size: 17px;
+}
+
+/* ---------- Register ---------- */
+
+.register-text {
+    margin-top: 25px;
+    color: var(--fw-muted);
+    font-size: 14px;
+}
+
+.register-text a {
+    color: var(--fw-forest);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.register-text a {
+    text-decoration: underline;
+}
