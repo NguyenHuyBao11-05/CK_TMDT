@@ -12,20 +12,188 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/design-create-request.css">
 </head>
 <body data-nav="design">
 
 <div id="site-header"></div>
 
-<main>
-  <section class="coming-soon">
-    <div class="container">
-      <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-      <h1 class="h2">Tạo yêu cầu cắm hoa</h1>
-      <p class="text-muted-fw">Trang này đang được phát triển (KH05 — Bảo).</p>
-      <a href="../index.html" class="btn btn-forest mt-2">Về trang chủ</a>
-    </div>
-  </section>
+<main class="py-5">
+  <div class="container request-page">
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="../index.html"><i class="fa-solid fa-house me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tạo yêu cầu cắm hoa</li>
+      </ol>
+    </nav>
+
+    <span class="badge-soft mb-3"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Thiết kế hoa theo yêu cầu</span>
+    <h1 class="display-6 mb-3">Tạo thiết kế hoa mang dấu ấn của riêng bạn</h1>
+    <p class="text-muted-fw mb-5">
+      Mô tả ý tưởng, chọn ngân sách và phong cách mong muốn. Yêu cầu sẽ được đăng lên diễn đàn để
+      các Đối tác trên Fw12 gửi báo giá cho bạn so sánh và lựa chọn.
+    </p>
+
+    <form id="requestForm" novalidate>
+
+      <div class="form-card mb-4">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+          <div class="d-flex gap-3">
+            <span class="card-icon"><i class="fa-solid fa-palette"></i></span>
+            <div>
+              <h2 class="h4 mb-1">1. Chi tiết ý tưởng &amp; phong cách</h2>
+              <p class="small text-muted-fw mb-0">Mô tả càng rõ, Đối tác báo giá càng sát</p>
+            </div>
+          </div>
+          <span class="small text-muted-fw d-none d-sm-inline text-nowrap">(<span class="text-rose">*</span>) bắt buộc</span>
+        </div>
+
+        <div class="mb-4">
+          <label for="title" class="form-label">Tiêu đề yêu cầu <span class="text-rose">*</span></label>
+          <input type="text" id="title" class="form-control" maxlength="200" required
+                 placeholder="VD: Bó hoa kỷ niệm 5 năm ngày cưới tone hồng pastel">
+          <div class="invalid-feedback">Vui lòng nhập tiêu đề.</div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="occasion" class="form-label">Dịp tặng hoa <span class="text-rose">*</span></label>
+            <select id="occasion" class="form-select" required>
+              <option value="">-- Chọn dịp --</option>
+              <option>Sinh nhật</option>
+              <option>Kỷ niệm / Tình yêu</option>
+              <option>Đám cưới</option>
+              <option>Khai trương</option>
+              <option>Chúc mừng / Tốt nghiệp</option>
+              <option>Chia buồn</option>
+              <option>Khác</option>
+            </select>
+            <div class="invalid-feedback">Vui lòng chọn dịp tặng hoa.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="material" class="form-label">Chất liệu hoa <span class="text-rose">*</span></label>
+            <select id="material" class="form-select" required>
+              <option value="">-- Chọn chất liệu --</option>
+              <option>Hoa thật</option>
+              <option>Hoa nhung</option>
+              <option>Hoa giấy</option>
+            </select>
+            <div class="invalid-feedback">Vui lòng chọn chất liệu.</div>
+          </div>
+        </div>
+
+        <div class="budget-box mb-4">
+          <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 mb-3">
+            <div>
+              <label for="budget" class="form-label mb-1">Ngân sách dự kiến (VNĐ) <span class="text-rose">*</span></label>
+              <p class="small text-muted-fw mb-0">Tổng tiền bạn muốn chi cho cả yêu cầu</p>
+            </div>
+            <div class="budget-display" id="budgetDisplay">1.500.000 đ</div>
+          </div>
+          <input type="range" id="budgetRange" class="form-range" min="300000" max="5000000" step="100000" value="1500000">
+          <div class="d-flex justify-content-between small text-muted-fw mb-3">
+            <span>300.000 đ</span><span>5.000.000 đ</span>
+          </div>
+          <input type="number" id="budget" class="form-control" min="100000" step="10000" value="1500000" required>
+          <div class="invalid-feedback">Ngân sách tối thiểu 100.000 đ.</div>
+        </div>
+
+        <div class="mb-4" style="max-width: 220px">
+          <label for="quantity" class="form-label">Số lượng (bó / lẵng) <span class="text-rose">*</span></label>
+          <input type="number" id="quantity" class="form-control" min="1" max="100" value="1" required>
+          <div class="invalid-feedback">Số lượng từ 1 đến 100.</div>
+        </div>
+
+        <!-- Tông màu: là các nút radio, CSS vẽ thành ô màu -->
+        <div class="mb-4">
+          <label class="form-label">Tông màu chủ đạo <span class="text-rose">*</span></label>
+          <div class="color-grid">
+            <label class="color-option">
+              <input type="radio" name="color" value="Pastel mộng mơ" required>
+              <span class="color-dot" style="background: #f6c9d0"></span>
+              <span class="color-name">Pastel mộng mơ</span>
+              <span class="color-note">Hồng &amp; trắng kem</span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="Đỏ nồng nàn">
+              <span class="color-dot" style="background: #b3202c"></span>
+              <span class="color-name">Đỏ nồng nàn</span>
+              <span class="color-note">Đỏ ruby &amp; đỏ đô</span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="Trắng tinh khôi">
+              <span class="color-dot" style="background: #f4f4ef; border: 1px solid #ddd"></span>
+              <span class="color-name">Trắng tinh khôi</span>
+              <span class="color-note">Trắng &amp; xanh lá</span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="Cam hoàng hôn">
+              <span class="color-dot" style="background: #f4a43a"></span>
+              <span class="color-name">Cam hoàng hôn</span>
+              <span class="color-note">Cam &amp; vàng</span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="Tím mộng mị">
+              <span class="color-dot" style="background: #b9a7e8"></span>
+              <span class="color-name">Tím mộng mị</span>
+              <span class="color-note">Tím lavender</span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="Xanh nhiệt đới">
+              <span class="color-dot" style="background: #6fcfa8"></span>
+              <span class="color-name">Xanh nhiệt đới</span>
+              <span class="color-note">Xanh bơ &amp; xanh ngọc</span>
+            </label>
+          </div>
+          <div class="text-rose small mt-2" id="colorError" hidden>Vui lòng chọn 1 tông màu.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="image" class="form-label">Ảnh mẫu tham khảo (không bắt buộc)</label>
+          <div class="upload-box">
+            <i class="fa-solid fa-cloud-arrow-up fa-2x text-forest mb-2"></i>
+            <p class="mb-1">Chọn 1 ảnh tham khảo từ máy của bạn</p>
+            <p class="small text-muted-fw mb-3">JPG, PNG — tối đa 2MB</p>
+            <input type="file" id="image" class="form-control mx-auto" accept="image/png, image/jpeg" style="max-width: 320px">
+            <img id="imagePreview" class="image-preview mt-3" alt="Ảnh tham khảo đã chọn" hidden>
+          </div>
+          <div class="text-rose small mt-2" id="imageError" hidden>Ảnh vượt quá 2MB, vui lòng chọn ảnh nhỏ hơn.</div>
+        </div>
+
+        <div>
+          <label for="description" class="form-label">Mô tả chi tiết &amp; yêu cầu đặc biệt <span class="text-rose">*</span></label>
+          <textarea id="description" class="form-control" rows="4" required minlength="20"
+                    placeholder="VD: Hoa nở bung vừa phải, kèm thiệp viết tay, không dùng hoa nhuộm màu..."></textarea>
+          <div class="invalid-feedback">Mô tả ít nhất 20 ký tự để Đối tác hiểu ý tưởng.</div>
+        </div>
+      </div>
+
+      <div class="form-card mb-4">
+        <div class="d-flex gap-3 mb-4">
+          <span class="card-icon"><i class="fa-solid fa-truck"></i></span>
+          <div>
+            <h2 class="h4 mb-1">2. Thời gian nhận hoa</h2>
+            <p class="small text-muted-fw mb-0">Địa chỉ nhận hoa sẽ nhập ở bước thanh toán, sau khi bạn chọn báo giá</p>
+          </div>
+        </div>
+        <div style="max-width: 320px">
+          <label for="desiredDate" class="form-label">Ngày &amp; giờ muốn nhận <span class="text-rose">*</span></label>
+          <input type="datetime-local" id="desiredDate" class="form-control" required>
+          <div class="invalid-feedback">Vui lòng chọn thời gian, ít nhất 1 ngày kể từ bây giờ.</div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-forest btn-lg px-5" id="submitBtn">
+          Đăng lên diễn đàn <i class="fa-solid fa-arrow-right ms-1"></i>
+        </button>
+        <p class="small text-muted-fw mt-3 mb-0">
+          Sau khi đăng, các Đối tác sẽ gửi báo giá. Bạn xem và chọn ở mục "Yêu cầu của tôi".
+        </p>
+      </div>
+    </form>
+  </div>
 </main>
 
 <div id="site-footer"></div>
@@ -33,5 +201,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/design-create-request.js"></script>
 </body>
 </html>

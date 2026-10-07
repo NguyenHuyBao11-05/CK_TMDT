@@ -1,0 +1,64 @@
+
+.request-page { max-width: 860px; }
+.request-page .breadcrumb a { color: var(--fw-forest); text-decoration: none; }
+
+.badge-soft {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  background: var(--fw-sage-soft); color: var(--fw-forest);
+  border-radius: 999px; padding: 5px 12px;
+}
+
+.form-card {
+  background: var(--fw-surface);
+  border: 1px solid var(--fw-line);
+  border-radius: var(--fw-radius);
+  padding: 32px;
+}
+.card-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--fw-sage-soft); color: var(--fw-forest);
+}
+
+.form-label { font-weight: 600; font-size: 14px; }
+.form-control, .form-select { padding: 10px 14px; border-radius: 10px; }
+.form-control:focus, .form-select:focus {
+  border-color: var(--fw-sage);
+  box-shadow: 0 0 0 .2rem rgba(134, 169, 138, .25);
+}
+
+.budget-box { background: var(--fw-cream-2); border-radius: 14px; padding: 20px; }
+.budget-display {
+  background: var(--fw-surface); border-radius: 10px; padding: 8px 16px;
+  font-family: var(--fw-font-serif); font-size: 22px; color: var(--fw-rose);
+  align-self: flex-start; white-space: nowrap;
+}
+.form-range::-webkit-slider-thumb { background: var(--fw-forest); }
+.form-range::-moz-range-thumb { background: var(--fw-forest); }
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.color-option {
+  position: relative; cursor: pointer; text-align: center;
+  border: 1px solid var(--fw-line); border-radius: 12px; padding: 14px 8px;
+  background: var(--fw-surface);
+}
+.color-option input { position: absolute; opacity: 0; }
+.color-dot { display: block; width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 8px; }
+.color-name { display: block; font-size: 13px; font-weight: 600; }
+.color-note { display: block; font-size: 11px; color: var(--fw-muted); }
+.color-option:has(input:checked) { border: 2px solid var(--fw-rose); background: #fff7f5; }
+.color-option:has(input:focus-visible) { outline: 2px solid var(--fw-forest); outline-offset: 2px; }
+
+.upload-box {
+  text-align: center; border: 2px dashed var(--fw-line); border-radius: 14px;
+  padding: 28px 16px; background: var(--fw-cream);
+}
+.image-preview { max-width: 220px; max-height: 220px; border-radius: 10px; object-fit: cover; }
+
+@media (max-width: 575.98px) {
+  .form-card { padding: 20px; }
+}
