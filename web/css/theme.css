@@ -106,6 +106,24 @@ h1, h2, h3, .h1, .h2, .h3 {
   background: var(--fw-rose); color: #fff; border-radius: 999px; padding: 1px 5px;
 }
 
+/* ---------- Sidebar ---------- */
+.sidebar {
+    padding-top: 16px;
+    width: 250px;
+    min-height: 100vh;
+    background: #ffffff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1021;
+}
+
+.sidebar .box-logo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* ---------- Hero ---------- */
 .hero { position: relative; overflow: hidden; padding: 72px 0 96px; }
 .hero::before {
