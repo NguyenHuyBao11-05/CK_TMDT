@@ -164,6 +164,7 @@
     await Promise.all([
       loadPartial('site-header', 'partials/header.html'),
       loadPartial('site-footer', 'partials/footer.html'),
+      loadPartial('sidebar', 'partials/portal-sidebar.html'),
     ])
     resolveLinks()
     highlightNav()
