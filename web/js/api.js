@@ -1,8 +1,19 @@
+/* =====================================================================
+   api.js — MỌI chỗ lấy dữ liệu đều đi qua đây.
+   Hiện tại trả DỮ LIỆU GIẢ. Khi có backend Spring Boot, chỉ cần sửa thân
+   từng hàm thành fetch('/api/...') — các trang không phải sửa gì.
+
+   Tên field bám theo docs/schema.sql: view v_best_seller_products / v_new_products
+   (id, name, material, price, discount_price, thumbnail_url, ...),
+   cộng partner_name & rating mà API sẽ join từ users / reviews.
+   Cần load SAU common.js (dùng FW.url).
+   ===================================================================== */
 (function () {
   'use strict'
 
   const img = (file) => FW.url(`images/flowers/${file}`)
 
+  // material khớp giá trị gợi ý trong schema: 'Hoa thật' | 'Hoa nhung' | 'Hoa giấy'
   const MATERIALS = ['Hoa thật', 'Hoa nhung', 'Hoa giấy']
 
   const BEST_SELLERS = [
@@ -23,41 +34,54 @@
     { id: 12, name: "Bó Hoa 'Hương Sắc Mùa Thu' — bản mini", material: 'Hoa thật', price: 890000, discount_price: null, thumbnail_url: img('autumn-bowl.jpg'), partner_name: "Atelier L'Amour", rating: 4.8, badge: 'new' },
   ]
 
+  // Giả lập độ trễ mạng để giao diện "đang tải" hiện ra giống thật
   const fake = (data) => new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), 150))
+
+  const ALL_PRODUCTS = [...BEST_SELLERS, ...NEW_PRODUCTS]  // NÊN
+  const VOUCHERS = [  // NÊN — type: PERCENT | AMOUNT
+    { code: 'GIAM10', type: 'PERCENT', value: 10, min_order: 500000 },
+    { code: 'HOA50K', type: 'AMOUNT', value: 50000, min_order: 300000 },
+  ]
 
   window.FW_API = {
     MATERIALS,
 
+    // Sau này: return fetch('/api/products/best-sellers').then(r => r.json())
     getBestSellers() {
       return fake(BEST_SELLERS)
     },
 
+    // Sau này: return fetch('/api/products/new').then(r => r.json())
     getNewProducts() {
       return fake(NEW_PRODUCTS)
     },
+
+    // ===================== NÊN — Luồng mua hàng (KH01–KH04, KH08–KH09) =====================
+    // Sau này: fetch('/api/products?q=&material=&min=&max=&sort=')
+    getProducts({ q = '', materials = [], min = 0, max = Infinity, sort = 'popular' } = {}) {
+      const eff = (p) => p.discount_price ?? p.price
+      const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      let list = ALL_PRODUCTS.filter((p) =>
+          (!q || norm(p.name + ' ' + p.partner_name).includes(norm(q))) &&
+          (materials.length === 0 || materials.includes(p.material)) &&
+          eff(p) >= min && eff(p) <= max)
+      const by = { 'price-asc': (a, b) => eff(a) - eff(b), 'price-desc': (a, b) => eff(b) - eff(a), rating: (a, b) => b.rating - a.rating }[sort]
+      if (by) list = list.sort(by)
+      return fake(list)
+    },
+    getProductById(id) {
+      return fake(ALL_PRODUCTS.find((p) => p.id === Number(id)) || null)
+    },
+    getProductsByIds(ids) {
+      return fake(ALL_PRODUCTS.filter((p) => ids.map(Number).includes(p.id)))
+    },
+    // KH03 - Áp voucher. Sau này: fetch('/api/vouchers/validate', { method: 'POST', ... })
+    validateVoucher(code, subtotal) {
+      const v = VOUCHERS.find((x) => x.code === String(code).trim().toUpperCase())
+      if (!v) return fake({ ok: false, message: 'Mã voucher không tồn tại.' })
+      if (subtotal < v.min_order) return fake({ ok: false, message: `Đơn tối thiểu ${FW.formatVnd(v.min_order)} để dùng mã này.` })
+      const discount = v.type === 'PERCENT' ? Math.round(subtotal * v.value / 100) : v.value
+      return fake({ ok: true, code: v.code, discount: Math.min(discount, subtotal) })
+    },
   }
 })()
-
-const DESIGN_REQUEST_KEY = 'fw_design_requests'
-
-function getDesignRequests() {
-  try {
-    return JSON.parse(localStorage.getItem(DESIGN_REQUEST_KEY)) || []
-  } catch (e) {
-    return []
-  }
-}
-
-function saveDesignRequest(request) {
-  const list = getDesignRequests()
-  request.id = Date.now()
-  request.status = 'OPEN'
-  request.created_at = new Date().toISOString()
-  list.push(request)
-  try {
-    localStorage.setItem(DESIGN_REQUEST_KEY, JSON.stringify(list))
-    return true
-  } catch (e) {
-    return false
-  }
-}
