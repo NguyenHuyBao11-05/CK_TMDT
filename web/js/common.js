@@ -1,25 +1,41 @@
+/* =====================================================================
+   common.js — JS dùng chung cho MỌI trang. Gắn ở cuối <body>:
+     <script src="(đường dẫn tới)js/common.js"></script>
+   Việc nó làm:
+     1. Chèn header/footer dùng chung vào #site-header, #site-footer
+     2. Đổi data-href="..." thành link đúng, dù trang nằm ở thư mục nào
+     3. Tô sáng menu theo <body data-nav="...">
+     4. Cung cấp các hàm tiện ích qua đối tượng FW (FW.formatVnd, FW.toast...)
+   ===================================================================== */
 (function () {
   'use strict'
 
+  // Thư mục gốc của web = thư mục cha của js/. Tính từ chính đường dẫn file này,
+  // nên chạy bằng WebStorm (localhost:63342/CK_TMDT/web/...), Live Server hay
+  // Spring Boot (localhost:8080/...) đều ra đúng.
   const BASE = new URL('..', document.currentScript.src).href
 
   const FW = {
     BASE,
 
+    /** Đường dẫn tính từ thư mục gốc web/ → URL đầy đủ. VD: FW.url('shop/cart.html') */
     url(path) {
       return new URL(path, BASE).href
     },
 
+    /** 1450000 → "1.450.000 đ" (giá trong CSDL là DECIMAL(12,0), đơn vị đồng) */
     formatVnd(amount) {
       return new Intl.NumberFormat('vi-VN').format(amount) + ' đ'
     },
 
+    /** Chống chèn mã HTML khi đưa dữ liệu (tên sản phẩm, bình luận...) vào innerHTML */
     escapeHtml(value) {
       return String(value ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
     },
 
+    /** Hiện thông báo nhỏ góc dưới bên phải */
     toast(message) {
       let box = document.getElementById('fwToastBox')
       if (!box) {
@@ -40,6 +56,10 @@
       t.show()
     },
 
+    /**
+     * Vẽ 1 thẻ sản phẩm (HTML string). Dùng ở trang chủ, danh sách sản phẩm...
+     * product: { id, name, material, price, discount_price, thumbnail_url, partner_name, rating, badge }
+     */
     renderProductCard(p) {
       const e = FW.escapeHtml
       const hasDiscount = p.discount_price != null && p.discount_price < p.price
@@ -66,6 +86,7 @@
                 <span class="product-price">${FW.formatVnd(hasDiscount ? p.discount_price : p.price)}</span>
                 ${hasDiscount ? `<span class="product-old-price">${FW.formatVnd(p.price)}</span>` : ''}
               </div>
+              <!-- KH02 - Thêm vào giỏ hàng -->
               <button type="button" class="btn btn-cart" data-add-to-cart="${e(p.id)}"
                       data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ">
                 <i class="fa-solid fa-cart-plus"></i>
@@ -75,16 +96,37 @@
         </article>`
     },
 
+    /**
+     * Giỏ hàng TẠM (localStorage, lưu từng dòng: { product_id, quantity, quote_id? }).
+     * Khi có backend: thay bằng API giỏ hàng (KH02), chỉ cần sửa trong đây.
+     * quote_id dùng cho dòng hàng đến từ báo giá thiết kế riêng của Bảo.
+     */
     cart: {
-      count() {
-        try { return Number(localStorage.getItem('fw_cart_count')) || 0 } catch { return 0 }
+      items() {
+        try { return JSON.parse(localStorage.getItem('fw_cart_items')) || [] } catch { return [] }
       },
-      add(productId, name) {
-        const next = FW.cart.count() + 1
-        try { localStorage.setItem('fw_cart_count', String(next)) } catch {}
+      save(items) {
+        try { localStorage.setItem('fw_cart_items', JSON.stringify(items)) } catch { /* bị chặn → bỏ qua */ }
         FW.cart.renderBadge()
+      },
+      count() {
+        return FW.cart.items().reduce((n, i) => n + i.quantity, 0)
+      },
+      add(productId, name, quantity = 1) {
+        const items = FW.cart.items()
+        const line = items.find((i) => i.product_id === Number(productId) && !i.quote_id)
+        if (line) line.quantity += quantity
+        else items.push({ product_id: Number(productId), quantity })
+        FW.cart.save(items)
         FW.toast(`Đã thêm "${name}" vào giỏ hàng`)
       },
+      setQty(productId, quantity) {
+        FW.cart.save(FW.cart.items().map((i) => (i.product_id === productId ? { ...i, quantity: Math.max(1, quantity) } : i)))
+      },
+      remove(productId) {
+        FW.cart.save(FW.cart.items().filter((i) => i.product_id !== productId))
+      },
+      clear() { FW.cart.save([]) },
       renderBadge() {
         const badge = document.getElementById('cartCount')
         if (!badge) return
@@ -95,6 +137,7 @@
     },
   }
 
+  // ---------- Header / footer dùng chung ----------
   async function loadPartial(slotId, file) {
     const slot = document.getElementById(slotId)
     if (!slot) return
@@ -107,6 +150,7 @@
     }
   }
 
+  // Đổi data-href="shop/cart.html" → href đầy đủ
   function resolveLinks(root = document) {
     root.querySelectorAll('[data-href]').forEach((a) => {
       a.href = FW.url(a.dataset.href)
@@ -123,6 +167,7 @@
   }
 
   function wireHeader() {
+    // KH01 - Tìm kiếm bó hoa → trang danh sách kèm từ khoá
     const form = document.getElementById('headerSearch')
     form?.addEventListener('submit', (e) => {
       e.preventDefault()
@@ -139,6 +184,7 @@
     FW.cart.renderBadge()
   }
 
+  // Nút "thêm vào giỏ" ở bất kỳ đâu (kể cả thẻ được vẽ sau bằng JS)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-add-to-cart]')
     if (btn) FW.cart.add(btn.dataset.addToCart, btn.dataset.name)
