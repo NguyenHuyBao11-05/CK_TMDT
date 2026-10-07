@@ -16,8 +16,8 @@
 
     escapeHtml(value) {
       return String(value ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
     },
 
     toast(message) {
@@ -76,15 +76,31 @@
     },
 
     cart: {
-      count() {
-        try { return Number(localStorage.getItem('fw_cart_count')) || 0 } catch { return 0 }
+      items() {
+        try { return JSON.parse(localStorage.getItem('fw_cart_items')) || [] } catch { return [] }
       },
-      add(productId, name) {
-        const next = FW.cart.count() + 1
-        try { localStorage.setItem('fw_cart_count', String(next)) } catch {}
+      save(items) {
+        try { localStorage.setItem('fw_cart_items', JSON.stringify(items)) } catch {}
         FW.cart.renderBadge()
+      },
+      count() {
+        return FW.cart.items().reduce((n, i) => n + i.quantity, 0)
+      },
+      add(productId, name, quantity = 1) {
+        const items = FW.cart.items()
+        const line = items.find((i) => i.product_id === Number(productId) && !i.quote_id)
+        if (line) line.quantity += quantity
+        else items.push({ product_id: Number(productId), quantity })
+        FW.cart.save(items)
         FW.toast(`Đã thêm "${name}" vào giỏ hàng`)
       },
+      setQty(productId, quantity) {
+        FW.cart.save(FW.cart.items().map((i) => (i.product_id === productId ? { ...i, quantity: Math.max(1, quantity) } : i)))
+      },
+      remove(productId) {
+        FW.cart.save(FW.cart.items().filter((i) => i.product_id !== productId))
+      },
+      clear() { FW.cart.save([]) },
       renderBadge() {
         const badge = document.getElementById('cartCount')
         if (!badge) return

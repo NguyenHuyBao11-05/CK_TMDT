@@ -25,6 +25,12 @@
 
   const fake = (data) => new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), 150))
 
+  const ALL_PRODUCTS = [...BEST_SELLERS, ...NEW_PRODUCTS]
+  const VOUCHERS = [
+    { code: 'GIAM10', type: 'PERCENT', value: 10, min_order: 500000 },
+    { code: 'HOA50K', type: 'AMOUNT', value: 50000, min_order: 300000 },
+  ]
+
   window.FW_API = {
     MATERIALS,
 
@@ -34,6 +40,31 @@
 
     getNewProducts() {
       return fake(NEW_PRODUCTS)
+    },
+
+    getProducts({ q = '', materials = [], min = 0, max = Infinity, sort = 'popular' } = {}) {
+      const eff = (p) => p.discount_price ?? p.price
+      const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      let list = ALL_PRODUCTS.filter((p) =>
+          (!q || norm(p.name + ' ' + p.partner_name).includes(norm(q))) &&
+          (materials.length === 0 || materials.includes(p.material)) &&
+          eff(p) >= min && eff(p) <= max)
+      const by = { 'price-asc': (a, b) => eff(a) - eff(b), 'price-desc': (a, b) => eff(b) - eff(a), rating: (a, b) => b.rating - a.rating }[sort]
+      if (by) list = list.sort(by)
+      return fake(list)
+    },
+    getProductById(id) {
+      return fake(ALL_PRODUCTS.find((p) => p.id === Number(id)) || null)
+    },
+    getProductsByIds(ids) {
+      return fake(ALL_PRODUCTS.filter((p) => ids.map(Number).includes(p.id)))
+    },
+    validateVoucher(code, subtotal) {
+      const v = VOUCHERS.find((x) => x.code === String(code).trim().toUpperCase())
+      if (!v) return fake({ ok: false, message: 'Mã voucher không tồn tại.' })
+      if (subtotal < v.min_order) return fake({ ok: false, message: `Đơn tối thiểu ${FW.formatVnd(v.min_order)} để dùng mã này.` })
+      const discount = v.type === 'PERCENT' ? Math.round(subtotal * v.value / 100) : v.value
+      return fake({ ok: true, code: v.code, discount: Math.min(discount, subtotal) })
     },
   }
 })()
