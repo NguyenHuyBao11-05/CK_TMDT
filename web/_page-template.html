@@ -1,23 +1,10 @@
 <!doctype html>
-<!--
-  ===== FILE MẪU — COPY FILE NÀY KHI TẠO TRANG MỚI =====
-  Dành cho trang nằm trong thư mục con: shop/, account/, design/, partner/, admin/
-  (vì vậy mọi đường dẫn bắt đầu bằng ../).
 
-  Cần sửa 4 chỗ có ghi  ← SỬA :
-    1. <title>
-    2. <body data-nav="...">  : home | products | design  (để tô sáng menu; trang không có trên menu thì xoá)
-    3. Nội dung trong <main>
-    4. File JS riêng của trang ở cuối (js/pages/ten-trang.js), ghi mã use case ở đầu file
-
-  Header, footer tự được chèn vào — KHÔNG copy header/footer vào trang.
-  Link tới trang khác: viết đường dẫn tương đối, vd từ shop/cart.html sang account/login.html là ../account/login.html
--->
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tên trang — Fw12 Floral</title> <!-- ← SỬA -->
+  <title>Tên trang — Fw12 Floral</title>
   <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
@@ -27,12 +14,11 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
 </head>
-<body data-nav=""> <!-- ← SỬA -->
+<body data-nav="">
 
 <div id="site-header"></div>
 
 <main>
-  <!-- ← SỬA: nội dung trang -->
   <section class="coming-soon">
     <div class="container">
       <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
@@ -48,6 +34,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
-<!-- <script src="../js/pages/ten-trang.js"></script>  ← SỬA: JS riêng của trang -->
 </body>
 </html>

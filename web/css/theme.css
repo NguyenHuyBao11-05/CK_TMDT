@@ -1,8 +1,8 @@
-/* =====================================================================
+/*
    Theme Fw12 Floral — màu & font theo mockup Figma
-   Dùng chung cho MỌI trang. Muốn đổi màu thì sửa biến --fw-... ở đây,
+   Dùng chung cho MỌI trang.
    không đặt mã màu trực tiếp trong từng trang.
-   ===================================================================== */
+   */
 :root {
   --fw-cream: #f8f6f1;
   --fw-cream-2: #f1eee7;
@@ -26,7 +26,6 @@
   --fw-radius: 16px;
   --fw-shadow: 0 10px 30px rgba(30, 42, 35, 0.08);
 
-  /* Ghi đè biến Bootstrap để component Bootstrap tự ăn theo theme */
   --bs-body-font-family: var(--fw-font-sans);
   --bs-body-color: var(--fw-ink);
   --bs-body-bg: var(--fw-cream);
@@ -55,7 +54,6 @@ h1, h2, h3, .h1, .h2, .h3 {
 .text-rose { color: var(--fw-rose) !important; }
 .text-forest { color: var(--fw-forest) !important; }
 
-/* Nhãn nhỏ viết hoa phía trên tiêu đề section */
 .eyebrow {
   font-size: 11px;
   font-weight: 600;
@@ -67,7 +65,6 @@ h1, h2, h3, .h1, .h2, .h3 {
 .section { padding: 88px 0; }
 .section-alt { background: var(--fw-cream-2); }
 
-/* ---------- Buttons ---------- */
 .btn { border-radius: 999px; font-weight: 600; font-size: 14px; padding: 10px 22px; }
 .btn-peach { background: var(--fw-peach); color: var(--fw-ink); border: 0; }
 .btn-peach:hover, .btn-peach:focus-visible { background: var(--fw-peach-dark); color: var(--fw-ink); }
@@ -76,7 +73,6 @@ h1, h2, h3, .h1, .h2, .h3 {
 .btn-ghost { background: var(--fw-surface); color: var(--fw-ink); border: 1px solid var(--fw-line); }
 .btn-ghost:hover { background: var(--fw-cream-2); color: var(--fw-ink); }
 
-/* ---------- Header ---------- */
 .site-header {
   background: rgba(248, 246, 241, 0.92);
   backdrop-filter: blur(8px);
@@ -156,7 +152,6 @@ h1, h2, h3, .h1, .h2, .h3 {
 }
 .hero-product-card img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; }
 
-/* ---------- Process steps ---------- */
 .step-card {
   background: var(--fw-surface); border-radius: var(--fw-radius); padding: 28px;
   height: 100%; border: 1px solid var(--fw-line);
@@ -174,7 +169,6 @@ h1, h2, h3, .h1, .h2, .h3 {
 .step-card p { color: var(--fw-muted); font-size: 14px; margin-bottom: 18px; }
 .step-foot { font-size: 12.5px; font-weight: 600; }
 
-/* ---------- Product card (vẽ bằng FW.renderProductCard trong common.js) ---------- */
 .product-card {
   background: var(--fw-surface); border-radius: var(--fw-radius); padding: 10px;
   border: 1px solid var(--fw-line); height: 100%; display: flex; flex-direction: column;
@@ -209,14 +203,11 @@ h1, h2, h3, .h1, .h2, .h3 {
 }
 .btn-cart:hover { background: var(--fw-forest-dark); color: #fff; }
 
-/* ---------- Material filter tabs ---------- */
 .material-tabs .btn { padding: 7px 16px; font-weight: 500; }
 .material-tabs .btn.active { background: var(--fw-forest); color: #fff; border-color: var(--fw-forest); }
 
-/* ---------- Custom design CTA ---------- */
 .custom-cta { background: var(--fw-sage-soft); border-radius: 24px; }
 
-/* ---------- Partner CTA ---------- */
 .partner-cta {
   position: relative; overflow: hidden; background: var(--fw-sage); color: #fff;
   border-radius: 28px; padding: 64px 56px;
@@ -233,7 +224,6 @@ h1, h2, h3, .h1, .h2, .h3 {
   color: rgba(255, 255, 255, .12); pointer-events: none;
 }
 
-/* ---------- Footer ---------- */
 .site-footer { background: var(--fw-cream-2); border-top: 1px solid var(--fw-line); padding: 64px 0 24px; }
 .site-footer h5 { font-family: var(--fw-font-serif); font-size: 17px; margin-bottom: 16px; }
 .site-footer p, .site-footer li, .site-footer a { font-size: 13.5px; color: var(--fw-muted); }
@@ -246,11 +236,9 @@ h1, h2, h3, .h1, .h2, .h3 {
 .footer-input { border-radius: 999px; font-size: 14px; padding: 10px 16px; }
 .footer-bottom { border-top: 1px solid var(--fw-line); margin-top: 48px; padding-top: 20px; font-size: 12.5px; }
 
-/* ---------- Trang đang phát triển ---------- */
 .coming-soon { padding: 120px 0; text-align: center; }
 .coming-soon .icon { font-size: 44px; color: var(--fw-sage); }
 
-/* ---------- Toast thông báo (FW.toast) ---------- */
 .fw-toast { background: var(--fw-forest); color: #fff; border: 0; }
 
 @media (max-width: 991.98px) {
