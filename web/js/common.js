@@ -165,10 +165,13 @@
       loadPartial('site-header', 'partials/header.html'),
       loadPartial('site-footer', 'partials/footer.html'),
       loadPartial('sidebar', 'partials/portal-sidebar.html'),
+      loadPartial('admin-sidebar', 'partials/admin-sidebar.html'),
+      loadPartial('admin-topbar', 'partials/admin-topbar.html'),
     ])
     resolveLinks()
     highlightNav()
     wireHeader()
+    document.dispatchEvent(new Event('fw:partials-loaded'))
   }
 
   window.FW = FW
