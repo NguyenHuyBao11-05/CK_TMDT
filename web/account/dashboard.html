@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>dashboard — Fw12 Floral</title>
+    <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/portal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+<div id="site-header"></div>
+<div id="sidebar"></div>
+
+<main>
+    <section class="section-header">
+        <div class="container">
+            <div class="texts">
+                <h1 class="hello-text">Xin chào, User</h1>
+                <span>Chào mừng bạn trở lại! Bạn có <span class="new-design-text">1 đơn hàng</span> đang trên đường giao và <span
+                        class="new-price-text">3 đề xuất báo giá mới</span> từ các nghệ nhân cắm hoa.</span>
+            </div>
+            <a class="button-normal-design" href=""><i class="fa-solid fa-store"></i> Đặt hoa mẫu có sẵn</a>
+            <a class="button-new-design" href=""><i class="fa-regular fa-lightbulb"></i> Tạo yêu cầu cắm hoa mới</a>
+        </div>
+    </section>
+    <section class="section-statuses">
+        <div class="container all-orders">
+            <div class="top-box">
+                <div class="top-left">
+                    <span class="top-text">TỔNG ĐƠN ĐÃ ĐẶT</span>
+                    <div class="number-unit">
+                        <span class="number">18</span>
+                        <span class="unit">đơn</span>
+                    </div>
+                </div>
+                <div class="top-right">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+            </div>
+            <span><i class="fa-solid fa-arrow-trend-up"></i> +3 đơn trong tháng này</span>
+        </div>
+        <div class="container delivery-orders">
+            <div class="top-box">
+                <div class="top-left">
+                    <span class="top-text">ĐƠN ĐANG GIAO</span>
+                    <div class="number-unit">
+                        <span class="number">01</span>
+                        <span class="unit">đơn</span>
+                    </div>
+                </div>
+                <div class="top-right">
+                    <span>Đang vận chuyển</span>
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+            </div>
+            <span><i class="fa-regular fa-clock"></i> Dự kiến giao trước 11:30 hôm nay</span>
+        </div>
+        <div class="container pricing-orders">
+            <div class="top-box">
+                <div class="top-left">
+                    <span class="top-text">YÊU CẦU THIẾT KẾ CHỜ BÁO GIÁ</span>
+                    <div class="number-unit">
+                        <span class="number">02</span>
+                        <span class="unit">yêu cầu</span>
+                    </div>
+                </div>
+                <div class="top-right">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+            </div>
+            <span><i class="fa-regular fa-envelope"></i> Có 3 shop vừa gửi đề xuất giá mới</span>
+        </div>
+    </section>
+    <section class="section-recent-orders">
+        <div class="container">
+            <div class="texts">
+                <h1><i class="fa-solid fa-file-lines"></i>  Đơn hàng gần đây nhất</h1>
+                <a>Xem tất cả lịch sử <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="list-orders">
+                <div class="sub-header">
+                    <span>MÃ ĐƠN</span>
+                    <span>NGÀY ĐẶT</span>
+                    <span>LOẠI ĐƠN HÀNG</span>
+                    <span>SẢN PHẨM / YÊU CẦU</span>
+                    <span>TỔNG TIỀN</span>
+                    <span>TRẠNG THÁI</span>
+                    <span class="sub-action">THAO TÁC</span>
+                </div>
+                <div class="lists">
+                    <div class="list-item normal-design">
+                        <span class="order-id"><i class="fa-solid fa-fan"></i> #FW-202410</span>
+                        <span class="date-ordered">24/05/2025</span>
+                        <span class="order-type normal-design">Mẫu có sẵn</span>
+                        <div class="order-name">
+                            <span class="item-name">Bó hoa Tulip trắng Serenity x1</span>
+                            <span class="subtitle">Bộ kèm thiệp chúc mừng</span>
+                        </div>
+                        <div class="total-money">
+                            <span class="money">850.000đ</span>
+                        </div>
+                        <div class="product-statutes">
+                            <span class="item-status delivery"><i class="fa-solid fa-circle"></i> Đang giao hàng</span>
+                            <span class="shipper-name">FWExpress - Shipper Tuấn</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="follow-button"><i class="fa-solid fa-location-dot"></i> Theo dõi</button>
+                            <i class="fa-solid fa-eye"></i>
+                        </div>
+                    </div>
+                    <div class="list-item new-design">
+                        <span class="order-id"><i class="fa-solid fa-pen"></i> #YC-8921</span>
+                        <span class="date-ordered">22/05/2025</span>
+                        <span class="order-type new-design">Thiết kế riêng</span>
+                        <div class="order-name">
+                            <span class="item-name">Bó hoa kỷ niệm ngày cưới pastel</span>
+                            <span class="subtitle">Florist Thảo Điền Atelier nhận</span>
+                        </div>
+                        <div class="total-money">
+                            <span class="money">1.450.000đ</span>
+                            <span class="has-paid">Đã cọc 100%</span>
+                        </div>
+                        <div class="product-statutes">
+                            <span class="item-status is-doing"><i class="fa-solid fa-circle"></i> Đang hoàn thiện</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="see-image-button"><i class="fa-solid fa-camera"></i> Xem ảnh</button>
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+                    </div>
+                    <div class="list-item delivered">
+                        <span class="order-id"><i class="fa-solid fa-fan"></i> #FW-1998824</span>
+                        <span class="date-ordered">11/05/2025</span>
+                        <span class="order-type normal-design">Mẫu có sẵn</span>
+                        <div class="order-name">
+                            <span class="item-name">Giỏ hoa để bàn Sunshine Rose</span>
+                            <span class="subtitle">Tone vàng cam ấm</span>
+                        </div>
+                        <div class="total-money">
+                            <span class="money">850.000đ</span>
+                        </div>
+                        <div class="product-statutes">
+                            <span class="item-status delivered"><i class="fa-solid fa-circle"></i> Đã nhận hàng</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="review-button"><i class="fa-regular fa-star"></i> Đánh giá</button>
+                            <button class="reorder-button">Đặt lại</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-pricing-orders">
+        <div class="texts">
+            <div class="left-text">
+                <h1><i class="fa-solid fa-paintbrush"></i>  Yêu cầu thiết kế đang chờ báo giá</h1>
+                <span>2 yêu cầu đang mở</span>
+            </div>
+            <a>Quản lý tất cả yêu cầu <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="container">
+            <div class="upper-text">
+                <span class="order-id">MÃ #YC-8921</span>
+                <span class="time-remain"><i class="fa-regular fa-clock"></i> Hạn chót: Còn 14 giờ</span>
+            </div>
+            <h1 class="order-name">Bó hoa kỷ niệm ngày cưới tone hồng pastel ngọt ngào, dáng bay tự nhiên</h1>
+            <div class="order-specification">
+                <div class="order-spec">
+                    <span class="spec-title">Ngân sách dự kiến</span>
+                    <span class="spec-money">1.500.000đ</span>
+                </div>
+                <div class="order-spec">
+                    <span class="spec-title">Dịp tặng</span>
+                    <span>Kỷ niệm ngày cưới</span>
+                </div>
+                <div class="order-spec">
+                    <span class="spec-title">Tone màu</span>
+                    <span>Hồng pastel kem</span>
+                </div>
+            </div>
+            <div class="potential-florists">
+                <div class="upper-text">
+                    <span class="left-text">Đã nhận 3 đề xuất báo giá</span>
+                    <span class="right-text">+3 báo giá mới</span>
+                </div>
+                <div class="list-florists">
+                    <div class="lists">
+                        <button class="florist">TD</button>
+                        <button class="florist">NF</button>
+                        <button class="florist">LA</button>
+                    </div>
+                    <span>Florist Thảo Điền Atelier, Nhiên Floral, L'Amour...</span>
+                </div>
+            </div>
+            <div class="final-texts">
+                <span class="date-created">Tạo ngày: 22/05/2025</span>
+                <a class="choose-price-button">Xem & Chọn báo giá (3)</a>
+            </div>
+        </div>
+    </section>
+    <section class="section-complaints">
+        <div class="left-box">
+            <i class="fa-solid fa-shield"></i>
+            <div class="texts">
+                <div class="upper-text">
+                    <h1>Cam kết chất lượng Botanical Serenity</h1>
+                    <span>Đổi trả 100%</span>
+                </div>
+                <span>Bạn gặp vấn đề với đơn hoa đã nhận? Fw12 cam kết hoàn tiền hoặc cắm lại miễn phí nếu hoa không đúng cam kết hoặc bị dập nát quá trình giao nhận.</span>
+            </div>
+        </div>
+        <button class="send-complaint-button"><i class="fa-solid fa-shield-halved"></i> Gửi khiếu nại</button>
+        <button class="phone-button"><i class="fa-solid fa-phone"></i> Hotline 1900 5868</button>
+    </section>
+</main>
+
+<script src="../js/common.js"></script>
+</body>
+</html>
