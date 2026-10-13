@@ -48,3 +48,11 @@
 .commit-box { background: #edf6ef; border-radius: 12px; padding: 12px 12px 12px 36px; }
 
 #quoteModal .form-control { border-radius: 10px; padding: 10px 14px; }
+
+.partner-tabs { display: inline-flex; gap: 4px; background: var(--fw-cream-2); border-radius: 999px; padding: 4px; }
+.partner-tabs a {
+  border-radius: 999px; padding: 8px 18px; font-size: 14px; font-weight: 600;
+  color: var(--fw-muted); text-decoration: none;
+}
+.partner-tabs a:hover { color: var(--fw-ink); }
+.partner-tabs a.active { background: var(--fw-surface); color: var(--fw-forest); box-shadow: 0 2px 6px rgba(0, 0, 0, .06); }
