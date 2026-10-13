@@ -12,26 +12,122 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/portal.css">
+  <link rel="stylesheet" href="../css/design-my-requests.css">
 </head>
 <body>
 
+<div id="sidebar"></div>
 <div id="site-header"></div>
 
-<main>
-  <section class="coming-soon">
-    <div class="container">
-      <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-      <h1 class="h2">Yêu cầu thiết kế của tôi</h1>
-      <p class="text-muted-fw">Trang này đang được phát triển.</p>
-      <a href="../index.html" class="btn btn-forest mt-2">Về trang chủ</a>
+<main class="py-5">
+  <div class="container">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+      <div>
+        <div class="eyebrow mb-2"><i class="fa-solid fa-circle me-1" style="font-size: 6px"></i>Thiết kế hoa theo yêu cầu</div>
+        <h1 class="display-6 mb-2">Yêu cầu thiết kế riêng của bạn</h1>
+        <p class="text-muted-fw mb-0">Theo dõi các yêu cầu đã đăng, xem báo giá từ các shop và tiến độ thực hiện.</p>
+      </div>
+      <a href="create-request.html" class="btn btn-peach flex-shrink-0">
+        <i class="fa-solid fa-plus me-1"></i>Đăng yêu cầu mới
+      </a>
     </div>
-  </section>
+
+    <div class="row g-3 mb-5">
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div>
+            <div class="summary-label">Đang nhận báo giá</div>
+            <div class="summary-value" id="countOpen">0</div>
+          </div>
+          <span class="summary-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div>
+            <div class="summary-label">Đã chọn shop</div>
+            <div class="summary-value" id="countConfirmed">0</div>
+          </div>
+          <span class="summary-icon rose"><i class="fa-solid fa-store"></i></span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="summary-card">
+          <div>
+            <div class="summary-label">Đã huỷ</div>
+            <div class="summary-value" id="countCancelled">0</div>
+          </div>
+          <span class="summary-icon gray"><i class="fa-solid fa-ban"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <h2 class="h3 mb-0">Danh sách yêu cầu</h2>
+      <div class="filter-chips">
+        <span class="small text-muted-fw me-1">Lọc theo:</span>
+        <button type="button" class="active">Tất cả</button>
+        <button type="button">Đang nhận báo giá</button>
+        <button type="button">Đã chọn shop</button>
+        <button type="button">Đã huỷ</button>
+      </div>
+    </div>
+
+    <div id="requestList"></div>
+
+    <section class="tips-box mt-5">
+      <div class="eyebrow text-rose mb-2"><i class="fa-regular fa-lightbulb me-1"></i>Kinh nghiệm đặt hoa</div>
+      <h2 class="h3 mb-4">3 bí quyết để nhận được báo giá ưng ý</h2>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="tip-card">
+            <span class="tip-no">01</span>
+            <h3 class="h5 mt-3">Đính kèm ảnh tham khảo</h3>
+            <p class="small text-muted-fw mb-0">Một bức ảnh về màu sắc, kiểu dáng bạn thích giúp shop hiểu ý tưởng nhanh hơn nhiều so với chỉ mô tả bằng chữ.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tip-card">
+            <span class="tip-no">02</span>
+            <h3 class="h5 mt-3">Đặt ngân sách thực tế</h3>
+            <p class="small text-muted-fw mb-0">Shop sẽ chọn loại hoa phù hợp với số tiền bạn đưa ra. Ngân sách rõ ràng giúp báo giá sát hơn và tránh phát sinh.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tip-card">
+            <span class="tip-no">03</span>
+            <h3 class="h5 mt-3">Xem ảnh thật trước khi giao</h3>
+            <p class="small text-muted-fw mb-0">Shop gửi ảnh bó hoa hoàn thành trước khi giao. Bạn theo dõi được trong mục đơn hàng.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </main>
+
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <i class="fa-solid fa-triangle-exclamation fa-2x text-rose mb-3"></i>
+        <h2 class="h5" id="cancelTitle">Huỷ yêu cầu <span id="cancelCode"></span>?</h2>
+        <p class="small text-muted-fw mb-4">Yêu cầu sẽ bị gỡ khỏi diễn đàn và các shop đã báo giá sẽ nhận được thông báo.</p>
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Quay lại</button>
+          <button type="button" class="btn btn-danger rounded-pill" id="cancelConfirmBtn">Huỷ yêu cầu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="site-footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/design-my-requests.js"></script>
 </body>
 </html>
