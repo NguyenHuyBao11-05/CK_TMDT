@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Báo giá đã gửi — Fw12 Floral</title>
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/design-forum.css">
+  <link rel="stylesheet" href="../css/design-sent-quotes.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="py-5">
+  <div class="container">
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item">Kênh Đối tác</li>
+        <li class="breadcrumb-item active" aria-current="page">Báo giá đã gửi</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+      <div>
+        <div class="eyebrow mb-2"><i class="fa-solid fa-circle-check me-1"></i>Dành cho Đối tác</div>
+        <h1 class="display-6 mb-2">Báo giá đã gửi</h1>
+        <p class="text-muted-fw mb-0">Theo dõi các báo giá bạn đã gửi trên diễn đàn: báo giá nào đang chờ, được khách chọn hay bị từ chối.</p>
+      </div>
+      <div class="partner-chip">
+        <i class="fa-solid fa-store me-1"></i>Đang đăng nhập: <strong>Florist Thảo Điền Atelier</strong>
+      </div>
+    </div>
+
+    <div class="partner-tabs mb-4">
+      <a href="forum.html"><i class="fa-solid fa-layer-group me-1"></i>Diễn đàn yêu cầu</a>
+      <a href="sent-quotes.html" class="active"><i class="fa-solid fa-paper-plane me-1"></i>Báo giá đã gửi</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="quote-stat">
+          <span class="quote-stat-icon"><i class="fa-solid fa-paper-plane"></i></span>
+          <div><div class="quote-stat-value" id="countAll">0</div><div class="quote-stat-label">Tổng báo giá</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="quote-stat">
+          <span class="quote-stat-icon gold"><i class="fa-regular fa-hourglass-half"></i></span>
+          <div><div class="quote-stat-value" id="countPending">0</div><div class="quote-stat-label">Chờ khách chọn</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="quote-stat">
+          <span class="quote-stat-icon green"><i class="fa-solid fa-circle-check"></i></span>
+          <div><div class="quote-stat-value" id="countSelected">0</div><div class="quote-stat-label">Được chọn</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="quote-stat">
+          <span class="quote-stat-icon rose"><i class="fa-solid fa-circle-xmark"></i></span>
+          <div><div class="quote-stat-value" id="countRejected">0</div><div class="quote-stat-label">Bị từ chối</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-panel">
+      <div class="quote-toolbar d-flex flex-column flex-md-row justify-content-between gap-2">
+        <div class="filter-chips">
+          <button type="button" class="active">Tất cả</button>
+          <button type="button">Chờ khách chọn</button>
+          <button type="button">Được chọn</button>
+          <button type="button">Bị từ chối</button>
+        </div>
+        <input type="search" class="form-control" style="max-width: 280px" placeholder="Tìm theo mã hoặc tên yêu cầu...">
+      </div>
+
+      <div class="table-responsive">
+        <table class="table quote-table">
+          <thead>
+            <tr>
+              <th>Yêu cầu</th>
+              <th>Giá đã báo</th>
+              <th class="d-none d-md-table-cell">Hoàn thành</th>
+              <th class="d-none d-lg-table-cell">Ngày gửi</th>
+              <th>Trạng thái</th>
+              <th class="text-end"></th>
+            </tr>
+          </thead>
+          <tbody id="quoteTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="detailTitle">Chi tiết báo giá</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/pages/design-sent-quotes.js"></script>
+</body>
+</html>
