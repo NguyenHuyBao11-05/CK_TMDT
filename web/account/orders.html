@@ -1,31 +1,184 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lịch sử đơn hàng — Fw12 Floral</title>
-  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lịch sử đơn hàng — Fw12 Floral</title>
+    <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
-  <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/order.css">
+    <link rel="stylesheet" href="../css/portal.css">
 </head>
 <body>
 
 <div id="site-header"></div>
-
+<div id="sidebar"></div>
 <main>
-  <section class="coming-soon">
-    <div class="container">
-      <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-      <h1 class="h2">Lịch sử đơn hàng</h1>
-      <p class="text-muted-fw">Trang này đang được phát triển.</p>
-      <a href="../index.html" class="btn btn-forest mt-2">Về trang chủ</a>
-    </div>
-  </section>
+    <section class="section-start-header">
+        <div class="top-texts">
+            <span class="left-text">BẢO CHỨNG FW12 ESCROW</span>
+            <span class="right-text">Đồng hành cùng 12 xưởng hoa tuyển chọn</span>
+        </div>
+        <div class="middle-texts">
+            <div class="left-texts">
+                <h1>Lịch sử đơn hàng của bạn</h1>
+                <span>Theo dõi hành trình hoa từ lúc Florist cắm, ảnh chụp nghiệm thu trước khi giao đến tay người nhận và quản lý thanh toán ký quỹ Escrow minh bạch.</span>
+            </div>
+            <div class="right-texts">
+                <div class="left-box">
+                    <span class="title">TỔNG ĐƠN NĂM NAY</span>
+                    <span class="number-unit">18 đơn</span>
+                </div>
+                <div class="right-box">
+                    <span class="title">KÝ QUỸ ĐANG GIỮ</span>
+                    <span class="number-unit">3.320.000 đ</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-filter">
+        <div class="list-filters">
+            <div class="filter all active">
+                <a href="#">Tất cả</a>
+                <span>18</span>
+            </div>
+            <div class="filter is-doing">
+                <a href="#">Đang xử lý / Cắm hoa</a>
+                <span>1</span>
+            </div>
+            <div class="filter delivery">
+                <a href="#">Đang giao hàng</a>
+                <span>1</span>
+            </div>
+            <div class="filter finished">
+                <a href="#">Đã hoàn thành</a>
+                <span>15</span>
+            </div>
+            <div class="filter cancelled">
+                <a href="#">Đã hủy / Khiếu nại</a>
+                <span>1</span>
+            </div>
+        </div>
+        <div class="search-box">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <label for="searchOrder"></label>
+                <input type="text" id="searchOrder"
+                       placeholder="Tìm mã đơn (#ORD, #YC), tên hoa, hoa cưới, loài hoa...">
+                <button type="button" id="btnSearch" aria-label="Tìm kiếm">Tìm kiếm</button>
+            </div>
+
+            <div class="recent-dates">
+                <i class="fa-regular fa-calendar"></i>
+                <select id="filterDate" aria-label="Lọc theo thời gian">
+                    <option value="all">Tất cả thời gian</option>
+                    <option value="7days">7 ngày gần đây</option>
+                    <option value="30days">30 ngày gần đây</option>
+                    <option value="thisMonth">Tháng này</option>
+                    <option value="thisYear">Năm nay</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+
+            <div class="from-florist">
+                <i class="fa-solid fa-store"></i>
+                <select id="filterFlorist" aria-label="Lọc theo xưởng hoa">
+                    <option value="all">Tất cả xưởng hoa</option>
+                    <option value="florist-01">Florist 01</option>
+                    <option value="florist-02">Florist 02</option>
+                    <option value="florist-03">Florist 03</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+        </div>
+    </section>
+    <section class="section-list-orders">
+        <div class="order">
+            <div class="upper-texts">
+                <div class="left-texts">
+                    <span class="order-id">#ORD-9842</span>
+                    <span class="order-date">Đặt lúc 08:15 - Hôm nay, 16/05/2025</span>
+                    <span class="order-state">Đang giao hàng</span>
+                </div>
+                <span class="right-text"><i class="fa-solid fa-shield"></i>Escrow ký quỹ 100%</span>
+            </div>
+            <div class="order-content">
+                <div class="order-image">
+                    <img src="../images/flowers/autumn-bowl.jpg" alt="">
+                </div>
+                <div class="right-box">
+                    <div class="upper-texts">
+                        <div class="left-texts">
+                            <h1 class="order-name">Bình Tulip Trắng Hà Lan Royal Classic (15 cành)</h1>
+                            <div class="left-down-texts">
+                                <span class="made-by"><i
+                                        class="fa-solid fa-fan"></i> Xưởng: Florist Thảo Điền Atelier</span>
+                                <span class="location">Quận 2, TP.HCM</span>
+                            </div>
+                        </div>
+                        <div class="right-texts">
+                            <span class="money-title">Tổng thanh toán ký quỹ</span>
+                            <span class="total-money">1.870.000 đ</span>
+                            <span class="paid-state">Đã thanh toán Escrow 100%</span>
+                        </div>
+                    </div>
+                    <span class="order-description">Kèm bình thủy tinh trụ viền sương mù mờ, thiệp chúc mừng dập nổi thủ công kèm sáp niêm phong hoa oải hương.
+                        Người nhận: Chị Mai Lan (0908 123 456).
+                    </span>
+                    <div class="shipper-box">
+                        <div class="left-texts">
+                            <i class="fa-solid fa-snowflake"></i>
+                            <div class="shipper-state">
+                                <div class="upper-texts">
+                                    <span>Shipper đang giao bằng xe lạnh 18°C</span>
+                                    <span class="status">Nhiệt kế chuẩn</span>
+                                </div>
+                                <span>Dự kiến giao lúc 11:30 hôm nay (còn khoảng 25 phút)</span>
+                            </div>
+                        </div>
+                        <span class="shipper-name">Tài xế Hoàng Long (5.0★)</span>
+                    </div>
+                    <div class="action-box">
+                        <button class="see-image-button"><i class="fa-solid fa-images"></i> Xem ảnh nghiệm thu (3 ảnh)
+                        </button>
+                        <button class="see-order-button"><i class="fa-regular fa-file-lines"></i> Xem chi tiết hóa đơn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-paging">
+        <span class="total-pages">Hiển thị 4 trên tổng số 18 đơn hàng</span>
+        <div class="paging">
+            <button class="left-paging-button"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="number-button active">1</button>
+            <button class="number-button">2</button>
+            <button class="number-button">3</button>
+            <button class="right-paging-button"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </section>
+    <section class="section-complaints">
+        <div class="left-box">
+            <i class="fa-solid fa-shield"></i>
+            <div class="texts">
+                <div class="upper-text">
+                    <h1>Cam kết chất lượng Botanical Serenity</h1>
+                    <span>Đổi trả 100%</span>
+                </div>
+                <span>Bạn gặp vấn đề với đơn hoa đã nhận? Fw12 cam kết hoàn tiền hoặc cắm lại miễn phí nếu hoa không đúng cam kết hoặc bị dập nát quá trình giao nhận.</span>
+            </div>
+        </div>
+        <button class="send-complaint-button"><i class="fa-solid fa-shield-halved"></i> Gửi khiếu nại</button>
+        <button class="phone-button"><i class="fa-solid fa-phone"></i> Hotline 1900 5868</button>
+    </section>
 </main>
 
 <div id="site-footer"></div>
