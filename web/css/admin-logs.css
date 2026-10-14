@@ -1,0 +1,19 @@
+.log-time { white-space: nowrap; }
+.log-time .date { font-weight: 600; }
+.log-time .hour { font-size: 12px; color: var(--fw-muted); }
+
+.log-action { font-weight: 600; }
+.log-action-code {
+  display: inline-block; font-family: Consolas, monospace; font-size: 11px;
+  background: var(--fw-cream-2); border-radius: 6px; padding: 1px 6px; margin-top: 2px;
+}
+
+.log-target { font-family: Consolas, monospace; font-size: 12.5px; color: var(--fw-muted); white-space: nowrap; }
+.log-detail { max-width: 280px; font-size: 13px; color: var(--fw-muted); }
+
+.admin-table tbody tr.log-warning td { background: #fdf6f4; }
+
+.log-row-detail { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--fw-line); font-size: 14px; }
+.log-row-detail:last-child { border-bottom: 0; }
+.log-row-detail span:first-child { color: var(--fw-muted); flex-shrink: 0; }
+.log-row-detail span:last-child { text-align: right; font-weight: 600; }

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/admin-logs.css">
 </head>
 <body class="admin-page" data-nav="logs" data-page-role="admin">
 
@@ -20,11 +21,95 @@
 <div id="admin-topbar"></div>
 
 <main class="admin-content">
-  <h1 class="admin-title">Nhật ký hệ thống</h1>
-  <section class="coming-soon">
-    <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-    <p class="text-muted-fw">Trang này đang được phát triển (AD03 — Bảo).</p>
-  </section>
+  <div class="mb-4">
+    <div class="admin-breadcrumb">Hệ thống › <span>Nhật ký hệ thống</span></div>
+    <h1 class="admin-title">Nhật ký hệ thống</h1>
+    <p class="text-muted-fw mb-0">Lịch sử các thao tác quan trọng của người dùng và quản trị viên trên hệ thống.</p>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Thao tác hôm nay</div><div class="stat-value" id="statToday">0</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Đăng nhập</div><div class="stat-value" id="statLogin">0</div></div>
+        <span class="stat-icon gold"><i class="fa-solid fa-right-to-bracket"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Thay đổi dữ liệu</div><div class="stat-value" id="statChange">0</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Cảnh báo</div><div class="stat-value" id="statWarning">0</div></div>
+        <span class="stat-icon rose"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-toolbar row g-2 align-items-end">
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small mb-1" for="fromDate">Từ ngày</label>
+        <input type="date" id="fromDate" class="form-control" value="2026-10-08">
+      </div>
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small mb-1" for="toDate">Đến ngày</label>
+        <input type="date" id="toDate" class="form-control" value="2026-10-14">
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <label class="form-label small mb-1" for="actionType">Loại thao tác</label>
+        <select id="actionType" class="form-select">
+          <option>Tất cả thao tác</option>
+          <option>Đăng nhập / Đăng xuất</option>
+          <option>Tài khoản</option>
+          <option>Sản phẩm</option>
+          <option>Đơn hàng</option>
+          <option>Yêu cầu thiết kế &amp; báo giá</option>
+          <option>Khiếu nại</option>
+        </select>
+      </div>
+      <div class="col-md-8 col-xl-3">
+        <label class="form-label small mb-1" for="actorSearch">Người thực hiện</label>
+        <input type="search" id="actorSearch" class="form-control" placeholder="Tên hoặc email...">
+      </div>
+      <div class="col-md-4 col-xl-2">
+        <button type="button" class="btn btn-forest w-100"><i class="fa-solid fa-filter me-1"></i>Lọc</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table admin-table">
+        <thead>
+          <tr>
+            <th>Thời gian</th>
+            <th>Người thực hiện</th>
+            <th>Thao tác</th>
+            <th class="d-none d-lg-table-cell">Đối tượng</th>
+            <th class="d-none d-xxl-table-cell">Chi tiết</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+      </table>
+    </div>
+
+    <div class="admin-pagination d-flex justify-content-between align-items-center">
+      <span id="pageInfo"></span>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+      </ul>
+    </div>
+  </div>
 </main>
 
 <div class="no-access">
@@ -33,8 +118,21 @@
   <p class="text-muted-fw">Trang Nhật ký hệ thống chỉ dành cho Admin.</p>
 </div>
 
+<div class="modal fade admin-modal" id="logModal" tabindex="-1" aria-labelledby="logModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="logModalTitle">Chi tiết nhật ký</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body" id="logModalBody"></div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-logs.js"></script>
 </body>
 </html>
