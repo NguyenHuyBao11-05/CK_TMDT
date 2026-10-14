@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sản phẩm của tôi — Fw12 Floral</title>
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/portal.css">
+  <link rel="stylesheet" href="../css/partner.css">
+</head>
+<body class="partner-page" data-partner-nav="products">
+
+<div id="site-header"></div>
+<div id="sidebar"></div>
+
+<main class="partner-main">
+  <header class="partner-header">
+    <div>
+      <div class="eyebrow">Atelier portfolio · cập nhật 15 phút trước</div>
+      <h1 class="partner-title">Sản phẩm của tôi</h1>
+      <p class="partner-subtitle">Quản lý kho hoa mẫu, điều chỉnh giá bán lẻ và sỉ B2C và sỉ B2B dành cho đại lý và sự kiện tiệc cao cấp.</p>
+    </div>
+    <div class="partner-actions">
+      <button type="button" class="partner-primary-btn" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-solid fa-plus"></i> Tạo sản phẩm mới</button>
+    </div>
+  </header>
+
+  <div class="partner-stat-grid" id="productStats"></div>
+
+  <section class="partner-panel partner-product-management">
+    <div class="partner-toolbar">
+      <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="productSearch" type="search" placeholder="Tìm theo tên mẫu hoa, mã SKU hoặc từ khóa hoa tươi..."></label>
+      <select id="productCategory" class="form-select"><option value="">Tất cả danh mục</option><option>Hoa cưới</option><option>Hoa sinh nhật</option><option>Hoa khai trương</option></select>
+      <select id="productStatus" class="form-select"><option value="">Trạng thái: Tất cả</option><option>Đang hiển thị</option><option>Chờ duyệt</option><option>Bị từ chối</option><option>Hết nguyên liệu</option></select>
+      <select id="productStockFilter" class="form-select"><option value="">Chất liệu: Tất cả</option><option>Hoa thật</option><option>Hoa nhung</option><option>Hoa giấy</option></select>
+      <button type="button" class="partner-icon-button" id="refreshProducts" aria-label="Tải lại"><i class="fa-solid fa-rotate"></i></button>
+    </div>
+    <div class="table-responsive">
+      <table class="partner-table partner-products-table">
+        <thead><tr><th>Mẫu hoa / SKU</th><th>Tên mẫu &amp; phân loại</th><th>Chất liệu</th><th>Giá bán lẻ</th><th>Giá bán sỉ</th><th>Nhà kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <tbody id="productList"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="partner-guidance">
+    <span class="partner-guidance-icon"><i class="fa-regular fa-lightbulb"></i></span>
+    <div><strong>Quyết định tỷ lệ chiết đơn B2B cho Florist Kim Cương</strong><p class="mb-0">Tỷ lệ phí giao về gói và cắt từ 5% cho bạn nhận được nhiều bài mẫu giá ưu đãi trong các dự án công ty hơn 42% trên Fw12.</p></div>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#productModal">Tạo sản phẩm ưu đãi ngay <i class="fa-solid fa-arrow-right ms-1"></i></button>
+  </section>
+
+  <div class="modal fade admin-modal" id="productModal" tabindex="-1" aria-labelledby="productModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <form class="modal-content" id="productForm">
+        <div class="modal-header"><h2 class="modal-title h5" id="productModalTitle">Đăng sản phẩm mới</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>
+        <div class="modal-body">
+          <div class="partner-form-grid">
+          <div class="full">
+            <label class="form-label" for="productName">Tên sản phẩm</label>
+            <input id="productName" class="form-control" type="text" placeholder="VD: Bó Tulip Pastel Mơ Mộng" required>
+          </div>
+          <div>
+            <label class="form-label" for="productMaterial">Chất liệu</label>
+            <select id="productMaterial" class="form-select">
+              <option>Hoa thật</option>
+              <option>Hoa nhung</option>
+              <option>Hoa giấy</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="productPrice">Giá bán</label>
+            <input id="productPrice" class="form-control" type="number" min="1" placeholder="850000" required>
+          </div>
+          <div>
+            <label class="form-label" for="productStock">Tồn kho</label>
+            <input id="productStock" class="form-control" type="number" min="0" placeholder="15" required>
+          </div>
+          <div>
+            <label class="form-label" for="productOccasion">Dịp tặng</label>
+            <select id="productOccasion" class="form-select">
+              <option>Hoa cưới</option>
+              <option selected>Hoa sinh nhật</option>
+              <option>Kỷ niệm</option>
+              <option>Hoa khai trương</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="productWholesale">Giá bán sỉ</label>
+            <input id="productWholesale" class="form-control" type="number" min="1" placeholder="620000">
+          </div>
+          <div class="full">
+            <label class="form-label" for="productNotes">Mô tả</label>
+            <textarea id="productNotes" class="form-control" rows="4" placeholder="Mô tả chất liệu, kiểu dáng và lưu ý bảo quản..."></textarea>
+          </div>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="reset" class="partner-secondary-btn" id="resetForm">Làm mới</button><button type="submit" class="partner-primary-btn"><i class="fa-solid fa-paper-plane"></i> Gửi duyệt</button></div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/pages/partner-navigation.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/pages/partner-products.js"></script>
+</body>
+</html>

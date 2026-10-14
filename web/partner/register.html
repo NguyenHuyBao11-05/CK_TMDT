@@ -12,20 +12,92 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/partner.css">
 </head>
-<body>
+<body class="partner-page">
 
 <div id="site-header"></div>
 
-<main>
-  <section class="coming-soon">
-    <div class="container">
-      <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-      <h1 class="h2">Đăng ký làm Đối tác</h1>
-      <p class="text-muted-fw">Trang này đang được phát triển.</p>
-      <a href="../index.html" class="btn btn-forest mt-2">Về trang chủ</a>
+<main class="partner-main">
+  <section class="partner-hero-card">
+    <div class="eyebrow">Đăng ký đối tác</div>
+    <h1 class="partner-title">Gia nhập Fw12 với tư cách thương hiệu hoa</h1>
+    <p>Tăng doanh thu từ khách hàng đặt hoa theo yêu cầu, nhận đơn theo dõi và quản lý storefront trực tuyến.</p>
+    <div class="partner-status-row">
+      <span class="filter-chip"><i class="fa-solid fa-circle-check"></i> Duyệt hồ sơ nhanh trong 24h</span>
+      <span class="filter-chip"><i class="fa-solid fa-comments-dollar"></i> Tiếp cận khách hàng mới</span>
     </div>
   </section>
+
+  <div class="partner-grid">
+    <section class="partner-form-card">
+      <div class="partner-panel-header">
+        <h2 class="partner-panel-title">Thông tin doanh nghiệp</h2>
+      </div>
+      <form id="partnerRegisterForm">
+        <div class="partner-form-grid">
+          <div>
+            <label class="form-label" for="shopName">Tên cửa hàng</label>
+            <input id="shopName" class="form-control" type="text" value="Florist Thảo Điền Atelier">
+          </div>
+          <div>
+            <label class="form-label" for="ownerName">Người đại diện</label>
+            <input id="ownerName" class="form-control" type="text" value="Nguyễn Thị Hoa">
+          </div>
+          <div>
+            <label class="form-label" for="phone">Số điện thoại</label>
+            <input id="phone" class="form-control" type="tel" value="0908112233">
+          </div>
+          <div>
+            <label class="form-label" for="email">Email</label>
+            <input id="email" class="form-control" type="email" value="hello@thaodienatelier.vn">
+          </div>
+          <div>
+            <label class="form-label" for="city">Thành phố</label>
+            <select id="city" class="form-select">
+              <option selected>TP.HCM</option>
+              <option>Hà Nội</option>
+              <option>Đà Nẵng</option>
+              <option>Huế</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="category">Danh mục</label>
+            <select id="category" class="form-select">
+              <option selected>Hoa cưới</option>
+              <option>Hoa sự kiện</option>
+              <option>Hoa sinh nhật</option>
+              <option>Hoa chúc mừng</option>
+            </select>
+          </div>
+          <div class="full">
+            <label class="form-label" for="address">Địa chỉ cửa hàng</label>
+            <input id="address" class="form-control" type="text" value="18 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM">
+          </div>
+          <div class="full">
+            <label class="form-label" for="profile">Giới thiệu thương hiệu</label>
+            <textarea id="profile" class="form-control" rows="4">Chuyên thiết kế bó hoa cưới và lẵng hoa theo phong cách tối giản, sang trọng và ấm áp.</textarea>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button type="button" class="partner-secondary-btn"><i class="fa-solid fa-rotate-left"></i> Làm mới</button>
+          <button type="submit" class="partner-primary-btn"><i class="fa-solid fa-paper-plane"></i> Gửi hồ sơ</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="partner-panel">
+      <div class="partner-panel-header">
+        <h2 class="partner-panel-title">Điều kiện tham gia</h2>
+      </div>
+      <ul class="partner-checklist">
+        <li><i class="fa-solid fa-circle-check"></i><span>Có kinh nghiệm làm hoa tối thiểu 1 năm hoặc portfolio sản phẩm rõ ràng.</span></li>
+        <li><i class="fa-solid fa-circle-check"></i><span>Đổi mới hình thức bán, phản hồi đơn nhanh trong vòng 30 phút làm việc.</span></li>
+        <li><i class="fa-solid fa-circle-check"></i><span>Cam kết chất lượng hoa, đúng thời gian đặt hàng và hình ảnh minh họa.</span></li>
+        <li><i class="fa-solid fa-circle-check"></i><span>Cung cấp phương thức giao hàng, thanh toán và thông tin ngân hàng hỗ trợ.</span></li>
+      </ul>
+    </aside>
+  </div>
 </main>
 
 <div id="site-footer"></div>
@@ -33,5 +105,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/partner-register.js"></script>
 </body>
 </html>

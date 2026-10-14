@@ -168,5 +168,86 @@
     },
     // đợi chuc nang danh gia cua Tam xong roi goi len day
     getReviews() { return fake(SEED_REVIEWS) },
+
+    // Phong — Cổng Đối tác, kiểm duyệt & thống kê
+    getPartnerDashboard() {
+      return fake({
+        summary: [
+          { label: 'Đơn đang xử lý', value: 28, unit: 'đơn', trend: '+6%', icon: 'fa-box-open', tone: 'forest' },
+          { label: 'Doanh thu tháng', value: 182000000, unit: 'đ', trend: '+12%', icon: 'fa-wallet', tone: 'rose' },
+          { label: 'Mẫu hoa đang bán', value: 36, unit: 'sản phẩm', trend: '+4%', icon: 'fa-seedling', tone: 'gold' },
+          { label: 'Tỷ lệ hoàn thành', value: 94, unit: '%', trend: '+3%', icon: 'fa-chart-line', tone: 'blue' },
+        ],
+        orders: [
+          { id: '#FW-1014', customer: 'Nguyễn Thị Lan', item: 'Bó hoa cưới pastel', total: 1800000, status: 'PENDING', time: '20 phút trước' },
+          { id: '#FW-1015', customer: 'Lê Gia Huy', item: 'Lẵng hoa khai trương', total: 2950000, status: 'PROCESSING', time: '1 giờ trước' },
+          { id: '#FW-1016', customer: 'Trần Minh Anh', item: 'Giỏ hoa sự kiện', total: 2200000, status: 'SHIPPING', time: '2 giờ trước' },
+        ],
+        products: [
+          { name: 'Bó Hoa Cưới Pastel', price: 1800000, status: 'Đang hiển thị', sales: 126 },
+          { name: 'Lẵng Hoa Khai Trương', price: 2950000, status: 'Chờ duyệt', sales: 41 },
+          { name: 'Giỏ Hoa Sự Kiện', price: 2200000, status: 'Đang hiển thị', sales: 89 },
+        ],
+      })
+    },
+
+    getPartnerOrders() {
+      return fake([
+        { id: '#FW-1008', customer: 'Phạm Thu Hảo', item: 'Bó hoa cưới hồng pastel', total: 1850000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
+        { id: '#FW-1007', customer: 'Minh Khang', item: 'Giỏ hoa sinh nhật tone vàng', total: 750000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
+        { id: '#FW-1006', customer: 'Ngọc Trâm', item: 'Bình hoa Tulip Cát tường', total: 2100000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
+        { id: '#FW-1009', customer: 'Nguyễn Huy Bảo', item: 'Lẵng hoa sinh nhật', total: 2100000, status: 'PROCESSING', date: '15/10/2026', action: 'Đang thực hiện' },
+        { id: '#FW-1013', customer: 'Lê Minh Phương', item: 'Bó Tulip Trắng Serenity 21 cành', total: 1450000, status: 'PROCESSING', date: '15/10/2026', action: 'Cập nhật ảnh hoàn thành' },
+        { id: '#FW-1010', customer: 'Võ Minh Tâm', item: 'Bình hoa tươi', total: 1320000, status: 'SHIPPING', date: '15/10/2026', action: 'Cập nhật giao hàng' },
+        { id: '#FW-1011', customer: 'Đặng Thảo My', item: 'Giỏ hoa khai trương', total: 2600000, status: 'RECEIVED', date: '12/10/2026', action: 'Xem chi tiết' },
+        { id: '#FW-1012', customer: 'Trần Thanh Tùng', item: 'Bó hoa mừng thành công', total: 1500000, status: 'CANCELLED', date: '10/10/2026', action: 'Xem lý do' },
+      ])
+    },
+
+    getPartnerProducts() {
+      return fake([
+        { id: 21, sku: 'FW-TP-001', name: 'Bó Hoa Tulip Pastel Mơ Mộng', category: 'Hoa sinh nhật', material: 'Hoa thật', price: 850000, wholesale_price: 620000, status: 'Đang hiển thị', stock: 15, sold: 126 },
+        { id: 22, sku: 'FW-TH-204', name: 'Giỏ Hoa Hồng Juliet Quý Phái', category: 'Hoa cưới', material: 'Hoa thật', price: 1450000, wholesale_price: 1150000, status: 'Đang hiển thị', stock: 8, sold: 41 },
+        { id: 23, sku: 'FW-TH-309', name: 'Kệ Khai Trương Cam Có Hội Sunburst', category: 'Hoa khai trương', material: 'Hoa thật', price: 2800000, wholesale_price: 2100000, status: 'Đang hiển thị', stock: 3, sold: 89 },
+        { id: 24, sku: 'FW-TP-017', name: 'Bình Cắm Tú Cầu Xanh Lam Nhật Bản', category: 'Hoa sinh nhật', material: 'Hoa nhung', price: 1890000, wholesale_price: 1420000, status: 'Đang hiển thị', stock: 20, sold: 21 },
+        { id: 25, sku: 'FW-TP-052', name: 'Bó Cúc Tan Tỉnh Khói & Baby Trắng', category: 'Hoa cưới', material: 'Hoa giấy', price: 420000, wholesale_price: 310000, status: 'Hết nguyên liệu', stock: 0, sold: 55 },
+        { id: 26, sku: 'FW-TP-099', name: 'Chậu Lan Hồ Điệp Hoàng Gia 9 Cành VIP', category: 'Hoa khai trương', material: 'Hoa thật', price: 3950000, wholesale_price: 3200000, status: 'Chờ duyệt', stock: 3, sold: 14 },
+      ])
+    },
+
+    getPartnerApprovals() {
+      return fake([
+        { id: 'PT-014', shop: 'Florist Thảo Điền Atelier', owner: 'Nguyễn Huy Bảo', city: 'TP.HCM', submitted: '12/10/2026', score: 'Rất tốt', risk: 'Thấp' },
+        { id: 'PT-015', shop: 'Lan Tỏa Floral', owner: 'Trần Hoài My', city: 'Đà Nẵng', submitted: '13/10/2026', score: 'Đạt', risk: 'Trung bình' },
+        { id: 'PT-016', shop: 'Mộc Lan Studio', owner: 'Lý Gia Hân', city: 'Hà Nội', submitted: '14/10/2026', score: 'Cần bổ sung', risk: 'Cao' },
+      ])
+    },
+
+    getProductApprovals() {
+      return fake([
+        { id: 'SP-008', name: 'Bình Tulip Trắng Hà Lan', shop: 'Florist Thảo Điền Atelier', price: 1850000, submitted: '14/10/2026', status: 'Chờ duyệt', images: 4, category: 'Hoa cưới', material: 'Hoa thật', thumbnail: 'white-tulips.jpg', sku: 'FW-TP-801', wholesale_price: 1450000 },
+        { id: 'SP-009', name: 'Hộp Hoa Mùa Điệp Lên Đèn', shop: "L'Amour Floral Studio", price: 1250000, submitted: '14/10/2026', status: 'Chờ duyệt', images: 5, category: 'Hoa sinh nhật', material: 'Hoa thật', thumbnail: 'red-roses.jpg', sku: 'FW-MC-304', wholesale_price: 990000 },
+        { id: 'SP-010', name: 'Kệ Khai Trương Tường 2 Tầng', shop: 'Sài Gòn Hoa Tươi', price: 2700000, submitted: '13/10/2026', status: 'Chờ duyệt', images: 4, category: 'Hoa khai trương', material: 'Hoa thật', thumbnail: 'grand-opening.jpg', sku: 'FW-KK-519', wholesale_price: 2100000 },
+        { id: 'SP-011', name: 'Hoa Cưới Cổ Điển Pure Peony', shop: 'Maison de Fleur', price: 2100000, submitted: '13/10/2026', status: 'Chờ duyệt', images: 6, category: 'Hoa cưới', material: 'Hoa thật', thumbnail: 'lily-of-valley.jpg', sku: 'FW-WED-108', wholesale_price: 1650000 },
+        { id: 'SP-012', name: 'Giỏ Hoa Nắng Ban Mai', shop: 'Nhiên Floral Art', price: 950000, submitted: '12/10/2026', status: 'Cần chỉnh sửa', images: 3, category: 'Hoa sinh nhật', material: 'Hoa nhung', thumbnail: 'sunshine-basket.jpg', sku: 'FW-NA-310', wholesale_price: 780000 },
+      ])
+    },
+
+    getPartnerStats() {
+      return fake({
+        gross: 182000000,
+        orders: 726,
+        completion: 94,
+        pendingApprovals: 12,
+        monthly: [42, 58, 66, 71, 83, 78, 91],
+        byStatus: {
+          pending: 18,
+          processing: 26,
+          shipping: 21,
+          received: 63,
+          cancelled: 7,
+        },
+      })
+    },
   }
 })()

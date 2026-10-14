@@ -20,15 +20,81 @@
 <div id="admin-topbar"></div>
 
 <main class="admin-content">
-  <h1 class="admin-title">Tổng quan & thống kê</h1>
-  <section class="coming-soon">
-    <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-    <p class="text-muted-fw">Trang này đang được phát triển (AD05, QL05 — Phong).</p>
-  </section>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+      <div class="admin-breadcrumb">Bảng điều khiển › <span>Tổng quan &amp; thống kê</span></div>
+      <h1 class="admin-title">Tổng quan &amp; thống kê</h1>
+      <p class="text-muted-fw mb-0">Theo dõi đơn hàng, doanh thu và hiệu suất từ đối tác, sản phẩm và hoạt động vận hành.</p>
+    </div>
+    <button type="button" class="btn btn-forest"><i class="fa-solid fa-file-export me-1"></i>Xuất báo cáo</button>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Doanh thu</div><div class="stat-value" id="statRevenue">0</div></div>
+        <span class="stat-icon rose"><i class="fa-solid fa-wallet"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Tổng đơn</div><div class="stat-value" id="statOrders">0</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-box-open"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Tỷ lệ hoàn thành</div><div class="stat-value" id="statCompletion">0%</div></div>
+        <span class="stat-icon gold"><i class="fa-solid fa-percent"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Chờ duyệt</div><div class="stat-value" id="statPending">0</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-clock"></i></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-xl-8">
+      <div class="admin-panel p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">Doanh thu 7 ngày gần nhất</h2>
+          <span class="text-muted-fw small">Tuần này</span>
+        </div>
+        <div class="d-flex align-items-end gap-2" id="chartBars" style="height: 220px;"></div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="admin-panel p-3">
+        <h2 class="h5 mb-3">Phân bổ trạng thái</h2>
+        <div id="statusList" class="d-grid gap-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="table-responsive">
+      <table class="table admin-table">
+        <thead>
+        <tr>
+          <th>Chỉ số</th>
+          <th>Hiện tại</th>
+          <th>Xu hướng</th>
+          <th>Ghi chú</th>
+        </tr>
+        </thead>
+        <tbody id="statsTable"></tbody>
+      </table>
+    </div>
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-statistics.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/partner-review.css">
 </head>
 <body class="admin-page" data-nav="partner-approvals" data-page-role="manager">
 
@@ -20,11 +21,35 @@
 <div id="admin-topbar"></div>
 
 <main class="admin-content">
-  <h1 class="admin-title">Duyệt hồ sơ Đối tác</h1>
-  <section class="coming-soon">
-    <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-    <p class="text-muted-fw">Trang này đang được phát triển (QL01 — Phong).</p>
-  </section>
+  <div class="review-title-row">
+    <div>
+      <div class="admin-breadcrumb">Vận hành &amp; đối tác › <span>Yêu cầu Đăng ký Đối tác</span></div>
+      <h1 class="admin-title">Yêu cầu Đăng ký Đối tác Gian hàng</h1>
+      <p class="text-muted-fw mb-0">Kiểm duyệt giấy phép kinh doanh, năng lực nghệ nhân cắm hoa thủ công và tiêu chuẩn xưởng bảo quản lạnh trước khi cấp quyền bán hàng trên Fw12.</p>
+    </div>
+    <div class="review-export-actions"><button type="button" class="partner-secondary-btn"><i class="fa-solid fa-file-export"></i> Xuất báo cáo PDF</button><button type="button" class="partner-primary-btn"><i class="fa-solid fa-check-double"></i> Quy chuẩn thẩm định</button></div>
+  </div>
+
+  <div class="review-kpis partner-approval-kpis">
+    <div><span>CHỜ THẨM ĐỊNH</span><strong id="statPending">12 <small>hồ sơ</small></strong><em>+4 hồ sơ yêu cầu phản hồi sớm</em></div>
+    <div><span>ĐÃ DUYỆT THÁNG NÀY</span><strong id="statApproved">48 <small>đối tác mới</small></strong><em>Tăng 18% so với tháng trước</em></div>
+    <div><span>TỶ LỆ ĐẠT CHUẨN</span><strong>82<small>%</small></strong><em>Chất lượng xưởng tuyển chọn</em></div>
+    <div><span>CẦN BỔ SUNG</span><strong id="statNeedsEdit">03 <small>hồ sơ</small></strong><em>Hồ sơ thiếu xác thực</em></div>
+  </div>
+
+  <div class="review-application-toolbar">
+    <div class="review-state-tabs"><button class="active" type="button">Tất cả hồ sơ</button><button type="button">Chờ duyệt <span>12</span></button><button type="button">Hồ sơ mới</button><button type="button">Yêu cầu bổ sung</button></div>
+    <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="partnerSearch" type="search" placeholder="Tìm theo shop, SĐT, đại diện..."></label>
+    <select class="form-select" id="partnerRegion"><option value="">Khu vực: Toàn quốc</option><option>TP.HCM</option><option>Hà Nội</option><option>Đà Nẵng</option></select>
+  </div>
+
+  <div class="review-application-layout">
+    <section class="admin-panel">
+      <div class="review-list-header"><strong>Danh sách Đơn đăng ký chờ thẩm duyệt</strong><span id="partnerResultCount"></span></div>
+      <div class="review-application-list" id="approvalTable"></div>
+    </section>
+    <aside class="review-profile-panel" id="partnerProfile"></aside>
+  </div>
 </main>
 
 <div class="no-access">
@@ -35,6 +60,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-partner-approvals.js"></script>
 </body>
 </html>
