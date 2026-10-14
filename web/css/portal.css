@@ -48,7 +48,7 @@ body:has(> .sidebar) .container {
     display: flex;
     align-items: center;
 }
-.sidebar .box-name > i {
+.sidebar .box-name  i {
     height: 40px;
     width: 40px;
     font-size: 20px;
@@ -79,13 +79,18 @@ body:has(> .sidebar) .container {
 .sidebar .list-nav-items .nav-item {
     display: flex;
     align-items: center;
-    padding: 10px 16px;
+    padding: 0;
     border-radius: 10px;
 }
 
 .sidebar .list-nav-items .nav-item a {
     font-size: 12px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 10px 16px;
+    width: 100%;
+    color: var(--fw-ink);
 }
 
 .sidebar .list-nav-items .nav-item i {

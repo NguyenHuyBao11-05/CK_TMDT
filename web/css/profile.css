@@ -1,0 +1,83 @@
+main .container2 {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    max-width: 1320px;
+    padding: 24px;
+}
+
+.container2 .user-picture {
+    flex: 0 0 180px;
+}
+
+.container2 .user-picture img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 50%;
+    border: 1px solid var(--fw-forest);
+}
+
+.container2 .user-content {
+    flex: 1;
+}
+
+.container2 .user-content .content-card {
+    padding: 24px;
+    background: var(--fw-surface);
+    border-radius: 16px;
+}
+
+.container2 .user-content .content-card .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.container2 .user-content .content-card .section-heading h2 {
+    color: var(--fw-ink);
+    font-size: 20px;
+}
+
+.container2 .user-content .content-card .section-heading p {
+    margin: 0;
+    color: var(--fw-muted);
+    font-size: 13px;
+}
+
+.container2 .user-content .content-card .section-heading .change-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--fw-line);
+    border-radius: 8px;
+    background: var(--fw-surface);
+    color: var(--fw-forest);
+    cursor: pointer;
+}
+
+.container2 .user-content .content-card .profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.container2 .user-content .content-card .profile-details .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.container2 .user-content .content-card .profile-details .detail-item .label {
+    color: var(--fw-muted);
+    font-size: 12px;
+}
+
+.container2 .user-content .content-card .profile-details .detail-item .content {
+    color: var(--fw-ink);
+    font-size: 14px;
+    font-weight: 500;
+}

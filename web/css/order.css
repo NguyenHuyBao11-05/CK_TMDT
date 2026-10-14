@@ -1,0 +1,705 @@
+section {
+    max-width: 1320px;
+    padding: 24px;
+    margin: 20px 24px;
+}
+
+/* =========================== section-start-header =========================== */
+.section-start-header {
+    border-radius: 16px;
+    background: var(--fw-cream-2);
+}
+
+.section-start-header .top-texts {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--fw-line);
+    font-size: 10px;
+}
+
+.section-start-header .top-texts .left-text {
+    color: var(--fw-forest);
+    font-weight: 700;
+    background: var(--fw-sage-soft);
+    padding: 5px;
+    border-radius: 100px;
+}
+
+.section-start-header .top-texts .right-text {
+    color: var(--fw-muted);
+    text-align: right;
+}
+
+.section-start-header .middle-texts {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding-top: 24px;
+}
+
+.section-start-header .left-texts h1 {
+    color: var(--fw-ink);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.section-start-header .left-texts > span {
+    display: block;
+    max-width: 70%;
+    color: var(--fw-muted);
+    font-size: 14px;
+}
+
+.section-start-header .right-texts {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.section-start-header .right-texts div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    min-width: 15%;
+    padding: 20px;
+    background: var(--fw-surface);
+}
+
+.section-start-header .right-texts .left-box {
+    border-radius: 12px 0 0 12px;
+    border-right: 1px dashed var(--fw-cream-2);
+}
+
+.section-start-header .right-texts .right-box {
+    border-radius: 0 12px 12px 0;
+}
+
+.section-start-header .right-texts .title {
+    color: var(--fw-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.section-start-header .right-texts .number-unit {
+    color: var(--fw-forest);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.section-start-header .right-texts .right-box .number-unit {
+    color: var(--fw-rose);
+}
+
+/* =========================== section-filter =========================== */
+.section-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 20px 0 20px;
+    max-width: 1368px;
+}
+
+.section-filter .list-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.section-filter .filter {
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 10px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.section-filter .filter a {
+    color: var(--fw-muted);
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.section-filter .filter span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 100px;
+    background: var(--fw-surface);
+    color: var(--fw-muted);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.section-filter .filter.active {
+    background: var(--fw-forest);
+    border-color: var(--fw-forest);
+}
+
+.section-filter .filter.active a,
+.section-filter .filter.active span {
+    color: var(--fw-surface);
+}
+
+.section-filter .filter.active span {
+    background: var(--fw-muted);
+}
+
+.section-filter .filter:not(.active):hover {
+    background: var(--fw-sage-soft);
+    border-color: var(--fw-line);
+}
+
+.section-filter .filter:not(.active):hover a {
+    color: var(--fw-forest);
+}
+
+.section-filter .search-box {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 210px 220px;
+    gap: 12px;
+    align-items: center;
+}
+
+.section-filter .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    height: 40px;
+    padding: 0 6px 0 14px;
+    border: 1px solid var(--fw-line);
+    border-radius: 9px;
+    background: var(--fw-surface);
+    transition: 0.2s ease
+}
+
+.section-filter .search-bar > i {
+    flex-shrink: 0;
+    color: var(--fw-muted);
+    font-size: 14px;
+}
+
+.section-filter .search-bar input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--fw-ink);
+    font-size: 12px;
+}
+
+.section-filter .search-bar input::placeholder {
+    color: var(--fw-muted);
+}
+
+.section-filter .search-bar:focus-within {
+    border-color: var(--fw-forest);
+}
+
+.section-filter .search-bar button {
+    height: 32px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--fw-forest);
+    color: var(--fw-surface);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.section-filter .search-bar button:hover {
+    background: var(--fw-ink);
+}
+
+.section-filter .recent-dates,
+.section-filter .from-florist {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid var(--fw-line);
+    border-radius: 9px;
+    background: var(--fw-surface);
+    transition: 0.2s ease;
+}
+
+.section-filter .recent-dates:focus-within,
+.section-filter .from-florist:focus-within {
+    border-color: var(--fw-forest);
+}
+
+.section-filter .recent-dates > i:first-child,
+.section-filter .from-florist > i:first-child {
+    flex-shrink: 0;
+    color: var(--fw-muted);
+    font-size: 14px;
+}
+
+.section-filter .recent-dates select,
+.section-filter .from-florist select {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--fw-ink);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.section-filter .select-arrow {
+    flex-shrink: 0;
+    color: var(--fw-muted);
+    font-size: 10px;
+    pointer-events: none;
+}
+
+/* =========================== section-list-orders =========================== */
+.section-list-orders {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.section-list-orders .order {
+    background: var(--fw-surface);
+    border-radius: 16px;
+}
+
+.section-list-orders .order > .upper-texts {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.section-list-orders .upper-texts .left-texts {
+    display: flex;
+    align-items: center;
+    gap: 10px 14px;
+}
+
+.section-list-orders .order-id {
+    color: var(--fw-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.section-list-orders .order-date {
+    color: var(--fw-muted);
+    font-size: 13px;
+}
+
+.section-list-orders .order-state {
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 100px;
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.section-list-orders .order > .upper-texts > .right-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex-shrink: 0;
+    padding: 5px 10px;
+    color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.section-list-orders .order > .upper-texts > .right-text i {
+    font-size: 14px;
+}
+
+.section-list-orders .order-content {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 22px;
+    padding: 0 22px 22px;
+    align-items: start;
+}
+
+.section-list-orders .order-image {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--fw-surface);
+}
+
+.section-list-orders .order-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.section-list-orders .right-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section-list-orders .right-box > .upper-texts {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.section-list-orders .right-box .left-texts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.section-list-orders .order-name {
+    color: var(--fw-ink);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.section-list-orders .made-by,
+.section-list-orders .location {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--fw-ink);
+}
+
+.section-list-orders .made-by {
+    font-size: 12px;
+}
+
+.section-list-orders .location {
+    font-size: 10px;
+    border-radius: 10px;
+    background: var(--fw-cream-2);
+    padding: 5px 10px;
+}
+
+.section-list-orders .made-by i {
+    color: var(--fw-forest);
+}
+
+.section-list-orders .right-box .right-texts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 7px;
+    text-align: right;
+}
+
+.section-list-orders .money-title {
+    color: var(--fw-ink);
+    font-size: 10px;
+}
+
+.section-list-orders .total-money {
+    color: var(--fw-forest);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.section-list-orders .paid-state {
+    color: var(--fw-forest);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.section-list-orders .order-description {
+    display: block;
+    color: var(--fw-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.section-list-orders .shipper-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: 12px;
+    background: var(--fw-cream-2);
+}
+
+.section-list-orders .shipper-box .left-texts {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-list-orders .shipper-box .left-texts > i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+    font-size: 20px;
+}
+
+.section-list-orders .shipper-state {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.section-list-orders .shipper-state > .upper-texts {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-list-orders .shipper-state > .upper-texts > span:first-child {
+    color: var(--fw-ink);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.section-list-orders .shipper-state .status {
+    padding: 5px;
+    border-radius: 100px;
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.section-list-orders .shipper-state > span {
+    color: var(--fw-muted);
+    font-size: 10px;
+}
+
+.section-list-orders .shipper-name {
+    color: var(--fw-forest);
+    font-size: 10px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.section-list-orders .action-box {
+    padding-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-list-orders .action-box button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 12px;
+    color: var(--fw-ink);
+    background: var(--fw-cream-2);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.section-list-orders .action-box button:hover {
+    border-color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+}
+
+/* =========================== section-paging =========================== */
+.section-paging {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0 20px;
+}
+
+.section-paging .total-pages {
+    color: var(--fw-muted);
+    font-size: 12px;
+}
+
+.section-paging .paging {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.section-paging .paging button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--fw-line);
+    border-radius: 8px;
+    background: var(--fw-surface);
+    color: var(--fw-ink);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.section-paging .paging .number-button.active {
+    border-color: var(--fw-forest);
+    background: var(--fw-forest);
+    color: var(--fw-surface);
+    font-weight: 700;
+}
+
+.section-paging .paging .number-button:not(.active):hover {
+    border-color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+}
+
+.section-paging .paging .left-paging-button::before {
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.section-paging .paging .right-paging-button::before {
+    font-weight: 900;
+    font-size: 10px;
+}
+
+.section-paging .paging .left-paging-button:hover,
+.section-paging .paging .right-paging-button:hover {
+    border-color: var(--fw-forest);
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+}
+
+.section-paging .paging button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--fw-surface);
+}
+
+/* =========================== section-complaints =========================== */
+.section-complaints {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 24px;
+    background: var(--fw-cream-2);
+    border-radius: 16px;
+}
+
+.section-complaints .left-box {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex: 1;
+    min-width: 0;
+}
+
+.section-complaints .left-box > i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--fw-sage-soft);
+    color: var(--fw-forest);
+    font-size: 30px;
+}
+
+.section-complaints .left-box .texts {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-complaints .upper-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-complaints .upper-text h1 {
+    margin: 0;
+    color: var(--fw-ink);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.section-complaints .upper-text > span {
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    background: var(--fw-forest);
+    color: var(--fw-surface);
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.section-complaints .left-box .texts > span {
+    max-width: 70%;
+    color: var(--fw-muted);
+    font-size: 15px;
+}
+
+.section-complaints > button {
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.section-complaints .send-complaint-button {
+    color: var(--fw-red);
+    border: none;
+    background: var(--fw-surface);
+}
+
+.section-complaints .phone-button {
+    color: var(--fw-surface);
+    border: none;
+    background: var(--fw-forest);
+}
