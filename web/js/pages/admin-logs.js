@@ -1,25 +1,15 @@
-const logs = [
-  { id: 120, date: '14/10/2026', time: '09:42:15', actor: 'Quản trị viên', email: 'admin@nhanh.vn', role: 'ADMIN', action: 'USER_LOCK', group: 'account', target: 'users', targetId: 7, detail: 'Khoá tài khoản haiyen.do@gmail.com do vi phạm điều khoản.', ip: '113.161.42.10' },
-  { id: 119, date: '14/10/2026', time: '09:15:02', actor: 'Quản lý vận hành', email: 'manager@nhanh.vn', role: 'MANAGER', action: 'PRODUCT_APPROVE', group: 'product', target: 'products', targetId: 24, detail: 'Duyệt sản phẩm "Bình Tulip Trắng Hà Lan Royal Classic".', ip: '14.232.18.77' },
-  { id: 118, date: '14/10/2026', time: '08:58:41', actor: 'Không xác định', email: 'lanphuong@gmail.com', role: '', action: 'LOGIN_FAILED', group: 'auth', target: 'users', targetId: 5, detail: 'Đăng nhập sai mật khẩu 3 lần liên tiếp.', ip: '27.72.105.4', warning: true },
-  { id: 117, date: '14/10/2026', time: '08:30:09', actor: 'Trần Thị Lan Phương', email: 'lanphuong@gmail.com', role: 'CUSTOMER', action: 'LOGIN', group: 'auth', target: 'users', targetId: 5, detail: 'Đăng nhập bằng Google.', ip: '27.72.105.4' },
-  { id: 116, date: '13/10/2026', time: '21:10:33', actor: 'Nguyễn Thảo Vy', email: 'thaodien.atelier@gmail.com', role: 'PARTNER', action: 'QUOTE_CREATE', group: 'design', target: 'design_quotes', targetId: 31, detail: 'Gửi báo giá 1.450.000 đ cho yêu cầu #YC-8921.', ip: '171.244.9.21' },
-  { id: 115, date: '13/10/2026', time: '19:47:20', actor: 'Trần Thị Lan Phương', email: 'lanphuong@gmail.com', role: 'CUSTOMER', action: 'REQUEST_CREATE', group: 'design', target: 'design_requests', targetId: 8921, detail: 'Đăng yêu cầu thiết kế "Bó hoa kỷ niệm 5 năm ngày cưới".', ip: '27.72.105.4' },
-  { id: 114, date: '13/10/2026', time: '16:05:12', actor: 'Lê Văn Hưng', email: 'nangbanmai.hoa@gmail.com', role: 'PARTNER', action: 'ORDER_STATUS', group: 'order', target: 'orders', targetId: 1042, detail: 'Chuyển đơn #FW-1042 sang "Đang giao".', ip: '42.113.60.8' },
-  { id: 113, date: '13/10/2026', time: '14:22:48', actor: 'Quản lý vận hành', email: 'manager@nhanh.vn', role: 'MANAGER', action: 'PARTNER_APPROVE', group: 'account', target: 'partner_profiles', targetId: 4, detail: 'Duyệt hồ sơ Đối tác "Tiệm Hoa Nắng Ban Mai".', ip: '14.232.18.77' },
-  { id: 112, date: '12/10/2026', time: '11:40:57', actor: 'Phạm Minh Tuấn', email: 'minhtuan.pm@gmail.com', role: 'CUSTOMER', action: 'COMPLAINT_CREATE', group: 'complaint', target: 'complaints', targetId: 9, detail: 'Gửi khiếu nại cho đơn #FW-1031: hoa bị dập khi nhận.', ip: '115.79.33.2', warning: true },
-  { id: 111, date: '12/10/2026', time: '10:02:30', actor: 'Quản trị viên', email: 'admin@nhanh.vn', role: 'ADMIN', action: 'USER_ROLE', group: 'account', target: 'users', targetId: 4, detail: 'Đổi vai trò tài khoản nangbanmai.hoa@gmail.com: CUSTOMER → PARTNER.', ip: '113.161.42.10' },
-  { id: 110, date: '11/10/2026', time: '18:15:44', actor: 'Võ Đăng Khoa', email: 'dangkhoa@gmail.com', role: 'CUSTOMER', action: 'ORDER_CANCEL', group: 'order', target: 'orders', targetId: 1029, detail: 'Huỷ đơn #FW-1029 khi đơn đang "Chờ xử lý".', ip: '58.186.71.90' },
-  { id: 109, date: '11/10/2026', time: '08:00:01', actor: 'Hệ thống', email: '', role: 'SYSTEM', action: 'ORDER_AUTO_RECEIVED', group: 'order', target: 'orders', targetId: 1015, detail: 'Tự chuyển đơn #FW-1015 sang "Đã nhận" sau 3 ngày đang giao.', ip: '' },
-]
-
 const ACTION_LABEL = {
   USER_LOCK: 'Khoá tài khoản',
+  USER_UNLOCK: 'Mở khoá tài khoản',
   USER_ROLE: 'Phân quyền',
+  USER_CREATE: 'Tạo tài khoản',
+  USER_UPDATE: 'Sửa thông tin tài khoản',
+  USER_RESET_PASSWORD: 'Đặt lại mật khẩu',
   PRODUCT_APPROVE: 'Duyệt sản phẩm',
   PARTNER_APPROVE: 'Duyệt hồ sơ Đối tác',
   LOGIN: 'Đăng nhập',
   LOGIN_FAILED: 'Đăng nhập thất bại',
+  LOGOUT: 'Đăng xuất',
   QUOTE_CREATE: 'Gửi báo giá',
   REQUEST_CREATE: 'Đăng yêu cầu thiết kế',
   ORDER_STATUS: 'Cập nhật trạng thái đơn',
@@ -38,41 +28,124 @@ const ROLE_BADGE = {
 
 const logTable = document.getElementById('logTable')
 const logModal = new bootstrap.Modal(document.getElementById('logModal'))
+const fromDate = document.getElementById('fromDate')
+const toDate = document.getElementById('toDate')
+const actionType = document.getElementById('actionType')
+const actorSearch = document.getElementById('actorSearch')
+const pagination = document.getElementById('pagination')
 
+let logs = []
+let currentPage = 0
+
+
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text == null ? '' : text
+  return div.innerHTML
+}
+
+function toInputDate(date) {
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+}
+
+function formatDate(value) {
+  const d = new Date(value)
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear()
+}
+
+function formatTime(value) {
+  return new Date(value).toTimeString().slice(0, 8)
+}
+
+function actionLabel(action) {
+  return ACTION_LABEL[action] || action
+}
+
+function actorName(log) {
+  return log.actor_name ? escapeHtml(log.actor_name) : 'Hệ thống'
+}
+
+function targetText(log) {
+  return log.target_table ? escapeHtml(log.target_table) + (log.target_id ? ' #' + log.target_id : '') : '—'
+}
+
+
+function renderMessage(message) {
+  logTable.innerHTML = `<tr><td colspan="6" class="text-center text-muted-fw py-4">${escapeHtml(message)}</td></tr>`
+}
 
 function renderTable() {
+  if (logs.length === 0) {
+    renderMessage('Không có nhật ký nào phù hợp.')
+    return
+  }
   let html = ''
   logs.forEach(function (log) {
     html += `
       <tr class="${log.warning ? 'log-warning' : ''}">
         <td class="log-time">
-          <div class="date">${log.date}</div>
-          <div class="hour">${log.time}</div>
+          <div class="date">${formatDate(log.created_at)}</div>
+          <div class="hour">${formatTime(log.created_at)}</div>
         </td>
         <td>
-          <div class="fw-semibold">${log.actor}</div>
-          <div class="small text-muted-fw">${log.email || '—'}</div>
+          <div class="fw-semibold">${actorName(log)}</div>
+          <div class="small text-muted-fw">${escapeHtml(log.actor_email) || '—'}</div>
         </td>
         <td>
           <div class="log-action">
-            ${log.warning ? '<i class="fa-solid fa-triangle-exclamation text-rose me-1"></i>' : ''}${ACTION_LABEL[log.action]}
+            ${log.warning ? '<i class="fa-solid fa-triangle-exclamation text-rose me-1"></i>' : ''}${actionLabel(log.action)}
           </div>
-          <span class="log-action-code">${log.action}</span>
+          <span class="log-action-code">${escapeHtml(log.action)}</span>
         </td>
-        <td class="d-none d-lg-table-cell log-target">${log.target} #${log.targetId}</td>
-        <td class="d-none d-xxl-table-cell log-detail">${log.detail}</td>
+        <td class="d-none d-lg-table-cell log-target">${targetText(log)}</td>
+        <td class="d-none d-xxl-table-cell log-detail">${escapeHtml(log.detail)}</td>
         <td class="text-end">
           <button type="button" class="btn-icon" data-id="${log.id}" title="Xem chi tiết"><i class="fa-solid fa-eye"></i></button>
         </td>
       </tr>`
   })
   logTable.innerHTML = html
+}
 
-  document.getElementById('pageInfo').textContent = 'Hiển thị ' + logs.length + ' bản ghi'
-  document.getElementById('statToday').textContent = logs.filter(function (l) { return l.date === '14/10/2026' }).length
-  document.getElementById('statLogin').textContent = logs.filter(function (l) { return l.group === 'auth' }).length
-  document.getElementById('statChange').textContent = logs.filter(function (l) { return l.group !== 'auth' }).length
-  document.getElementById('statWarning').textContent = logs.filter(function (l) { return l.warning }).length
+function renderStats(stats) {
+  document.getElementById('statToday').textContent = stats.today
+  document.getElementById('statLogin').textContent = stats.login
+  document.getElementById('statChange').textContent = stats.change
+  document.getElementById('statWarning').textContent = stats.warning
+}
+
+function renderPagination(page, totalPages, totalItems) {
+  document.getElementById('pageInfo').textContent = 'Hiển thị ' + logs.length + ' / ' + totalItems + ' bản ghi'
+  let html = ''
+  for (let i = 0; i < totalPages; i++) {
+    html += `<li class="page-item ${i === page ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i + 1}</a></li>`
+  }
+  pagination.innerHTML = html
+}
+
+
+async function loadLogs(page) {
+  currentPage = page
+  renderMessage('Đang tải...')
+  try {
+    const data = await FW_API.getAdminLogs({
+      from: fromDate.value,
+      to: toDate.value,
+      group: actionType.value,
+      q: actorSearch.value.trim(),
+      page: page,
+      size: 10,
+    })
+    logs = data.items
+    renderTable()
+    renderStats(data.stats)
+    renderPagination(data.page, data.total_pages, data.total_items)
+  } catch (error) {
+    logs = []
+    renderMessage(error.message)
+    pagination.innerHTML = ''
+    document.getElementById('pageInfo').textContent = ''
+  }
 }
 
 
@@ -83,15 +156,39 @@ logTable.addEventListener('click', function (event) {
 
   document.getElementById('logModalTitle').textContent = 'Nhật ký #' + log.id
   document.getElementById('logModalBody').innerHTML = `
-    <div class="log-row-detail"><span>Thời gian</span><span>${log.date} ${log.time}</span></div>
-    <div class="log-row-detail"><span>Người thực hiện</span><span>${log.actor}${log.email ? '<br><small class="text-muted-fw fw-normal">' + log.email + '</small>' : ''}</span></div>
-    <div class="log-row-detail"><span>Vai trò</span><span>${ROLE_BADGE[log.role] || '—'}</span></div>
-    <div class="log-row-detail"><span>Thao tác</span><span>${ACTION_LABEL[log.action]}<br><span class="log-action-code fw-normal">${log.action}</span></span></div>
-    <div class="log-row-detail"><span>Đối tượng</span><span class="log-target">${log.target} #${log.targetId}</span></div>
-    <div class="log-row-detail"><span>Địa chỉ IP</span><span>${log.ip || '—'}</span></div>
-    <div class="log-row-detail"><span>Chi tiết</span><span>${log.detail}</span></div>`
+    <div class="log-row-detail"><span>Thời gian</span><span>${formatDate(log.created_at)} ${formatTime(log.created_at)}</span></div>
+    <div class="log-row-detail"><span>Người thực hiện</span><span>${actorName(log)}${log.actor_email ? '<br><small class="text-muted-fw fw-normal">' + escapeHtml(log.actor_email) + '</small>' : ''}</span></div>
+    <div class="log-row-detail"><span>Vai trò</span><span>${ROLE_BADGE[log.actor_role] || '—'}</span></div>
+    <div class="log-row-detail"><span>Thao tác</span><span>${actionLabel(log.action)}<br><span class="log-action-code fw-normal">${escapeHtml(log.action)}</span></span></div>
+    <div class="log-row-detail"><span>Đối tượng</span><span class="log-target">${targetText(log)}</span></div>
+    <div class="log-row-detail"><span>Chi tiết</span><span>${escapeHtml(log.detail) || '—'}</span></div>`
   logModal.show()
 })
 
+pagination.addEventListener('click', function (event) {
+  const link = event.target.closest('[data-page]')
+  if (!link) return
+  event.preventDefault()
+  loadLogs(Number(link.dataset.page))
+})
 
-renderTable()
+document.getElementById('filterButton').addEventListener('click', function () {
+  loadLogs(0)
+})
+
+actorSearch.addEventListener('keydown', function (event) {
+  if (event.key === 'Enter') loadLogs(0)
+})
+
+document.addEventListener('change', function (event) {
+  if (event.target.id === 'roleSwitch') loadLogs(currentPage)
+})
+
+
+const today = new Date()
+const weekAgo = new Date()
+weekAgo.setDate(today.getDate() - 6)
+fromDate.value = toInputDate(weekAgo)
+toDate.value = toInputDate(today)
+
+loadLogs(0)

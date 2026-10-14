@@ -1,14 +1,3 @@
-let users = [
-  { id: 1, full_name: 'Quản trị viên', email: 'admin@nhanh.vn', phone: '', role: 'ADMIN', auth_provider: 'LOCAL', status: 'ACTIVE', created_at: '01/09/2026' },
-  { id: 2, full_name: 'Quản lý vận hành', email: 'manager@nhanh.vn', phone: '', role: 'MANAGER', auth_provider: 'LOCAL', status: 'ACTIVE', created_at: '01/09/2026' },
-  { id: 3, full_name: 'Nguyễn Thảo Vy', email: 'thaodien.atelier@gmail.com', phone: '0903821990', role: 'PARTNER', auth_provider: 'LOCAL', status: 'ACTIVE', created_at: '12/09/2026' },
-  { id: 4, full_name: 'Lê Văn Hưng', email: 'nangbanmai.hoa@gmail.com', phone: '0918340120', role: 'PARTNER', auth_provider: 'GOOGLE', status: 'ACTIVE', created_at: '15/09/2026' },
-  { id: 5, full_name: 'Trần Thị Lan Phương', email: 'lanphuong@gmail.com', phone: '0908223989', role: 'CUSTOMER', auth_provider: 'GOOGLE', status: 'ACTIVE', created_at: '20/09/2026' },
-  { id: 6, full_name: 'Phạm Minh Tuấn', email: 'minhtuan.pm@gmail.com', phone: '0977451880', role: 'CUSTOMER', auth_provider: 'LOCAL', status: 'ACTIVE', created_at: '22/09/2026' },
-  { id: 7, full_name: 'Đỗ Hải Yến', email: 'haiyen.do@gmail.com', phone: '0936294110', role: 'CUSTOMER', auth_provider: 'LOCAL', status: 'LOCKED', created_at: '25/09/2026' },
-  { id: 8, full_name: 'Võ Đăng Khoa', email: 'dangkhoa@gmail.com', phone: '0912345678', role: 'CUSTOMER', auth_provider: 'GOOGLE', status: 'ACTIVE', created_at: '02/10/2026' },
-]
-
 const ROLE_LABEL = {
   ADMIN: '<span class="badge-soft rose">Admin</span>',
   MANAGER: '<span class="badge-soft gold">Quản lý</span>',
@@ -19,20 +8,52 @@ const ROLE_LABEL = {
 const userTable = document.getElementById('userTable')
 const userForm = document.getElementById('userForm')
 const userModal = new bootstrap.Modal(document.getElementById('userModal'))
-const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'))
+const resetModal = new bootstrap.Modal(document.getElementById('resetModal'))
+const searchInput = document.getElementById('searchInput')
+const roleFilter = document.getElementById('roleFilter')
+const statusFilter = document.getElementById('statusFilter')
+const pagination = document.getElementById('pagination')
 
+let users = []
+let currentPage = 0
 let editingId = null
-let deletingId = null
+let resettingId = null
+let searchTimer = null
 
 
-function renderStats() {
-  document.getElementById('statTotal').textContent = users.length
-  document.getElementById('statCustomer').textContent = users.filter(function (u) { return u.role === 'CUSTOMER' }).length
-  document.getElementById('statPartner').textContent = users.filter(function (u) { return u.role === 'PARTNER' }).length
-  document.getElementById('statLocked').textContent = users.filter(function (u) { return u.status === 'LOCKED' }).length
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text == null ? '' : text
+  return div.innerHTML
+}
+
+function formatDate(value) {
+  if (!value) return '—'
+  const d = new Date(value)
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear()
+}
+
+function findUser(id) {
+  return users.find(function (u) { return u.id === Number(id) })
+}
+
+
+function renderMessage(message) {
+  userTable.innerHTML = `<tr><td colspan="7" class="text-center text-muted-fw py-4">${escapeHtml(message)}</td></tr>`
+}
+
+function renderStats(stats) {
+  document.getElementById('statTotal').textContent = stats.total
+  document.getElementById('statCustomer').textContent = stats.customer
+  document.getElementById('statPartner').textContent = stats.partner
+  document.getElementById('statLocked').textContent = stats.locked
 }
 
 function renderTable() {
+  if (users.length === 0) {
+    renderMessage('Không tìm thấy tài khoản nào.')
+    return
+  }
   let html = ''
   users.forEach(function (u) {
     const locked = u.status === 'LOCKED'
@@ -40,18 +61,18 @@ function renderTable() {
       <tr>
         <td>
           <div class="user-cell">
-            <span class="user-initial">${u.full_name.charAt(0)}</span>
+            <span class="user-initial">${escapeHtml(u.full_name.charAt(0))}</span>
             <div>
-              <div class="fw-semibold">${u.full_name}</div>
-              <div class="small text-muted-fw">${u.email}</div>
+              <div class="fw-semibold">${escapeHtml(u.full_name)}</div>
+              <div class="small text-muted-fw">${escapeHtml(u.email)}</div>
             </div>
           </div>
         </td>
-        <td>${u.phone || '—'}</td>
+        <td>${escapeHtml(u.phone) || '—'}</td>
         <td>${ROLE_LABEL[u.role]}</td>
         <td class="d-none d-xxl-table-cell">${u.auth_provider === 'GOOGLE' ? '<i class="fa-brands fa-google me-1"></i>Google' : 'Email'}</td>
         <td>${locked ? '<span class="badge-soft rose">Đã khoá</span>' : '<span class="badge-soft green">Hoạt động</span>'}</td>
-        <td class="d-none d-xxl-table-cell">${u.created_at}</td>
+        <td class="d-none d-xxl-table-cell">${formatDate(u.created_at)}</td>
         <td class="text-end text-nowrap">
           <button type="button" class="btn-icon" data-action="edit" data-id="${u.id}" title="Sửa">
             <i class="fa-solid fa-pen"></i>
@@ -62,19 +83,46 @@ function renderTable() {
           <button type="button" class="btn-icon" data-action="reset" data-id="${u.id}" title="Đặt lại mật khẩu">
             <i class="fa-solid fa-key"></i>
           </button>
-          <button type="button" class="btn-icon danger" data-action="delete" data-id="${u.id}" title="Xoá">
-            <i class="fa-solid fa-trash"></i>
-          </button>
         </td>
       </tr>`
   })
   userTable.innerHTML = html
-  document.getElementById('pageInfo').textContent = 'Hiển thị ' + users.length + ' tài khoản'
-  renderStats()
 }
 
-function findUser(id) {
-  return users.find(function (u) { return u.id === Number(id) })
+function renderPagination(page, totalPages, totalItems) {
+  document.getElementById('pageInfo').textContent = 'Hiển thị ' + users.length + ' / ' + totalItems + ' tài khoản'
+  let html = ''
+  for (let i = 0; i < totalPages; i++) {
+    html += `<li class="page-item ${i === page ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i + 1}</a></li>`
+  }
+  pagination.innerHTML = html
+}
+
+
+async function loadUsers(page) {
+  currentPage = page
+  try {
+    const data = await FW_API.getAdminUsers({
+      q: searchInput.value.trim(),
+      role: roleFilter.value,
+      status: statusFilter.value,
+      page: page,
+      size: 10,
+    })
+    if (data.items.length === 0 && page > 0) {
+      loadUsers(page - 1)
+      return
+    }
+    users = data.items
+    renderTable()
+    renderStats(data.stats)
+    renderPagination(data.page, data.total_pages, data.total_items)
+  } catch (error) {
+    users = []
+    renderMessage(error.message)
+    pagination.innerHTML = ''
+    document.getElementById('pageInfo').textContent = ''
+  }
 }
 
 
@@ -88,14 +136,13 @@ function openAddModal() {
   userModal.show()
 }
 
-function openEditModal(id) {
-  const u = findUser(id)
+function openEditModal(u) {
   editingId = u.id
   userForm.classList.remove('was-validated')
   document.getElementById('userModalTitle').textContent = 'Sửa tài khoản'
   document.getElementById('fullName').value = u.full_name
   document.getElementById('email').value = u.email
-  document.getElementById('phone').value = u.phone
+  document.getElementById('phone').value = u.phone || ''
   document.getElementById('role').value = u.role
   document.getElementById('status').value = u.status
   document.getElementById('passwordGroup').hidden = true
@@ -105,7 +152,7 @@ function openEditModal(id) {
 
 document.getElementById('addBtn').addEventListener('click', openAddModal)
 
-userForm.addEventListener('submit', function (event) {
+userForm.addEventListener('submit', async function (event) {
   event.preventDefault()
   userForm.classList.add('was-validated')
   if (!userForm.checkValidity()) return
@@ -118,55 +165,83 @@ userForm.addEventListener('submit', function (event) {
     status: document.getElementById('status').value,
   }
 
-  if (editingId) {
-    Object.assign(findUser(editingId), data)
-    FW.toast('Đã cập nhật tài khoản ' + data.full_name)
-  } else {
-    data.id = users.length ? users[users.length - 1].id + 1 : 1
-    data.auth_provider = 'LOCAL'
-    data.created_at = new Date().toLocaleDateString('vi-VN')
-    users.push(data)
-    FW.toast('Đã thêm tài khoản ' + data.full_name)
+  try {
+    if (editingId) {
+      await FW_API.updateUser(editingId, data)
+      FW.toast('Đã cập nhật tài khoản ' + data.full_name)
+    } else {
+      data.password = document.getElementById('password').value
+      await FW_API.createUser(data)
+      FW.toast('Đã thêm tài khoản ' + data.full_name)
+    }
+    userModal.hide()
+    loadUsers(editingId ? currentPage : 0)
+  } catch (error) {
+    FW.toast(error.message)
   }
-
-  userModal.hide()
-  renderTable()
 })
 
 
-userTable.addEventListener('click', function (event) {
+userTable.addEventListener('click', async function (event) {
   const button = event.target.closest('[data-action]')
   if (!button) return
   const u = findUser(button.dataset.id)
 
   if (button.dataset.action === 'edit') {
-    openEditModal(u.id)
+    openEditModal(u)
   }
 
   if (button.dataset.action === 'lock') {
-    u.status = u.status === 'LOCKED' ? 'ACTIVE' : 'LOCKED'
-    renderTable()
-    FW.toast((u.status === 'LOCKED' ? 'Đã khoá ' : 'Đã mở khoá ') + u.full_name)
+    const nextStatus = u.status === 'LOCKED' ? 'ACTIVE' : 'LOCKED'
+    try {
+      await FW_API.changeUserStatus(u.id, nextStatus)
+      FW.toast((nextStatus === 'LOCKED' ? 'Đã khoá ' : 'Đã mở khoá ') + u.full_name)
+      loadUsers(currentPage)
+    } catch (error) {
+      FW.toast(error.message)
+    }
   }
 
   if (button.dataset.action === 'reset') {
-    FW.toast('Đã gửi email đặt lại mật khẩu cho ' + u.email)
-  }
-
-  if (button.dataset.action === 'delete') {
-    deletingId = u.id
-    document.getElementById('deleteName').textContent = u.full_name
-    deleteModal.show()
+    resettingId = u.id
+    document.getElementById('resetName').textContent = u.full_name
+    document.getElementById('resetConfirm').hidden = false
+    document.getElementById('resetResult').hidden = true
+    resetModal.show()
   }
 })
 
-document.getElementById('confirmDelete').addEventListener('click', function () {
-  const u = findUser(deletingId)
-  users = users.filter(function (x) { return x.id !== deletingId })
-  deleteModal.hide()
-  renderTable()
-  FW.toast('Đã xoá tài khoản ' + u.full_name)
+document.getElementById('confirmReset').addEventListener('click', async function () {
+  try {
+    const data = await FW_API.resetUserPassword(resettingId)
+    document.getElementById('tempPassword').textContent = data.temporary_password
+    document.getElementById('resetConfirm').hidden = true
+    document.getElementById('resetResult').hidden = false
+  } catch (error) {
+    resetModal.hide()
+    FW.toast(error.message)
+  }
 })
 
 
-renderTable()
+searchInput.addEventListener('input', function () {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(function () { loadUsers(0) }, 300)
+})
+
+roleFilter.addEventListener('change', function () { loadUsers(0) })
+statusFilter.addEventListener('change', function () { loadUsers(0) })
+
+pagination.addEventListener('click', function (event) {
+  const link = event.target.closest('[data-page]')
+  if (!link) return
+  event.preventDefault()
+  loadUsers(Number(link.dataset.page))
+})
+
+document.addEventListener('change', function (event) {
+  if (event.target.id === 'roleSwitch') loadUsers(currentPage)
+})
+
+
+loadUsers(0)

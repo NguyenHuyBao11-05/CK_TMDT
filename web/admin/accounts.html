@@ -61,22 +61,22 @@
   <div class="admin-panel">
     <div class="admin-toolbar row g-2">
       <div class="col-md-6">
-        <input type="search" class="form-control" placeholder="Tìm theo tên, email, số điện thoại...">
+        <input type="search" id="searchInput" class="form-control" placeholder="Tìm theo tên, email, số điện thoại...">
       </div>
       <div class="col-6 col-md-3">
-        <select class="form-select">
-          <option>Tất cả vai trò</option>
-          <option>Khách hàng</option>
-          <option>Đối tác</option>
-          <option>Quản lý</option>
-          <option>Admin</option>
+        <select id="roleFilter" class="form-select">
+          <option value="">Tất cả vai trò</option>
+          <option value="CUSTOMER">Khách hàng</option>
+          <option value="PARTNER">Đối tác</option>
+          <option value="MANAGER">Quản lý</option>
+          <option value="ADMIN">Admin</option>
         </select>
       </div>
       <div class="col-6 col-md-3">
-        <select class="form-select">
-          <option>Tất cả trạng thái</option>
-          <option>Đang hoạt động</option>
-          <option>Đã khoá</option>
+        <select id="statusFilter" class="form-select">
+          <option value="">Tất cả trạng thái</option>
+          <option value="ACTIVE">Đang hoạt động</option>
+          <option value="LOCKED">Đã khoá</option>
         </select>
       </div>
     </div>
@@ -100,11 +100,7 @@
 
     <div class="admin-pagination d-flex justify-content-between align-items-center">
       <span id="pageInfo"></span>
-      <ul class="pagination pagination-sm mb-0">
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-      </ul>
+      <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
     </div>
   </div>
 </main>
@@ -170,16 +166,24 @@
   </div>
 </div>
 
-<div class="modal fade admin-modal" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+<div class="modal fade admin-modal" id="resetModal" tabindex="-1" aria-labelledby="resetModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
       <div class="modal-body text-center p-4">
-        <i class="fa-solid fa-triangle-exclamation fa-2x text-rose mb-3"></i>
-        <h2 class="h5" id="deleteModalTitle">Xoá tài khoản?</h2>
-        <p class="small text-muted-fw mb-4">Tài khoản <strong id="deleteName"></strong> sẽ bị xoá vĩnh viễn.</p>
-        <div class="d-flex gap-2 justify-content-center">
-          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Huỷ</button>
-          <button type="button" class="btn btn-danger rounded-pill" id="confirmDelete">Xoá</button>
+        <i class="fa-solid fa-key fa-2x text-rose mb-3"></i>
+        <h2 class="h5" id="resetModalTitle">Đặt lại mật khẩu?</h2>
+        <div id="resetConfirm">
+          <p class="small text-muted-fw mb-4">Hệ thống sẽ tạo mật khẩu tạm cho <strong id="resetName"></strong>. Mật khẩu cũ sẽ không dùng được nữa.</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Huỷ</button>
+            <button type="button" class="btn btn-forest" id="confirmReset">Đặt lại</button>
+          </div>
+        </div>
+        <div id="resetResult" hidden>
+          <p class="small text-muted-fw mb-2">Mật khẩu tạm mới:</p>
+          <p class="h4 fw-bold mb-3" id="tempPassword"></p>
+          <p class="small text-muted-fw mb-4">Hãy gửi mật khẩu này cho người dùng và nhắc họ đổi lại sau khi đăng nhập.</p>
+          <button type="button" class="btn btn-forest" data-bs-dismiss="modal">Đã hiểu</button>
         </div>
       </div>
     </div>
@@ -188,6 +192,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
 <script src="../js/pages/admin-accounts.js"></script>
 </body>

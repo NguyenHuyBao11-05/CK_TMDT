@@ -170,3 +170,87 @@
     getReviews() { return fake(SEED_REVIEWS) },
   }
 })()
+
+// Bảo — Diễn đàn thiết kế riêng (KH05)
+const DESIGN_REQUEST_KEY = 'fw_design_requests'
+
+function getDesignRequests() {
+  try {
+    return JSON.parse(localStorage.getItem(DESIGN_REQUEST_KEY)) || []
+  } catch (e) {
+    return []
+  }
+}
+
+function saveDesignRequest(request) {
+  const list = getDesignRequests()
+  request.id = Date.now()
+  request.status = 'OPEN'
+  request.created_at = new Date().toISOString()
+  list.push(request)
+  try {
+    localStorage.setItem(DESIGN_REQUEST_KEY, JSON.stringify(list))
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+const BAO_SERVER = 'http://localhost:8080'
+const BAO_ADMIN_USER = { admin: 1, manager: 2 }
+
+function mockUserId() {
+  try {
+    if (document.body.classList.contains('admin-page')) {
+      return BAO_ADMIN_USER[localStorage.getItem('fw_admin_role') || 'admin']
+    }
+    return localStorage.getItem('fw_user_id') || 3
+  } catch (e) {
+    return 3
+  }
+}
+
+async function callServer(path, options = {}) {
+  let res
+  try {
+    res = await fetch(BAO_SERVER + path, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', 'X-User-Id': mockUserId(), ...options.headers },
+    })
+  } catch (e) {
+    throw new Error('Không kết nối được máy chủ. Kiểm tra backend đã chạy chưa.')
+  }
+  const data = await res.json().catch(() => null)
+  if (!res.ok) throw new Error((data && data.message) || 'Có lỗi xảy ra, vui lòng thử lại.')
+  return data
+}
+
+Object.assign(window.FW_API, {
+  getAdminLogs(params) {
+    const query = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== '' && value != null) query.set(key, value)
+    })
+    return callServer('/api/admin/logs?' + query)
+  },
+
+  getAdminUsers(params) {
+    const query = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== '' && value != null) query.set(key, value)
+    })
+    return callServer('/api/admin/users?' + query)
+  },
+  createUser(data) {
+    return callServer('/api/admin/users', { method: 'POST', body: JSON.stringify(data) })
+  },
+  updateUser(id, data) {
+    return callServer('/api/admin/users/' + id, { method: 'PUT', body: JSON.stringify(data) })
+  },
+  changeUserStatus(id, status) {
+    return callServer('/api/admin/users/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) })
+  },
+  resetUserPassword(id) {
+    return callServer('/api/admin/users/' + id + '/reset-password', { method: 'POST' })
+  },
+})
