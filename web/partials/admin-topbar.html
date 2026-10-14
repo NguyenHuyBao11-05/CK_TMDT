@@ -1,0 +1,28 @@
+<header class="admin-topbar">
+  <div class="admin-search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="search" placeholder="Tìm tài khoản, đối tác, mã khiếu nại..." aria-label="Tìm kiếm">
+  </div>
+
+  <div class="d-flex align-items-center gap-3">
+    <label class="role-switch">
+      <span class="d-none d-md-inline">Xem theo vai trò:</span>
+      <select id="roleSwitch" class="form-select form-select-sm">
+        <option value="admin">Admin</option>
+        <option value="manager">Quản lý</option>
+      </select>
+    </label>
+
+    <button type="button" class="admin-bell" aria-label="Thông báo">
+      <i class="fa-regular fa-bell"></i><span class="admin-bell-count">5</span>
+    </button>
+
+    <div class="admin-account d-none d-sm-flex">
+      <span class="admin-avatar"><i class="fa-solid fa-user"></i></span>
+      <span>
+        <span class="d-block fw-semibold small" id="topbarName">Ban Quản Trị</span>
+        <span class="d-block text-muted-fw" style="font-size: 12px" id="topbarEmail">admin@nhanh.vn</span>
+      </span>
+    </div>
+  </div>
+</header>
