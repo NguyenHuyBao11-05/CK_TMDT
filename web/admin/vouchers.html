@@ -20,11 +20,54 @@
 <div id="admin-topbar"></div>
 
 <main class="admin-content">
-  <h1 class="admin-title">Quản lý voucher</h1>
-  <section class="coming-soon">
-    <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-    <p class="text-muted-fw">Trang này đang được phát triển (Nên).</p>
-  </section>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+      <div class="admin-breadcrumb">Vận hành › <span>Quản lý voucher</span></div>
+      <h1 class="admin-title">Quản lý voucher</h1>
+      <p class="text-muted-fw mb-0">Thêm, bật/tắt và xoá mã giảm giá. Mã đang bật mới dùng được ở trang giỏ hàng.</p>
+    </div>
+    <button type="button" class="btn btn-forest" id="addBtn">
+      <i class="fa-solid fa-plus me-1"></i>Thêm voucher
+    </button>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-4">
+      <div class="stat-card">
+        <div><div class="stat-label">Tổng voucher</div><div class="stat-value" id="statTotal">0</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-ticket"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-4">
+      <div class="stat-card">
+        <div><div class="stat-label">Đang bật</div><div class="stat-value" id="statActive">0</div></div>
+        <span class="stat-icon gold"><i class="fa-solid fa-toggle-on"></i></span>
+      </div>
+    </div>
+    <div class="col-12 col-xl-4">
+      <div class="stat-card">
+        <div><div class="stat-label">Đã tắt</div><div class="stat-value" id="statOff">0</div></div>
+        <span class="stat-icon rose"><i class="fa-solid fa-toggle-off"></i></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="table-responsive">
+      <table class="table admin-table">
+        <thead>
+        <tr>
+          <th>Mã</th>
+          <th>Mức giảm</th>
+          <th>Đơn tối thiểu</th>
+          <th>Trạng thái</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="voucherTable"></tbody>
+      </table>
+    </div>
+  </div>
 </main>
 
 <div class="no-access">
@@ -33,8 +76,66 @@
   <p class="text-muted-fw">Trang Quản lý voucher chỉ dành cho Quản lý.</p>
 </div>
 
+<div class="modal fade admin-modal" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="voucherForm" novalidate>
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="voucherModalTitle">Thêm voucher</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="vCode" class="form-label">Mã voucher <span class="text-rose">*</span></label>
+          <input type="text" id="vCode" class="form-control" maxlength="20" placeholder="VD: TET20" required>
+          <div class="invalid-feedback" id="vCodeMsg">Mã gồm 3–20 chữ hoặc số, không dấu, không khoảng trắng.</div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label for="vType" class="form-label">Loại giảm</label>
+            <select id="vType" class="form-select">
+              <option value="PERCENT">Giảm theo %</option>
+              <option value="AMOUNT">Giảm số tiền (đ)</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label for="vValue" class="form-label">Giá trị <span class="text-rose">*</span></label>
+            <input type="number" id="vValue" class="form-control" min="1" required>
+            <div class="invalid-feedback" id="vValueMsg">Giá trị chưa hợp lệ.</div>
+          </div>
+        </div>
+        <div>
+          <label for="vMin" class="form-label">Đơn tối thiểu (đ)</label>
+          <input type="number" id="vMin" class="form-control" min="0" value="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-forest">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade admin-modal" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <i class="fa-solid fa-triangle-exclamation fa-2x text-rose mb-3"></i>
+        <h2 class="h5" id="deleteModalTitle">Xoá voucher?</h2>
+        <p class="small text-muted-fw mb-4">Mã <strong id="deleteCode"></strong> sẽ bị xoá vĩnh viễn.</p>
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Huỷ</button>
+          <button type="button" class="btn btn-danger rounded-pill" id="confirmDelete">Xoá</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-vouchers.js"></script>
 </body>
 </html>

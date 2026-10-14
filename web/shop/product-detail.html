@@ -13,17 +13,58 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
 </head>
-<body>
+<body data-nav="products">
 
 <div id="site-header"></div>
 
 <main>
-  <section class="coming-soon">
+  <section class="section pt-5">
     <div class="container">
-      <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-      <h1 class="h2">Chi tiết sản phẩm</h1>
-      <p class="text-muted-fw">Trang này đang được phát triển.</p>
-      <a href="../index.html" class="btn btn-forest mt-2">Về trang chủ</a>
+      <nav aria-label="breadcrumb" class="small mb-3">
+        <a data-href="shop/products.html" class="text-forest">Mẫu hoa có sẵn</a> <span class="text-muted-fw">/</span>
+        <span id="crumbName" class="text-muted-fw"></span>
+      </nav>
+
+      <div id="notFound" class="text-center py-5" hidden>
+        <p class="text-muted-fw">Không tìm thấy sản phẩm này.</p>
+        <a data-href="shop/products.html" class="btn btn-forest">Xem mẫu hoa khác</a>
+      </div>
+
+      <div id="detail" class="row g-4" hidden>
+        <div class="col-md-6"><img id="pImg" class="w-100 rounded-4 border object-fit-cover" style="aspect-ratio:1/1" alt=""></div>
+        <div class="col-md-6">
+          <div class="small text-muted-fw mb-1"><i class="fa-solid fa-store me-1"></i><span id="pPartner"></span> · <span id="pMaterial"></span></div>
+          <h1 id="pName" class="h3 font-serif"></h1>
+          <div class="mb-3"><i class="fa-solid fa-star text-rose me-1"></i><span id="pRating"></span><span id="pSold" class="text-muted-fw ms-2"></span></div>
+          <div class="mb-4"><span id="pPrice" class="h4 text-rose me-2"></span><span id="pOld" class="product-old-price"></span></div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span>Số lượng</span>
+            <button type="button" class="btn btn-ghost px-3" id="qtyMinus" aria-label="Giảm số lượng">−</button>
+            <span id="qtyVal" class="px-2" aria-live="polite">1</span>
+            <button type="button" class="btn btn-ghost px-3" id="qtyPlus" aria-label="Tăng số lượng">+</button>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-peach" id="addBtn"><i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ</button>
+            <button type="button" class="btn btn-forest" id="buyBtn">Mua ngay</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="extra" class="row g-4 mt-2" hidden>
+        <div class="col-lg-6">
+          <h2 class="h5 font-serif mb-3">Đánh giá của khách</h2>
+          <div id="reviewList" class="d-grid gap-3"></div>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="h5 font-serif mb-3">Bình luận</h2>
+          <form id="commentForm" class="mb-3" hidden>
+            <textarea name="content" class="form-control mb-2" rows="3" maxlength="500" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm" aria-label="Nội dung bình luận"></textarea>
+            <button class="btn btn-forest" type="submit">Gửi bình luận</button>
+          </form>
+          <p id="commentLock" class="small text-muted-fw p-3 bg-white border rounded-4" hidden>Chỉ khách đã mua sản phẩm này mới bình luận được.</p>
+          <div id="commentList" class="d-grid gap-3"></div>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -33,5 +74,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/shop-product-detail.js"></script>
 </body>
 </html>
