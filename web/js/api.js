@@ -183,11 +183,6 @@
           { id: '#FW-1015', customer: 'Lê Gia Huy', item: 'Lẵng hoa khai trương', total: 2950000, status: 'PROCESSING', time: '1 giờ trước' },
           { id: '#FW-1016', customer: 'Trần Minh Anh', item: 'Giỏ hoa sự kiện', total: 2200000, status: 'SHIPPING', time: '2 giờ trước' },
         ],
-        products: [
-          { name: 'Bó Hoa Cưới Pastel', price: 1800000, status: 'Đang hiển thị', sales: 126 },
-          { name: 'Lẵng Hoa Khai Trương', price: 2950000, status: 'Chờ duyệt', sales: 41 },
-          { name: 'Giỏ Hoa Sự Kiện', price: 2200000, status: 'Đang hiển thị', sales: 89 },
-        ],
       })
     },
 
@@ -206,12 +201,12 @@
 
     getPartnerProducts() {
       return fake([
-        { id: 21, sku: 'FW-TP-001', name: 'Bó Hoa Tulip Pastel Mơ Mộng', category: 'Hoa sinh nhật', material: 'Hoa thật', price: 850000, wholesale_price: 620000, status: 'Đang hiển thị', stock: 15, sold: 126 },
-        { id: 22, sku: 'FW-TH-204', name: 'Giỏ Hoa Hồng Juliet Quý Phái', category: 'Hoa cưới', material: 'Hoa thật', price: 1450000, wholesale_price: 1150000, status: 'Đang hiển thị', stock: 8, sold: 41 },
-        { id: 23, sku: 'FW-TH-309', name: 'Kệ Khai Trương Cam Có Hội Sunburst', category: 'Hoa khai trương', material: 'Hoa thật', price: 2800000, wholesale_price: 2100000, status: 'Đang hiển thị', stock: 3, sold: 89 },
-        { id: 24, sku: 'FW-TP-017', name: 'Bình Cắm Tú Cầu Xanh Lam Nhật Bản', category: 'Hoa sinh nhật', material: 'Hoa nhung', price: 1890000, wholesale_price: 1420000, status: 'Đang hiển thị', stock: 20, sold: 21 },
-        { id: 25, sku: 'FW-TP-052', name: 'Bó Cúc Tan Tỉnh Khói & Baby Trắng', category: 'Hoa cưới', material: 'Hoa giấy', price: 420000, wholesale_price: 310000, status: 'Hết nguyên liệu', stock: 0, sold: 55 },
-        { id: 26, sku: 'FW-TP-099', name: 'Chậu Lan Hồ Điệp Hoàng Gia 9 Cành VIP', category: 'Hoa khai trương', material: 'Hoa thật', price: 3950000, wholesale_price: 3200000, status: 'Chờ duyệt', stock: 3, sold: 14 },
+        { id: 21, partner_id: 2, name: 'Bó Hoa Tulip Pastel Mơ Mộng', material: 'Hoa thật', description: 'Bó tulip tone pastel tươi mới, thích hợp làm quà tặng.', price: 850000, discount_price: null, stock_quantity: 15, thumbnail_url: img('white-tulips.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-10 10:00:00', reject_reason: null, created_at: '2026-10-01 09:00:00', updated_at: '2026-10-10 10:00:00' },
+        { id: 22, partner_id: 2, name: 'Giỏ Hoa Hồng Juliet Quý Phái', material: 'Hoa thật', description: 'Giỏ hoa hồng Juliet thanh lịch.', price: 1450000, discount_price: 1290000, stock_quantity: 8, thumbnail_url: img('sunshine-basket.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-10 10:00:00', reject_reason: null, created_at: '2026-10-02 09:00:00', updated_at: '2026-10-10 10:00:00' },
+        { id: 23, partner_id: 2, name: 'Kệ Khai Trương Cam Có Hội Sunburst', material: 'Hoa thật', description: 'Kệ hoa khai trương màu cam vàng rực rỡ.', price: 2800000, discount_price: null, stock_quantity: 3, thumbnail_url: img('grand-opening.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-11 10:00:00', reject_reason: null, created_at: '2026-10-03 09:00:00', updated_at: '2026-10-11 10:00:00' },
+        { id: 24, partner_id: 2, name: 'Bình Cắm Tú Cầu Xanh Lam Nhật Bản', material: 'Hoa nhung', description: 'Bình hoa xanh lam dùng trang trí không gian.', price: 1890000, discount_price: null, stock_quantity: 20, thumbnail_url: img('green-hydrangea.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-11 10:00:00', reject_reason: null, created_at: '2026-10-04 09:00:00', updated_at: '2026-10-11 10:00:00' },
+        { id: 25, partner_id: 2, name: 'Bó Cúc Tana Tinh Khôi & Baby Trắng', material: 'Hoa giấy', description: 'Bó hoa giấy trắng phong cách nhẹ nhàng.', price: 420000, discount_price: null, stock_quantity: 0, thumbnail_url: img('yellow-basket.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-12 10:00:00', reject_reason: null, created_at: '2026-10-05 09:00:00', updated_at: '2026-10-12 10:00:00' },
+        { id: 26, partner_id: 2, name: 'Chậu Lan Hồ Điệp Hoàng Gia 9 Cành VIP', material: 'Hoa thật', description: 'Chậu lan hồ điệp sang trọng.', price: 3950000, discount_price: null, stock_quantity: 3, thumbnail_url: img('lily-of-valley.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 09:00:00', updated_at: '2026-10-14 09:00:00' },
       ])
     },
 
@@ -225,11 +220,11 @@
 
     getProductApprovals() {
       return fake([
-        { id: 'SP-008', name: 'Bình Tulip Trắng Hà Lan', shop: 'Florist Thảo Điền Atelier', price: 1850000, submitted: '14/10/2026', status: 'Chờ duyệt', images: 4, category: 'Hoa cưới', material: 'Hoa thật', thumbnail: 'white-tulips.jpg', sku: 'FW-TP-801', wholesale_price: 1450000 },
-        { id: 'SP-009', name: 'Hộp Hoa Mùa Điệp Lên Đèn', shop: "L'Amour Floral Studio", price: 1250000, submitted: '14/10/2026', status: 'Chờ duyệt', images: 5, category: 'Hoa sinh nhật', material: 'Hoa thật', thumbnail: 'red-roses.jpg', sku: 'FW-MC-304', wholesale_price: 990000 },
-        { id: 'SP-010', name: 'Kệ Khai Trương Tường 2 Tầng', shop: 'Sài Gòn Hoa Tươi', price: 2700000, submitted: '13/10/2026', status: 'Chờ duyệt', images: 4, category: 'Hoa khai trương', material: 'Hoa thật', thumbnail: 'grand-opening.jpg', sku: 'FW-KK-519', wholesale_price: 2100000 },
-        { id: 'SP-011', name: 'Hoa Cưới Cổ Điển Pure Peony', shop: 'Maison de Fleur', price: 2100000, submitted: '13/10/2026', status: 'Chờ duyệt', images: 6, category: 'Hoa cưới', material: 'Hoa thật', thumbnail: 'lily-of-valley.jpg', sku: 'FW-WED-108', wholesale_price: 1650000 },
-        { id: 'SP-012', name: 'Giỏ Hoa Nắng Ban Mai', shop: 'Nhiên Floral Art', price: 950000, submitted: '12/10/2026', status: 'Cần chỉnh sửa', images: 3, category: 'Hoa sinh nhật', material: 'Hoa nhung', thumbnail: 'sunshine-basket.jpg', sku: 'FW-NA-310', wholesale_price: 780000 },
+        { id: 81, partner_id: 2, name: 'Bình Tulip Trắng Hà Lan', material: 'Hoa thật', description: 'Bình tulip trắng cắm thủ công.', price: 1850000, discount_price: null, stock_quantity: 10, thumbnail_url: img('white-tulips.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 09:00:00', updated_at: '2026-10-14 09:00:00' },
+        { id: 82, partner_id: 3, name: 'Hộp Hoa Mùa Điệp Lên Đèn', material: 'Hoa thật', description: 'Hộp hoa phối màu mùa thu.', price: 1250000, discount_price: null, stock_quantity: 8, thumbnail_url: img('red-roses.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 10:00:00', updated_at: '2026-10-14 10:00:00' },
+        { id: 83, partner_id: 4, name: 'Kệ Khai Trương Tường 2 Tầng', material: 'Hoa thật', description: 'Kệ hoa khai trương tông màu rực rỡ.', price: 2700000, discount_price: null, stock_quantity: 5, thumbnail_url: img('grand-opening.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-13 09:00:00', updated_at: '2026-10-13 09:00:00' },
+        { id: 84, partner_id: 5, name: 'Hoa Cưới Cổ Điển Pure Peony', material: 'Hoa thật', description: 'Hoa cưới phong cách cổ điển.', price: 2100000, discount_price: null, stock_quantity: 6, thumbnail_url: img('lily-of-valley.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-13 11:00:00', updated_at: '2026-10-13 11:00:00' },
+        { id: 85, partner_id: 6, name: 'Giỏ Hoa Nắng Ban Mai', material: 'Hoa nhung', description: 'Giỏ hoa tone vàng cam.', price: 950000, discount_price: null, stock_quantity: 4, thumbnail_url: img('sunshine-basket.jpg'), status: 'REJECTED', approved_by: 1, approved_at: '2026-10-12 11:00:00', reject_reason: 'Vui lòng bổ sung ảnh đại diện rõ nét.', created_at: '2026-10-12 09:00:00', updated_at: '2026-10-12 11:00:00' },
       ])
     },
 

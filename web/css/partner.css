@@ -25,23 +25,30 @@ body.partner-page .sidebar .list-nav-items .nav-item {
   transition: background-color .18s ease, color .18s ease;
 }
 
-body.partner-page .sidebar .list-nav-items .nav-item > i {
+body.partner-page .sidebar .list-nav-items .nav-item > a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 24px;
+  color: var(--fw-ink);
+  text-decoration: none;
+}
+
+body.partner-page .sidebar .list-nav-items .nav-item > a > i {
   width: 22px;
   flex: 0 0 22px;
-  margin-right: 10px;
+  margin: 0;
   color: var(--fw-muted);
   text-align: center;
   font-size: 15px;
 }
 
-body.partner-page .sidebar .list-nav-items .nav-item > a {
-  display: block;
+body.partner-page .sidebar .list-nav-items .nav-item > a > span {
   flex: 1;
-  color: var(--fw-ink);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  text-decoration: none;
   white-space: nowrap;
 }
 
@@ -53,12 +60,12 @@ body.partner-page .sidebar .list-nav-items .nav-item.selected {
   background: var(--fw-sage-soft);
 }
 
-body.partner-page .sidebar .list-nav-items .nav-item.selected > i,
-body.partner-page .sidebar .list-nav-items .nav-item.selected > a {
+body.partner-page .sidebar .list-nav-items .nav-item.selected > a,
+body.partner-page .sidebar .list-nav-items .nav-item.selected > a > i {
   color: var(--fw-forest);
 }
 
-body.partner-page .sidebar .list-nav-items .nav-item.selected > a {
+body.partner-page .sidebar .list-nav-items .nav-item.selected > a > span {
   font-weight: 700;
 }
 

@@ -18,8 +18,10 @@
       if (!row) return
       row.classList.toggle('selected', nav === current)
       row.innerHTML = `
-        <i class="fa-solid ${icon}" aria-hidden="true"></i>
-        <a href="${FW.url(path)}" ${nav === current ? 'aria-current="page"' : ''}>${label}</a>
+        <a href="${FW.url(path)}" ${nav === current ? 'aria-current="page"' : ''}>
+          <i class="fa-solid ${icon}" aria-hidden="true"></i>
+          <span>${label}</span>
+        </a>
       `
     })
 

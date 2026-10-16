@@ -25,7 +25,7 @@
     <div>
       <div class="eyebrow">Atelier portfolio · cập nhật 15 phút trước</div>
       <h1 class="partner-title">Sản phẩm của tôi</h1>
-      <p class="partner-subtitle">Quản lý kho hoa mẫu, điều chỉnh giá bán lẻ và sỉ B2C và sỉ B2B dành cho đại lý và sự kiện tiệc cao cấp.</p>
+      <p class="partner-subtitle">Quản lý mẫu hoa, giá bán, chất liệu, số lượng tồn kho và trạng thái kiểm duyệt.</p>
     </div>
     <div class="partner-actions">
       <button type="button" class="partner-primary-btn" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-solid fa-plus"></i> Tạo sản phẩm mới</button>
@@ -37,14 +37,14 @@
   <section class="partner-panel partner-product-management">
     <div class="partner-toolbar">
       <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="productSearch" type="search" placeholder="Tìm theo tên mẫu hoa, mã SKU hoặc từ khóa hoa tươi..."></label>
-      <select id="productCategory" class="form-select"><option value="">Tất cả danh mục</option><option>Hoa cưới</option><option>Hoa sinh nhật</option><option>Hoa khai trương</option></select>
-      <select id="productStatus" class="form-select"><option value="">Trạng thái: Tất cả</option><option>Đang hiển thị</option><option>Chờ duyệt</option><option>Bị từ chối</option><option>Hết nguyên liệu</option></select>
-      <select id="productStockFilter" class="form-select"><option value="">Chất liệu: Tất cả</option><option>Hoa thật</option><option>Hoa nhung</option><option>Hoa giấy</option></select>
+      <select id="productMaterialFilter" class="form-select" aria-label="Lọc theo chất liệu"><option value="">Chất liệu: Tất cả</option><option>Hoa thật</option><option>Hoa nhung</option><option>Hoa giấy</option></select>
+      <select id="productStatus" class="form-select" aria-label="Lọc theo trạng thái"><option value="">Trạng thái: Tất cả</option><option value="APPROVED">Đang hiển thị</option><option value="PENDING">Chờ duyệt</option><option value="REJECTED">Bị từ chối</option></select>
+      <select id="productStockFilter" class="form-select" aria-label="Lọc theo số lượng tồn kho"><option value="">Tồn kho: Tất cả</option><option value="available">Còn hàng</option><option value="empty">Hết hàng</option></select>
       <button type="button" class="partner-icon-button" id="refreshProducts" aria-label="Tải lại"><i class="fa-solid fa-rotate"></i></button>
     </div>
     <div class="table-responsive">
       <table class="partner-table partner-products-table">
-        <thead><tr><th>Mẫu hoa / SKU</th><th>Tên mẫu &amp; phân loại</th><th>Chất liệu</th><th>Giá bán lẻ</th><th>Giá bán sỉ</th><th>Nhà kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <thead><tr><th>Mã</th><th>Sản phẩm</th><th>Chất liệu</th><th>Giá</th><th>Giá ưu đãi</th><th>Số lượng tồn</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
         <tbody id="productList"></tbody>
       </table>
     </div>
@@ -52,8 +52,8 @@
 
   <section class="partner-guidance">
     <span class="partner-guidance-icon"><i class="fa-regular fa-lightbulb"></i></span>
-    <div><strong>Quyết định tỷ lệ chiết đơn B2B cho Florist Kim Cương</strong><p class="mb-0">Tỷ lệ phí giao về gói và cắt từ 5% cho bạn nhận được nhiều bài mẫu giá ưu đãi trong các dự án công ty hơn 42% trên Fw12.</p></div>
-    <button type="button" data-bs-toggle="modal" data-bs-target="#productModal">Tạo sản phẩm ưu đãi ngay <i class="fa-solid fa-arrow-right ms-1"></i></button>
+    <div><strong>Lưu ý trạng thái sản phẩm</strong><p class="mb-0">Sản phẩm mới gửi sẽ ở trạng thái Chờ duyệt và chỉ hiển thị với khách hàng sau khi được Quản lý phê duyệt.</p></div>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#productModal">Tạo sản phẩm mới <i class="fa-solid fa-arrow-right ms-1"></i></button>
   </section>
 
   <div class="modal fade admin-modal" id="productModal" tabindex="-1" aria-labelledby="productModalTitle" aria-hidden="true">
@@ -69,9 +69,9 @@
           <div>
             <label class="form-label" for="productMaterial">Chất liệu</label>
             <select id="productMaterial" class="form-select">
-              <option>Hoa thật</option>
-              <option>Hoa nhung</option>
-              <option>Hoa giấy</option>
+              <option value="Hoa thật">Hoa thật</option>
+              <option value="Hoa nhung">Hoa nhung</option>
+              <option value="Hoa giấy">Hoa giấy</option>
             </select>
           </div>
           <div>
@@ -79,25 +79,20 @@
             <input id="productPrice" class="form-control" type="number" min="1" placeholder="850000" required>
           </div>
           <div>
-            <label class="form-label" for="productStock">Tồn kho</label>
-            <input id="productStock" class="form-control" type="number" min="0" placeholder="15" required>
+            <label class="form-label" for="productStockQuantity">Số lượng tồn kho</label>
+            <input id="productStockQuantity" class="form-control" type="number" min="0" placeholder="15" required>
           </div>
           <div>
-            <label class="form-label" for="productOccasion">Dịp tặng</label>
-            <select id="productOccasion" class="form-select">
-              <option>Hoa cưới</option>
-              <option selected>Hoa sinh nhật</option>
-              <option>Kỷ niệm</option>
-              <option>Hoa khai trương</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" for="productWholesale">Giá bán sỉ</label>
-            <input id="productWholesale" class="form-control" type="number" min="1" placeholder="620000">
+            <label class="form-label" for="productDiscountPrice">Giá ưu đãi (không bắt buộc)</label>
+            <input id="productDiscountPrice" class="form-control" type="number" min="1" placeholder="Để trống nếu không giảm">
           </div>
           <div class="full">
-            <label class="form-label" for="productNotes">Mô tả</label>
-            <textarea id="productNotes" class="form-control" rows="4" placeholder="Mô tả chất liệu, kiểu dáng và lưu ý bảo quản..."></textarea>
+            <label class="form-label" for="productThumbnailUrl">Đường dẫn ảnh đại diện</label>
+            <input id="productThumbnailUrl" class="form-control" type="url" placeholder="https://...">
+          </div>
+          <div class="full">
+            <label class="form-label" for="productDescription">Mô tả</label>
+            <textarea id="productDescription" class="form-control" rows="4" placeholder="Mô tả chất liệu, kiểu dáng và lưu ý bảo quản..."></textarea>
           </div>
           </div>
         </div>
