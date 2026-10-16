@@ -9,9 +9,15 @@
       { item: '.nav-item.all', label: 'Tổng quan', path: 'partner/dashboard.html', icon: 'fa-border-all', nav: 'dashboard' },
       { item: '.nav-item.order-history', label: 'Quản lý đơn hàng', path: 'partner/orders.html', icon: 'fa-box-archive', nav: 'orders' },
       { item: '.nav-item.design', label: 'Diễn đàn yêu cầu', path: 'design/forum.html', icon: 'fa-palette', nav: 'forum' },
+      { item: '.nav-item.sent-quotes', label: 'Báo giá đã gửi', path: 'design/sent-quotes.html', icon: 'fa-file-invoice-dollar', nav: 'sent-quotes' },
       { item: '.nav-item.complaint', label: 'Sản phẩm của tôi', path: 'partner/products.html', icon: 'fa-seedling', nav: 'products' },
     ]
     const current = document.body.dataset.partnerNav
+
+    const designRow = sidebar.querySelector('.nav-item.design')
+    if (designRow && !sidebar.querySelector('.nav-item.sent-quotes')) {
+      designRow.insertAdjacentHTML('afterend', '<li class="nav-item sent-quotes"></li>')
+    }
 
     links.forEach(({ item, label, path, icon, nav }) => {
       const row = sidebar.querySelector(item)

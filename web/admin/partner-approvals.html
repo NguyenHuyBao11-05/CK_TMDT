@@ -23,29 +23,28 @@
 <main class="admin-content">
   <div class="review-title-row">
     <div>
-      <div class="admin-breadcrumb">Vận hành &amp; đối tác › <span>Yêu cầu Đăng ký Đối tác</span></div>
-      <h1 class="admin-title">Yêu cầu Đăng ký Đối tác Gian hàng</h1>
-      <p class="text-muted-fw mb-0">Kiểm duyệt giấy phép kinh doanh, năng lực nghệ nhân cắm hoa thủ công và tiêu chuẩn xưởng bảo quản lạnh trước khi cấp quyền bán hàng trên Fw12.</p>
+      <div class="admin-breadcrumb">Vận hành &amp; đối tác › <span>Duyệt hồ sơ Đối tác</span></div>
+      <h1 class="admin-title">Duyệt hồ sơ Đối tác</h1>
+      <p class="text-muted-fw mb-0">Xem thông tin và portfolio của người đăng ký làm Đối tác, sau đó phê duyệt hoặc từ chối kèm lý do.</p>
     </div>
-    <div class="review-export-actions"><button type="button" class="partner-secondary-btn"><i class="fa-solid fa-file-export"></i> Xuất báo cáo PDF</button><button type="button" class="partner-primary-btn"><i class="fa-solid fa-check-double"></i> Quy chuẩn thẩm định</button></div>
   </div>
 
   <div class="review-kpis partner-approval-kpis">
-    <div><span>CHỜ THẨM ĐỊNH</span><strong id="statPending">12 <small>hồ sơ</small></strong><em>+4 hồ sơ yêu cầu phản hồi sớm</em></div>
-    <div><span>ĐÃ DUYỆT THÁNG NÀY</span><strong id="statApproved">48 <small>đối tác mới</small></strong><em>Tăng 18% so với tháng trước</em></div>
-    <div><span>TỶ LỆ ĐẠT CHUẨN</span><strong>82<small>%</small></strong><em>Chất lượng xưởng tuyển chọn</em></div>
-    <div><span>CẦN BỔ SUNG</span><strong id="statNeedsEdit">03 <small>hồ sơ</small></strong><em>Hồ sơ thiếu xác thực</em></div>
+    <div><span>CHỜ DUYỆT</span><strong id="statPending">0 <small>hồ sơ</small></strong><em>Cần Quản lý xem xét</em></div>
+    <div><span>ĐÃ DUYỆT</span><strong id="statApproved">0 <small>hồ sơ</small></strong><em>Đã thành Đối tác</em></div>
+    <div><span>TỪ CHỐI</span><strong id="statRejected">0 <small>hồ sơ</small></strong><em>Đã gửi lý do cho ứng viên</em></div>
+    <div><span>TỔNG HỒ SƠ</span><strong id="statTotal">0 <small>hồ sơ</small></strong><em>Tất cả hồ sơ đã nhận</em></div>
   </div>
 
   <div class="review-application-toolbar">
-    <div class="review-state-tabs"><button class="active" type="button">Tất cả hồ sơ</button><button type="button">Chờ duyệt <span>12</span></button><button type="button">Hồ sơ mới</button><button type="button">Yêu cầu bổ sung</button></div>
+    <div class="review-state-tabs"><button class="active" type="button" data-status="">Tất cả hồ sơ</button><button type="button" data-status="Chờ duyệt">Chờ duyệt</button><button type="button" data-status="Đã duyệt">Đã duyệt</button><button type="button" data-status="Từ chối">Từ chối</button></div>
     <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="partnerSearch" type="search" placeholder="Tìm theo shop, SĐT, đại diện..."></label>
     <select class="form-select" id="partnerRegion"><option value="">Khu vực: Toàn quốc</option><option>TP.HCM</option><option>Hà Nội</option><option>Đà Nẵng</option></select>
   </div>
 
   <div class="review-application-layout">
     <section class="admin-panel">
-      <div class="review-list-header"><strong>Danh sách Đơn đăng ký chờ thẩm duyệt</strong><span id="partnerResultCount"></span></div>
+      <div class="review-list-header"><strong>Danh sách hồ sơ đăng ký</strong><span id="partnerResultCount"></span></div>
       <div class="review-application-list" id="approvalTable"></div>
     </section>
     <aside class="review-profile-panel" id="partnerProfile"></aside>
