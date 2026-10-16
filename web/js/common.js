@@ -138,6 +138,19 @@
     })
   }
 
+  function highlightSidebar() {
+    const sidebar = document.querySelector('.sidebar')
+    if (!sidebar) return
+    const aliases = { 'design/compare-quotes.html': 'design/my-requests.html' }
+    const page = location.pathname.split('/').slice(-2).join('/')
+    const target = aliases[page] || page
+    sidebar.querySelectorAll('.nav-item').forEach((item) => {
+      const link = item.querySelector('a[href]')
+      const match = !!link && new URL(link.href).pathname.endsWith('/' + target)
+      item.classList.toggle('selected', match)
+    })
+  }
+
   function wireHeader() {
     const form = document.getElementById('headerSearch')
     form?.addEventListener('submit', (e) => {
@@ -170,6 +183,7 @@
     ])
     resolveLinks()
     highlightNav()
+    highlightSidebar()
     wireHeader()
     document.dispatchEvent(new Event('fw:partials-loaded'))
   }
