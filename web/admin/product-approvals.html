@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/partner-review.css">
 </head>
 <body class="admin-page" data-nav="product-approvals" data-page-role="manager">
 
@@ -20,11 +21,51 @@
 <div id="admin-topbar"></div>
 
 <main class="admin-content">
-  <h1 class="admin-title">Kiểm duyệt mẫu hoa</h1>
-  <section class="coming-soon">
-    <div class="icon mb-3"><i class="fa-solid fa-seedling"></i></div>
-    <p class="text-muted-fw">Trang này đang được phát triển (QL02 — Phong).</p>
-  </section>
+  <div class="review-title-row">
+    <div>
+      <div class="admin-breadcrumb">Vận hành &amp; kiểm duyệt › <span>Kiểm duyệt mẫu hoa</span></div>
+      <div class="review-kicker">PHIÊN BẢN NỀN TẢNG · ĐANG HOẠT ĐỘNG</div>
+      <h1 class="admin-title">Kiểm duyệt Mẫu hoa mới &amp; Bảng giá</h1>
+      <p class="text-muted-fw mb-0">Thẩm định nguồn gốc hoa tươi, tiêu chuẩn kỹ thuật, giá bán tuân thủ chính sách sàn và minh chứng trước khi hiển thị.</p>
+    </div>
+    <div class="review-kpis">
+      <div><span>CHỜ KIỂM DUYỆT</span><strong id="statPending">08 <small>mẫu</small></strong></div>
+      <div><span>ĐÃ DUYỆT HÔM NAY</span><strong id="statApproved">24 <small>mẫu</small></strong></div>
+      <div><span>TỶ LỆ ĐẠT</span><strong>91,5<small>%</small></strong></div>
+      <div><span>CẦN CHỈNH SỬA</span><strong id="statNeedsEdit">02 <small>mẫu</small></strong></div>
+    </div>
+  </div>
+
+  <div class="review-filterbar">
+    <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="approvalSearch" type="search" placeholder="Tìm theo tên, mã SKU, tên Florist..."></label>
+    <button type="button" class="review-filter active" data-material="">Tất cả</button>
+    <button type="button" class="review-filter" data-material="Hoa thật">Hoa thật</button>
+    <button type="button" class="review-filter" data-material="Hoa nhung">Hoa nhung</button>
+    <button type="button" class="review-filter" data-material="Hoa giấy">Hoa giấy</button>
+    <button type="button" class="partner-icon-button ms-auto" aria-label="Dạng lưới"><i class="fa-solid fa-grip"></i></button>
+  </div>
+
+  <div class="review-guidelines"><i class="fa-solid fa-shield-heart"></i><strong>Quy chuẩn xét duyệt hình ảnh &amp; Niêm yết Fw12</strong><span>Tuổi &lt; 72h</span><span>Chuẩn 4K không watermark</span><span>Khung giá sàn tuân thủ</span></div>
+
+  <div class="review-product-grid" id="productTable"></div>
+
+  <div class="review-bottom-grid">
+    <section class="admin-panel review-checklist">
+      <h2>Checklist Thẩm định Bắt buộc</h2>
+      <p>Admin cần đánh giá các tiêu chí trước khi phê duyệt</p>
+      <div class="review-check-items">
+        <span><i class="fa-solid fa-circle-check"></i> Cam kết độ tuổi tối thiểu 72 giờ</span>
+        <span><i class="fa-solid fa-circle-check"></i> Ảnh chụp thật, không filter ảo</span>
+        <span><i class="fa-solid fa-circle-check"></i> Tuân thủ khung giá thị trường Fw12</span>
+        <span><i class="fa-solid fa-circle-check"></i> Minh bạch hoa nội địa &amp; nhập khẩu</span>
+      </div>
+    </section>
+    <section class="admin-panel review-log">
+      <h2>Nhật ký duyệt gần nhất</h2>
+      <div><span class="badge-soft green">Đã duyệt</span> Lẵng Hoa Hướng Dương <small>Florist Quỳnh · 1 phút trước</small></div>
+      <div><span class="badge-soft rose">Yêu cầu bổ sung</span> Bó Hồng Ecuador <small>Florist Bình Thạnh · 38 phút trước</small></div>
+    </section>
+  </div>
 </main>
 
 <div class="no-access">
@@ -35,6 +76,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-product-approvals.js"></script>
 </body>
 </html>
