@@ -12,6 +12,7 @@ const ACTION_LABEL = {
   LOGOUT: 'Đăng xuất',
   QUOTE_CREATE: 'Gửi báo giá',
   REQUEST_CREATE: 'Đăng yêu cầu thiết kế',
+  REQUEST_CANCEL: 'Huỷ yêu cầu thiết kế',
   ORDER_STATUS: 'Cập nhật trạng thái đơn',
   ORDER_CANCEL: 'Huỷ đơn hàng',
   ORDER_AUTO_RECEIVED: 'Tự động xác nhận đã nhận',

@@ -8,7 +8,7 @@ const imagePreview = document.getElementById('imagePreview')
 const imageError = document.getElementById('imageError')
 const colorError = document.getElementById('colorError')
 
-let imageData = ''
+let imageFile = null
 
 budgetRange.addEventListener('input', function () {
   budgetInput.value = budgetRange.value
@@ -42,7 +42,7 @@ imageInput.addEventListener('change', function () {
   const file = imageInput.files[0]
   imageError.hidden = true
   imagePreview.hidden = true
-  imageData = ''
+  imageFile = null
 
   if (!file) return
 
@@ -52,18 +52,14 @@ imageInput.addEventListener('change', function () {
     return
   }
 
-  const reader = new FileReader()
-  reader.onload = function () {
-    imageData = reader.result
-    imagePreview.src = imageData
-    imagePreview.hidden = false
-  }
-  reader.readAsDataURL(file)
+  imageFile = file
+  imagePreview.src = URL.createObjectURL(file)
+  imagePreview.hidden = false
 })
 
 
 
-form.addEventListener('submit', function (event) {
+form.addEventListener('submit', async function (event) {
   event.preventDefault()
   const chosenDate = new Date(desiredDateInput.value)
   if (desiredDateInput.value && chosenDate < getMinDate()) {
@@ -90,22 +86,24 @@ form.addEventListener('submit', function (event) {
     budget: Number(budgetInput.value),
     quantity: Number(document.getElementById('quantity').value),
     description: document.getElementById('description').value.trim(),
-    reference_image_url: imageData,
+    reference_image_url: '',
     desired_date: desiredDateInput.value,
   }
 
-  let saved = saveDesignRequest(request)
-  if (!saved && request.reference_image_url) {
-    request.reference_image_url = ''
-    saved = saveDesignRequest(request)
-  }
-
-  if (!saved) {
-    alert('Không lưu được yêu cầu, vui lòng thử lại.')
+  const submitBtn = document.getElementById('submitBtn')
+  submitBtn.disabled = true
+  try {
+    if (imageFile) {
+      const uploaded = await FW_API.uploadImage(imageFile)
+      request.reference_image_url = uploaded.url
+    }
+    await FW_API.createDesignRequest(request)
+  } catch (error) {
+    submitBtn.disabled = false
+    FW.toast(error.message)
     return
   }
 
-  document.getElementById('submitBtn').disabled = true
   FW.toast('Đã đăng yêu cầu lên diễn đàn!')
   setTimeout(function () {
     window.location.href = 'my-requests.html'

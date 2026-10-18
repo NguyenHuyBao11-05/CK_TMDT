@@ -1,40 +1,32 @@
-const requests = [
-  {
-    id: 8921, title: 'Bó hoa kỷ niệm 5 năm ngày cưới tone hồng pastel ngọt ngào',
-    status: 'OPEN', image: '../images/flowers/hero-bouquet.jpg',
-    budget: 1500000, occasion: 'Kỷ niệm / Tình yêu', date: '28/10/2026 lúc 09:30', timeLeft: 'Còn 2 ngày',
-    quotes: [
-      { short: 'TĐ', color: '#3f6b4e', name: 'Florist Thảo Điền Atelier' },
-      { short: 'LA', color: '#b5452f', name: "L'Amour Atelier" },
-      { short: 'SG', color: '#86a98a', name: 'Sài Gòn Hoa Tươi' },
-    ],
-    minPrice: 1250000,
-  },
-  {
-    id: 9032, title: 'Kệ hoa mừng khai trương showroom tone cam đất & trắng hiện đại',
-    status: 'OPEN', image: '../images/flowers/event-stand.jpg',
-    budget: 2500000, occasion: 'Khai trương', date: '30/10/2026 lúc 08:00', timeLeft: 'Còn 4 ngày',
-    quotes: [], minPrice: 0,
-  },
-  {
-    id: 8710, title: 'Hộp hoa tone xanh lá eucalyptus & cúc tana sinh nhật bạn thân',
-    status: 'CONFIRMED', image: '../images/flowers/green-hydrangea.jpg',
-    shop: 'Nhiên Floral Art', price: 1200000, date: '26/10/2026 lúc 16:30', orderStep: 2,
-  },
-  {
-    id: 8655, title: 'Bó hoa giấy tone tím lavender tặng cô giáo',
-    status: 'CANCELLED', image: '../images/flowers/autumn-bowl.jpg',
-    budget: 600000, occasion: 'Chúc mừng / Tốt nghiệp', date: '20/10/2026 lúc 10:00',
-  },
-]
-
 const ORDER_STEPS = ['Chờ xử lý', 'Đã xử lý', 'Đang giao', 'Đã nhận']
+const ORDER_STEP_INDEX = { PENDING: 0, PROCESSING: 1, SHIPPING: 2, RECEIVED: 3 }
+const AVATAR_COLORS = ['#3f6b4e', '#b5452f', '#86a98a', '#c08a3e', '#5a7ea6']
 
 const requestList = document.getElementById('requestList')
 const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'))
+const e = FW.escapeHtml
 
+let requests = []
 let cancelId = null
 
+
+function formatDate(value) {
+  const d = new Date(value)
+  const pad = function (n) { return String(n).padStart(2, '0') }
+  return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' lúc ' + pad(d.getHours()) + ':' + pad(d.getMinutes())
+}
+
+function timeLeft(value) {
+  const hours = Math.floor((new Date(value) - new Date()) / 3600000)
+  if (hours < 0) return 'Đã quá hạn'
+  if (hours < 24) return 'Còn ' + hours + ' giờ'
+  return 'Còn ' + Math.floor(hours / 24) + ' ngày'
+}
+
+function initials(name) {
+  const words = name.trim().split(/\s+/)
+  return (words[0].charAt(0) + (words.length > 1 ? words[words.length - 1].charAt(0) : '')).toUpperCase()
+}
 
 function infoRow(items) {
   let html = '<div class="info-row row g-2 mx-0">'
@@ -44,75 +36,95 @@ function infoRow(items) {
   return html + '</div>'
 }
 
+function basicInfo(r) {
+  return infoRow([['Ngân sách dự kiến', FW.formatVnd(r.budget)], ['Dịp tặng', e(r.occasion)], ['Hẹn giao', formatDate(r.desired_date)]])
+}
+
+function cancelButton(r) {
+  return '<button type="button" class="btn btn-link text-rose btn-sm ms-auto" data-cancel="' + r.id + '"><i class="fa-regular fa-circle-xmark me-1"></i>Huỷ yêu cầu</button>'
+}
+
 function openContent(r) {
-  if (r.quotes.length === 0) {
-    return infoRow([['Ngân sách dự kiến', FW.formatVnd(r.budget)], ['Dịp tặng', r.occasion], ['Hẹn giao', r.date]])
+  if (r.quote_count === 0) {
+    return basicInfo(r)
       + '<div class="waiting-box"><i class="fa-regular fa-hourglass-half me-2 text-forest"></i>Đang chờ Đối tác báo giá. Bạn sẽ nhận được thông báo khi có shop gửi đề xuất.</div>'
       + '<div class="d-flex flex-wrap gap-2 align-items-center">'
       + '<button type="button" class="btn btn-ghost btn-sm" disabled><i class="fa-solid fa-scale-balanced me-1"></i>Chưa có báo giá</button>'
-      + '<button type="button" class="btn btn-link text-rose btn-sm ms-auto" data-cancel="' + r.id + '"><i class="fa-regular fa-circle-xmark me-1"></i>Huỷ yêu cầu</button>'
+      + cancelButton(r)
       + '</div>'
   }
 
   let avatars = ''
-  let names = []
-  r.quotes.forEach(function (q) {
-    avatars += '<span style="background:' + q.color + '">' + q.short + '</span>'
-    names.push(q.name)
+  r.partner_names.forEach(function (name, index) {
+    avatars += '<span style="background:' + AVATAR_COLORS[index % AVATAR_COLORS.length] + '">' + e(initials(name)) + '</span>'
   })
+  const chosen = r.selected_partner_name
+    ? '<div class="waiting-box"><i class="fa-solid fa-circle-check me-2 text-forest"></i>Bạn đã chọn <strong>' + e(r.selected_partner_name) + '</strong> (' + FW.formatVnd(r.selected_price) + '). Hãy xác nhận đặt để chuyển sang thanh toán.</div>'
+    : ''
 
-  return infoRow([['Ngân sách dự kiến', FW.formatVnd(r.budget)], ['Dịp tặng', r.occasion], ['Hẹn giao', r.date]])
+  return basicInfo(r)
     + '<div class="d-flex flex-wrap align-items-center gap-3 mb-3">'
     + '<div class="quote-avatars">' + avatars + '</div>'
-    + '<div class="small"><strong>' + r.quotes.length + ' shop đã gửi báo giá</strong><br><span class="text-muted-fw">' + names.join(', ') + '</span></div>'
-    + '<span class="ms-auto small text-forest fw-semibold">Giá từ ' + FW.formatVnd(r.minPrice) + '</span>'
+    + '<div class="small"><strong>' + r.quote_count + ' shop đã gửi báo giá</strong><br><span class="text-muted-fw">' + e(r.partner_names.join(', ')) + '</span></div>'
+    + '<span class="ms-auto small text-forest fw-semibold">Giá từ ' + FW.formatVnd(r.min_price) + '</span>'
     + '</div>'
+    + chosen
     + '<div class="d-flex flex-wrap gap-2 align-items-center">'
-    + '<a href="compare-quotes.html" class="btn btn-peach btn-sm"><i class="fa-solid fa-scale-balanced me-1"></i>So sánh &amp; chọn báo giá (' + r.quotes.length + ')</a>'
-    + '<button type="button" class="btn btn-link text-rose btn-sm ms-auto" data-cancel="' + r.id + '"><i class="fa-regular fa-circle-xmark me-1"></i>Huỷ yêu cầu</button>'
+    + '<a href="compare-quotes.html?id=' + r.id + '" class="btn btn-peach btn-sm"><i class="fa-solid fa-scale-balanced me-1"></i>So sánh &amp; chọn báo giá (' + r.quote_count + ')</a>'
+    + cancelButton(r)
     + '</div>'
 }
 
 function confirmedContent(r) {
+  const step = r.order_status in ORDER_STEP_INDEX ? ORDER_STEP_INDEX[r.order_status] : 0
   let steps = ''
-  ORDER_STEPS.forEach(function (step, index) {
-    const done = index <= r.orderStep
-    steps += '<span class="' + (done ? 'done' : '') + '"><i class="fa-' + (done ? 'solid fa-circle-check' : 'regular fa-circle') + ' me-1"></i>' + step + '</span>'
+  ORDER_STEPS.forEach(function (name, index) {
+    const done = index <= step
+    steps += '<span class="' + (done ? 'done' : '') + '"><i class="fa-' + (done ? 'solid fa-circle-check' : 'regular fa-circle') + ' me-1"></i>' + name + '</span>'
   })
-  const percent = (r.orderStep + 1) / ORDER_STEPS.length * 100
+  const percent = (step + 1) / ORDER_STEPS.length * 100
 
-  return infoRow([['Shop thực hiện', '<i class="fa-solid fa-store me-1 text-forest"></i>' + r.shop], ['Giá đã chốt', '<span class="text-forest">' + FW.formatVnd(r.price) + '</span>'], ['Dự kiến giao', r.date]])
+  return infoRow([['Shop thực hiện', '<i class="fa-solid fa-store me-1 text-forest"></i>' + e(r.selected_partner_name || '—')], ['Giá đã chốt', '<span class="text-forest">' + FW.formatVnd(r.selected_price) + '</span>'], ['Dự kiến giao', formatDate(r.desired_date)]])
     + '<div class="progress-steps">' + steps + '</div>'
     + '<div class="progress"><div class="progress-bar" style="width: ' + percent + '%"></div></div>'
     + '<div class="d-flex flex-wrap gap-2">'
     + '<a href="../account/orders.html" class="btn btn-forest btn-sm"><i class="fa-solid fa-box me-1"></i>Xem đơn hàng</a>'
-    + '<a href="compare-quotes.html" class="btn btn-ghost btn-sm">Xem báo giá đã chọn</a>'
+    + '<a href="compare-quotes.html?id=' + r.id + '" class="btn btn-ghost btn-sm">Xem báo giá đã chọn</a>'
     + '</div>'
 }
 
 function cancelledContent(r) {
-  return infoRow([['Ngân sách dự kiến', FW.formatVnd(r.budget)], ['Dịp tặng', r.occasion], ['Hẹn giao', r.date]])
+  return basicInfo(r)
     + '<div class="small text-muted-fw"><i class="fa-solid fa-ban me-1"></i>Yêu cầu đã được huỷ.</div>'
 }
 
 function renderList() {
+  document.getElementById('countOpen').textContent = requests.filter(function (r) { return r.status === 'OPEN' }).length
+  document.getElementById('countConfirmed').textContent = requests.filter(function (r) { return r.status === 'CONFIRMED' }).length
+  document.getElementById('countCancelled').textContent = requests.filter(function (r) { return r.status === 'CANCELLED' }).length
+
+  if (requests.length === 0) {
+    requestList.innerHTML = '<div class="waiting-box text-center">Bạn chưa có yêu cầu thiết kế nào. <a href="create-request.html">Tạo yêu cầu đầu tiên</a></div>'
+    return
+  }
+
   let html = ''
   requests.forEach(function (r) {
     let badge = ''
     let chip = ''
     let content = ''
 
-    if (r.status === 'OPEN' && r.quotes.length > 0) {
-      badge = '<span class="state-badge open">Đang nhận báo giá</span>'
-      chip = '<span class="deadline-chip"><i class="fa-regular fa-clock me-1"></i>' + r.timeLeft + '</span>'
+    if (r.status === 'OPEN' && r.quote_count > 0) {
+      badge = '<span class="state-badge open">' + (r.selected_quote_id ? 'Đã chọn, chờ xác nhận' : 'Đang nhận báo giá') + '</span>'
+      chip = '<span class="deadline-chip"><i class="fa-regular fa-clock me-1"></i>' + timeLeft(r.desired_date) + '</span>'
       content = openContent(r)
     } else if (r.status === 'OPEN') {
       badge = '<span class="state-badge waiting">Chờ báo giá</span>'
-      chip = '<span class="deadline-chip soft"><i class="fa-regular fa-clock me-1"></i>' + r.timeLeft + '</span>'
+      chip = '<span class="deadline-chip soft"><i class="fa-regular fa-clock me-1"></i>' + timeLeft(r.desired_date) + '</span>'
       content = openContent(r)
     } else if (r.status === 'CONFIRMED') {
       badge = '<span class="state-badge confirmed">Đã chọn shop</span>'
-      chip = '<span class="deadline-chip soft"><i class="fa-solid fa-truck me-1"></i>Đơn: ' + ORDER_STEPS[r.orderStep] + '</span>'
+      chip = '<span class="deadline-chip soft"><i class="fa-solid fa-truck me-1"></i>Đơn: ' + (r.order_status ? ORDER_STEPS[ORDER_STEP_INDEX[r.order_status]] || 'Đã huỷ' : 'Chờ thanh toán') + '</span>'
       content = confirmedContent(r)
     } else {
       badge = '<span class="state-badge cancelled">Đã huỷ</span>'
@@ -124,7 +136,7 @@ function renderList() {
         <div class="row g-4">
           <div class="col-md-4">
             <div class="my-request-image">
-              <img src="${r.image}" alt="${r.title}">
+              <img src="${e(FW_API.imageUrl(r.reference_image_url))}" alt="${e(r.title)}">
               ${badge}
             </div>
           </div>
@@ -133,17 +145,22 @@ function renderList() {
               <span class="request-code">MÃ YÊU CẦU: #YC-${r.id}</span>
               ${chip}
             </div>
-            <h3 class="my-request-title">${r.title}</h3>
+            <h3 class="my-request-title">${e(r.title)}</h3>
             ${content}
           </div>
         </div>
       </article>`
   })
   requestList.innerHTML = html
+}
 
-  document.getElementById('countOpen').textContent = requests.filter(function (r) { return r.status === 'OPEN' }).length
-  document.getElementById('countConfirmed').textContent = requests.filter(function (r) { return r.status === 'CONFIRMED' }).length
-  document.getElementById('countCancelled').textContent = requests.filter(function (r) { return r.status === 'CANCELLED' }).length
+async function loadRequests() {
+  try {
+    requests = await FW_API.getMyDesignRequests()
+    renderList()
+  } catch (error) {
+    requestList.innerHTML = '<div class="waiting-box text-center text-rose">' + e(error.message) + '</div>'
+  }
 }
 
 
@@ -155,21 +172,17 @@ requestList.addEventListener('click', function (event) {
   cancelModal.show()
 })
 
-document.getElementById('cancelConfirmBtn').addEventListener('click', function () {
-  const r = requests.find(function (x) { return x.id === cancelId })
-  r.status = 'CANCELLED'
-  cancelModal.hide()
-  renderList()
-  FW.toast('Đã huỷ yêu cầu #YC-' + r.id)
+document.getElementById('cancelConfirmBtn').addEventListener('click', async function () {
+  try {
+    await FW_API.cancelDesignRequest(cancelId)
+    cancelModal.hide()
+    FW.toast('Đã huỷ yêu cầu #YC-' + cancelId)
+    loadRequests()
+  } catch (error) {
+    cancelModal.hide()
+    FW.toast(error.message)
+  }
 })
 
 
-document.addEventListener('fw:partials-loaded', function () {
-  const items = document.querySelectorAll('.sidebar .nav-item')
-  items.forEach(function (item) { item.classList.remove('selected') })
-  const design = document.querySelector('.sidebar .nav-item.design')
-  if (design) design.classList.add('selected')
-})
-
-
-renderList()
+loadRequests()

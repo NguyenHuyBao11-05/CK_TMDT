@@ -247,30 +247,7 @@
   }
 })()
 
-// Bảo — Diễn đàn thiết kế riêng (KH05)
-const DESIGN_REQUEST_KEY = 'fw_design_requests'
-
-function getDesignRequests() {
-  try {
-    return JSON.parse(localStorage.getItem(DESIGN_REQUEST_KEY)) || []
-  } catch (e) {
-    return []
-  }
-}
-
-function saveDesignRequest(request) {
-  const list = getDesignRequests()
-  request.id = Date.now()
-  request.status = 'OPEN'
-  request.created_at = new Date().toISOString()
-  list.push(request)
-  try {
-    localStorage.setItem(DESIGN_REQUEST_KEY, JSON.stringify(list))
-    return true
-  } catch (e) {
-    return false
-  }
-}
+// Bảo — Diễn đàn thiết kế riêng, quản trị tài khoản & nhật ký
 
 const BAO_SERVER = 'http://localhost:8080'
 const BAO_ADMIN_USER = { admin: 1, manager: 2 }
@@ -291,7 +268,11 @@ async function callServer(path, options = {}) {
   try {
     res = await fetch(BAO_SERVER + path, {
       ...options,
-      headers: { 'Content-Type': 'application/json', 'X-User-Id': mockUserId(), ...options.headers },
+      headers: {
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+        'X-User-Id': mockUserId(),
+        ...options.headers,
+      },
     })
   } catch (e) {
     throw new Error('Không kết nối được máy chủ. Kiểm tra backend đã chạy chưa.')
@@ -328,5 +309,25 @@ Object.assign(window.FW_API, {
   },
   resetUserPassword(id) {
     return callServer('/api/admin/users/' + id + '/reset-password', { method: 'POST' })
+  },
+
+  uploadImage(file) {
+    const data = new FormData()
+    data.append('file', file)
+    return callServer('/api/uploads', { method: 'POST', body: data })
+  },
+  imageUrl(url) {
+    if (!url) return FW.url('images/flowers/hero-bouquet.jpg')
+    if (/^https?:/.test(url)) return url
+    return url.startsWith('/uploads/') ? BAO_SERVER + url : FW.url(url)
+  },
+  createDesignRequest(data) {
+    return callServer('/api/design-requests', { method: 'POST', body: JSON.stringify(data) })
+  },
+  getMyDesignRequests() {
+    return callServer('/api/design-requests/mine')
+  },
+  cancelDesignRequest(id) {
+    return callServer('/api/design-requests/' + id + '/cancel', { method: 'POST' })
   },
 })
