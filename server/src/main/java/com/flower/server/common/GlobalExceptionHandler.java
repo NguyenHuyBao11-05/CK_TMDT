@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,5 +31,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
     public ResponseEntity<Map<String, String>> handleBadInput(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Dữ liệu gửi lên không hợp lệ."));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleTooLarge(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Ảnh vượt quá 2MB, vui lòng chọn ảnh nhỏ hơn."));
     }
 }
