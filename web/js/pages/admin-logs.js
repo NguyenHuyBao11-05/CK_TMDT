@@ -11,6 +11,8 @@ const ACTION_LABEL = {
   LOGIN_FAILED: 'Đăng nhập thất bại',
   LOGOUT: 'Đăng xuất',
   QUOTE_CREATE: 'Gửi báo giá',
+  QUOTE_SELECT: 'Chọn báo giá',
+  REQUEST_CONFIRM: 'Xác nhận đặt theo báo giá',
   REQUEST_CREATE: 'Đăng yêu cầu thiết kế',
   REQUEST_CANCEL: 'Huỷ yêu cầu thiết kế',
   ORDER_STATUS: 'Cập nhật trạng thái đơn',

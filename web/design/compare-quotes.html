@@ -25,7 +25,7 @@
       <ol class="breadcrumb small">
         <li class="breadcrumb-item"><a href="../index.html"><i class="fa-solid fa-house me-1"></i>Trang chủ</a></li>
         <li class="breadcrumb-item"><a href="my-requests.html">Yêu cầu của tôi</a></li>
-        <li class="breadcrumb-item active" aria-current="page">So sánh báo giá #YC-8921</li>
+        <li class="breadcrumb-item active" aria-current="page">So sánh báo giá <span class="request-code-text"></span></li>
       </ol>
     </nav>
 
@@ -33,7 +33,7 @@
       <div>
         <h1 class="display-6 mb-2">So sánh và chọn báo giá</h1>
         <p class="text-muted-fw mb-0">
-          Bạn đã nhận được <strong class="text-forest" id="quoteCount">0 đề xuất</strong> cho yêu cầu <strong>#YC-8921</strong>.
+          Bạn đã nhận được <strong class="text-forest" id="quoteCount">0 đề xuất</strong> cho yêu cầu <strong class="request-code-text"></strong>.
           Hãy cân nhắc giá, thời gian hoàn thành và cách làm để chọn shop phù hợp nhất.
         </p>
       </div>
@@ -46,34 +46,34 @@
       <div class="row g-4 align-items-center">
         <div class="col-md-4 col-lg-3">
           <div class="summary-image">
-            <img src="../images/flowers/hero-bouquet.jpg" alt="Ảnh mẫu khách gửi">
+            <img id="requestImage" src="../images/flowers/hero-bouquet.jpg" alt="Ảnh mẫu khách gửi">
             <span class="summary-image-tag"><i class="fa-regular fa-image me-1"></i>Ảnh mẫu của bạn</span>
           </div>
         </div>
         <div class="col-md-8 col-lg-9">
           <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-            <span class="code-chip">#YC-8921</span>
-            <span class="small text-muted-fw"><i class="fa-regular fa-clock me-1"></i>Đăng lúc 09:30, 24/10/2026</span>
-            <span class="badge-quote ms-auto"><i class="fa-solid fa-circle-check me-1"></i>Đang nhận báo giá</span>
+            <span class="code-chip request-code-text"></span>
+            <span class="small text-muted-fw"><i class="fa-regular fa-clock me-1"></i>Đăng lúc <span id="requestCreated"></span></span>
+            <span class="badge-quote ms-auto" id="requestStatus"></span>
           </div>
-          <h2 class="h3 mb-3">Bó hoa kỷ niệm 5 năm ngày cưới tone hồng pastel ngọt ngào</h2>
+          <h2 class="h3 mb-3" id="requestTitle"></h2>
           <div class="d-flex flex-wrap gap-3 small mb-3">
-            <span><i class="fa-solid fa-gift text-forest me-1"></i>Dịp tặng: <strong>Kỷ niệm / Tình yêu</strong></span>
-            <span><i class="fa-solid fa-seedling text-forest me-1"></i>Chất liệu: <strong>Hoa thật</strong></span>
-            <span><i class="fa-solid fa-palette text-forest me-1"></i>Tông màu: <strong>Pastel mộng mơ</strong></span>
-            <span><i class="fa-regular fa-calendar text-rose me-1"></i>Hẹn giao: <strong>28/10/2026 lúc 09:30</strong></span>
+            <span><i class="fa-solid fa-gift text-forest me-1"></i>Dịp tặng: <strong id="requestOccasion"></strong></span>
+            <span><i class="fa-solid fa-seedling text-forest me-1"></i>Chất liệu: <strong id="requestMaterial"></strong></span>
+            <span><i class="fa-solid fa-palette text-forest me-1"></i>Tông màu: <strong id="requestColor"></strong></span>
+            <span><i class="fa-regular fa-calendar text-rose me-1"></i>Hẹn giao: <strong id="requestDate"></strong> · Số lượng: <strong id="requestQuantity"></strong></span>
           </div>
           <div class="row g-3">
             <div class="col-lg-8">
               <div class="note-box">
                 <div class="small fw-semibold mb-1"><i class="fa-solid fa-quote-left me-1"></i>Mô tả của bạn</div>
-                <p class="mb-0 fst-italic small">Muốn bó hoa phong cách Hàn Quốc dáng bay, phối hồng Ohara với hoa phụ nhỏ màu trắng, giấy gói màu kem tối giản. Kèm thiệp viết tay.</p>
+                <p class="mb-0 fst-italic small" id="requestDescription"></p>
               </div>
             </div>
             <div class="col-lg-4">
               <div class="note-box text-lg-end h-100">
                 <div class="small text-muted-fw">Ngân sách mong muốn</div>
-                <div class="budget-value">1.500.000 đ</div>
+                <div class="budget-value" id="requestBudget"></div>
               </div>
             </div>
           </div>
@@ -82,27 +82,23 @@
     </section>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-      <div class="quote-tabs">
-        <button type="button" class="active">Tất cả đề xuất</button>
-        <button type="button">Giá tốt nhất</button>
-        <button type="button">Đánh giá cao nhất</button>
-      </div>
-      <select class="form-select w-auto">
-        <option>Sắp xếp: Mới nhất</option>
-        <option>Giá thấp đến cao</option>
-        <option>Hoàn thành nhanh nhất</option>
+      <span class="small text-muted-fw">Giá trong báo giá là tổng tiền cho toàn bộ yêu cầu.</span>
+      <select class="form-select w-auto" id="sortSelect">
+        <option value="price">Sắp xếp: Giá thấp đến cao</option>
+        <option value="days">Hoàn thành nhanh nhất</option>
+        <option value="newest">Mới nhất</option>
       </select>
     </div>
 
     <div class="alert alert-success" id="selectedBanner" hidden>
       <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-        <span><i class="fa-solid fa-circle-check me-2"></i>Bạn đã chọn báo giá của <strong id="selectedName"></strong>. Tiếp theo hãy chọn phương thức thanh toán.</span>
-        <a href="../shop/checkout.html" class="btn btn-forest btn-sm">Tiếp tục thanh toán <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        <span id="selectedText"></span>
+        <button type="button" class="btn btn-forest btn-sm" id="selectedAction"></button>
       </div>
     </div>
 
     <div class="alert alert-secondary" id="cancelledBanner" hidden>
-      <i class="fa-solid fa-ban me-2"></i>Bạn đã từ chối tất cả đề xuất. Yêu cầu <strong>#YC-8921</strong> đã được huỷ và các shop đã được thông báo.
+      <i class="fa-solid fa-ban me-2"></i>Bạn đã từ chối tất cả đề xuất. Yêu cầu <strong class="request-code-text"></strong> đã được huỷ và các shop đã được thông báo.
     </div>
 
     <div id="quoteList"></div>
