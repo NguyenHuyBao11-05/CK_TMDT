@@ -128,9 +128,7 @@
 
     // KH08 - Đơn từ báo giá của Bảo (1 dòng hàng có quote_id). Bảo thay bằng dữ liệu báo giá thật.
     getQuoteForPayment(quoteId) {
-      const line = { product_id: null, quote_id: quoteId, name: 'Thiết kế riêng theo yêu cầu', partner_name: 'Florist Thảo Điền Atelier',
-        thumbnail_url: img('lily-of-valley.jpg'), unit_price: 1800000, quantity: 1 }
-      return fake({ lines: [line], subtotal: 1800000, voucher_code: null, discount: 0, total: 1800000 })
+      return callServer('/api/design-requests/quotes/' + encodeURIComponent(quoteId) + '/payment')
     },
 
     // KH09 - Tạo đơn sau khi khách báo đã chuyển khoản. Sau này: POST /api/orders
@@ -329,5 +327,23 @@ Object.assign(window.FW_API, {
   },
   cancelDesignRequest(id) {
     return callServer('/api/design-requests/' + id + '/cancel', { method: 'POST' })
+  },
+  getDesignRequest(id) {
+    return callServer('/api/design-requests/' + id)
+  },
+  selectQuote(requestId, quoteId) {
+    return callServer('/api/design-requests/' + requestId + '/select', { method: 'POST', body: JSON.stringify({ quote_id: quoteId }) })
+  },
+  confirmDesignRequest(id) {
+    return callServer('/api/design-requests/' + id + '/confirm', { method: 'POST' })
+  },
+  getForumRequests() {
+    return callServer('/api/partner/forum')
+  },
+  sendQuote(requestId, data) {
+    return callServer('/api/partner/forum/' + requestId + '/quotes', { method: 'POST', body: JSON.stringify(data) })
+  },
+  getSentQuotes() {
+    return callServer('/api/partner/quotes')
   },
 })

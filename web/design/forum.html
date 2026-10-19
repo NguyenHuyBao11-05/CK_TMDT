@@ -95,10 +95,11 @@
             <h3 class="h4 mb-1">Gửi đề xuất báo giá</h3>
             <p class="small text-muted-fw mb-4">Báo giá là tổng tiền cho toàn bộ yêu cầu của khách.</p>
 
+            <div class="alert alert-light small" id="quoteNotice" hidden></div>
             <form id="quoteForm" novalidate>
               <div class="mb-3">
                 <div class="d-flex justify-content-between">
-                  <label for="quotePrice" class="form-label">1. Giá đề xuất (VNĐ) <span class="text-rose">*</span></label>
+                  <label for="quotePrice" class="form-label">1. Tổng giá cho toàn bộ yêu cầu (VNĐ) <span class="text-rose">*</span></label>
                   <span class="small text-muted-fw" id="budgetHint"></span>
                 </div>
                 <input type="number" id="quotePrice" class="form-control" min="50000" step="10000" required>

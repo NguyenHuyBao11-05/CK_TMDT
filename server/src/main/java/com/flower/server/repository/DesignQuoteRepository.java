@@ -14,4 +14,9 @@ public interface DesignQuoteRepository extends JpaRepository<DesignQuote, Long> 
 
     @EntityGraph(attributePaths = "partner")
     List<DesignQuote> findByRequestId(Long requestId);
+
+    @EntityGraph(attributePaths = {"request", "request.customer"})
+    List<DesignQuote> findByPartnerIdOrderByCreatedAtDesc(Long partnerId);
+
+    boolean existsByRequestIdAndPartnerId(Long requestId, Long partnerId);
 }
