@@ -95,7 +95,7 @@ function confirmedContent(r) {
 
 function cancelledContent(r) {
   return basicInfo(r)
-    + '<div class="small text-muted-fw"><i class="fa-solid fa-ban me-1"></i>Yêu cầu đã được huỷ.</div>'
+    + '<div class="small text-muted-fw"><i class="fa-solid fa-ban me-1"></i>Yêu cầu đã đóng do bạn huỷ hoặc đã quá thời gian giao.</div>'
 }
 
 function renderList() {

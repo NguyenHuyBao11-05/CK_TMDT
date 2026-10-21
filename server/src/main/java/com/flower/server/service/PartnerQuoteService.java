@@ -125,7 +125,7 @@ public class PartnerQuoteService {
         }
         if (quote.getStatus() == QuoteStatus.REJECTED) {
             return request.getStatus() == RequestStatus.CANCELLED
-                    ? "Khách đã huỷ yêu cầu này."
+                    ? "Yêu cầu đã đóng do khách huỷ hoặc đã quá thời gian giao."
                     : "Khách đã chọn báo giá của shop khác.";
         }
         return "Khách đang xem và so sánh các báo giá. Bạn sẽ nhận được thông báo khi khách chọn.";

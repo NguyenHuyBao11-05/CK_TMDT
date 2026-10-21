@@ -15,6 +15,7 @@ const ACTION_LABEL = {
   REQUEST_CONFIRM: 'Xác nhận đặt theo báo giá',
   REQUEST_CREATE: 'Đăng yêu cầu thiết kế',
   REQUEST_CANCEL: 'Huỷ yêu cầu thiết kế',
+  REQUEST_EXPIRE: 'Tự đóng yêu cầu quá hạn',
   ORDER_STATUS: 'Cập nhật trạng thái đơn',
   ORDER_CANCEL: 'Huỷ đơn hàng',
   ORDER_AUTO_RECEIVED: 'Tự động xác nhận đã nhận',
