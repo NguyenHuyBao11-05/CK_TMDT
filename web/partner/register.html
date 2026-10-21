@@ -38,44 +38,34 @@
         <div class="partner-form-grid">
           <div>
             <label class="form-label" for="shopName">Tên cửa hàng</label>
-            <input id="shopName" class="form-control" type="text" value="Florist Thảo Điền Atelier">
-          </div>
-          <div>
-            <label class="form-label" for="ownerName">Người đại diện</label>
-            <input id="ownerName" class="form-control" type="text" value="Nguyễn Thị Hoa">
-          </div>
-          <div>
-            <label class="form-label" for="phone">Số điện thoại</label>
-            <input id="phone" class="form-control" type="tel" value="0908112233">
-          </div>
-          <div>
-            <label class="form-label" for="email">Email</label>
-            <input id="email" class="form-control" type="email" value="hello@thaodienatelier.vn">
+            <input id="shopName" class="form-control" type="text" maxlength="200">
           </div>
           <div>
             <label class="form-label" for="city">Thành phố</label>
             <select id="city" class="form-select">
-              <option selected>TP.HCM</option>
+              <option value="">Chọn thành phố (không bắt buộc)</option>
               <option>Hà Nội</option>
               <option>Đà Nẵng</option>
+              <option>TP.HCM</option>
               <option>Huế</option>
             </select>
           </div>
           <div>
             <label class="form-label" for="portfolioUrl">Link portfolio <span class="text-rose">*</span></label>
-            <input id="portfolioUrl" class="form-control" type="url" required placeholder="https://drive.google.com/...">
+            <input id="portfolioUrl" class="form-control" type="url" required maxlength="500" placeholder="https://drive.google.com/...">
           </div>
           <div class="full">
             <label class="form-label" for="address">Địa chỉ cửa hàng</label>
-            <input id="address" class="form-control" type="text" value="18 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM">
+            <input id="address" class="form-control" type="text" maxlength="300">
           </div>
           <div class="full">
-            <label class="form-label" for="profile">Giới thiệu thương hiệu</label>
-            <textarea id="profile" class="form-control" rows="4">Chuyên thiết kế bó hoa cưới và lẵng hoa theo phong cách tối giản, sang trọng và ấm áp.</textarea>
+            <label class="form-label" for="profile">Giới thiệu thương hiệu <span class="text-rose">*</span></label>
+            <textarea id="profile" class="form-control" rows="4" required minlength="50" placeholder="Giới thiệu kinh nghiệm, phong cách và sản phẩm của bạn (ít nhất 50 ký tự)."></textarea>
+            <small class="text-muted-fw">Thông tin cửa hàng, thành phố và địa chỉ (nếu có) sẽ được lưu chung trong phần giới thiệu.</small>
           </div>
         </div>
         <div class="d-flex gap-2 mt-3">
-          <button type="button" class="partner-secondary-btn"><i class="fa-solid fa-rotate-left"></i> Làm mới</button>
+          <button type="reset" class="partner-secondary-btn"><i class="fa-solid fa-rotate-left"></i> Làm mới</button>
           <button type="submit" class="partner-primary-btn"><i class="fa-solid fa-paper-plane"></i> Gửi hồ sơ</button>
         </div>
       </form>

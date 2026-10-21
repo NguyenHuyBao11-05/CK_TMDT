@@ -281,6 +281,10 @@ async function callServer(path, options = {}) {
 }
 
 Object.assign(window.FW_API, {
+  applyPartner(data) {
+    return callServer('/api/partner/apply', { method: 'POST', body: JSON.stringify(data) })
+  },
+
   getAdminLogs(params) {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {

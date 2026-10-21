@@ -5,6 +5,7 @@ const ACTION_LABEL = {
   USER_CREATE: 'Tạo tài khoản',
   USER_UPDATE: 'Sửa thông tin tài khoản',
   USER_RESET_PASSWORD: 'Đặt lại mật khẩu',
+  PARTNER_APPLY: 'Đăng ký làm Đối tác',
   PRODUCT_APPROVE: 'Duyệt sản phẩm',
   PARTNER_APPROVE: 'Duyệt hồ sơ Đối tác',
   LOGIN: 'Đăng nhập',
