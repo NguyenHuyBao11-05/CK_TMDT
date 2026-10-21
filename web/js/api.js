@@ -347,13 +347,109 @@ Object.assign(window.FW_API, {
   getSentQuotes() {
     return callServer('/api/partner/quotes')
   },
-  register(data) {
-    return callServer('/api/auth/register', {method: 'POST', body: JSON.stringify(data)});
+  getNotifications() {
+    return callServer('/api/notifications')
   },
-  verifyRegisterOtp(data) {
-    return callServer('/api/auth/register/verify', {method: 'POST', body: JSON.stringify(data)});
+  readNotification(id) {
+    return callServer('/api/notifications/' + id + '/read', { method: 'POST' })
   },
-  resendRegisterOtp() {
-    return callServer('/api/auth/register/resend', {method: 'POST'});
+  readAllNotifications() {
+    return callServer('/api/notifications/read-all', { method: 'POST' })
   },
+  getAdminMenuCounts() {
+    return callServer('/api/admin/menu-counts')
+  },
+})
+
+async function loadAdminMenuCounts() {
+  if (!document.querySelector('[data-menu-count]')) return
+  try {
+    const counts = await FW_API.getAdminMenuCounts()
+    document.querySelectorAll('[data-menu-count]').forEach(function (badge) {
+      const value = counts[badge.dataset.menuCount] || 0
+      badge.textContent = value
+      badge.hidden = value === 0
+    })
+  } catch (e) {}
+}
+
+document.addEventListener('fw:partials-loaded', loadAdminMenuCounts)
+
+function isLoggedIn() {
+  if (document.body.classList.contains('admin-page')) return true
+  try {
+    return !!localStorage.getItem('fw_user_id')
+  } catch (e) {
+    return false
+  }
+}
+
+function timeAgo(value) {
+  const minutes = Math.floor((Date.now() - new Date(value)) / 60000)
+  if (minutes < 1) return 'Vừa xong'
+  if (minutes < 60) return minutes + ' phút trước'
+  if (minutes < 1440) return Math.floor(minutes / 60) + ' giờ trước'
+  return Math.floor(minutes / 1440) + ' ngày trước'
+}
+
+function renderNotifications(data) {
+  const e = FW.escapeHtml
+  document.querySelectorAll('[data-notif-count]').forEach(function (badge) {
+    badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count
+    badge.hidden = data.unread_count === 0
+  })
+  const header = '<div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">'
+    + '<strong class="small">Thông báo</strong>'
+    + (data.unread_count ? '<button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-notif-read-all>Đánh dấu đã đọc hết</button>' : '')
+    + '</div>'
+  const items = data.items.length
+    ? data.items.map(function (n) {
+      return '<button type="button" class="dropdown-item text-wrap py-2 border-bottom' + (n.read ? '' : ' fw-semibold') + '" data-notif-id="' + n.id + '" data-notif-link="' + e(n.link_url || '') + '"'
+        + (n.read ? '' : ' style="background: var(--fw-cream, #fdf8f3)"') + '>'
+        + '<div class="small">' + (n.read ? '' : '<i class="fa-solid fa-circle text-rose me-1" style="font-size: 7px; vertical-align: middle"></i>') + e(n.title) + '</div>'
+        + (n.content ? '<div class="small text-muted-fw fw-normal">' + e(n.content) + '</div>' : '')
+        + '<div class="text-muted-fw fw-normal" style="font-size: 11px">' + timeAgo(n.created_at) + '</div>'
+        + '</button>'
+    }).join('')
+    : '<div class="p-3 small text-muted-fw text-center">Chưa có thông báo nào.</div>'
+  document.querySelectorAll('[data-notif-menu]').forEach(function (menu) { menu.innerHTML = header + items })
+}
+
+async function loadNotifications() {
+  try {
+    renderNotifications(await FW_API.getNotifications())
+  } catch (e) {
+    document.querySelectorAll('[data-notif-menu]').forEach(function (menu) {
+      menu.innerHTML = '<div class="p-3 small text-muted-fw">' + FW.escapeHtml(e.message) + '</div>'
+    })
+  }
+}
+
+document.addEventListener('fw:partials-loaded', function () {
+  const boxes = document.querySelectorAll('[data-notif-box]')
+  if (!boxes.length || !isLoggedIn()) return
+  boxes.forEach(function (box) { box.hidden = false })
+  loadNotifications()
+  setInterval(loadNotifications, 60000)
+})
+
+document.addEventListener('click', async function (event) {
+  if (event.target.closest('[data-notif-read-all]')) {
+    try {
+      await FW_API.readAllNotifications()
+    } catch (e) {}
+    loadNotifications()
+    return
+  }
+  const item = event.target.closest('[data-notif-id]')
+  if (!item) return
+  try {
+    await FW_API.readNotification(item.dataset.notifId)
+  } catch (e) {}
+  if (item.dataset.notifLink) location.href = FW.url(item.dataset.notifLink)
+  else loadNotifications()
+})
+
+document.addEventListener('change', function (event) {
+  if (event.target.id === 'roleSwitch') loadNotifications()
 })
