@@ -28,13 +28,14 @@
       <p class="partner-subtitle">Theo dõi từng bước tiếp nhận, hoàn thiện cắm hoa đến khâu bàn giao vận chuyển.</p>
     </div>
     <div class="partner-actions">
-      <span class="filter-chip"><i class="fa-solid fa-circle-check"></i> 8 đơn hôm nay</span>
-      <span class="filter-chip filter-chip-alert"><i class="fa-solid fa-clock"></i> 2 cần xác nhận</span>
+      <span class="filter-chip"><i class="fa-solid fa-box"></i> <span id="availableOrderCount">Đang tải đơn khả dụng...</span></span>
+      <button type="button" class="partner-icon-button" id="refreshOrders" aria-label="Tải lại đơn hàng"><i class="fa-solid fa-rotate"></i></button>
     </div>
   </header>
 
   <div class="partner-toolbar">
     <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="orderSearch" type="search" placeholder="Tìm mã đơn, tên khách hàng, số điện thoại..."></label>
+    <label class="visually-hidden" for="orderTypeFilter">Lọc theo loại đơn</label>
     <select id="orderTypeFilter" class="form-select"><option value="">Loại đơn: Tất cả</option><option value="Mẫu có sẵn">Mẫu có sẵn</option><option value="Thiết kế riêng">Thiết kế riêng</option></select>
   </div>
 
