@@ -129,7 +129,7 @@ public class PartnerOrderService {
     }
 
     @Transactional
-    public void ship(User partner, Long orderId, String completionImageUrl) {
+    public void saveProof(User partner, Long orderId, String completionImageUrl) {
         String fileName = completionImageUrl.substring("/uploads/".length());
         if (!Files.isRegularFile(uploadDir.resolve(fileName).normalize())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Không tìm thấy ảnh hoàn thành đã tải lên.");
@@ -142,25 +142,53 @@ public class PartnerOrderService {
 
         int updated = jdbc.update("""
                 UPDATE orders
-                SET completion_image_url = ?, status = 'SHIPPING', shipped_at = CURRENT_TIMESTAMP
+                SET completion_image_url = ?
                 WHERE id = ? AND partner_id = ? AND status = 'PROCESSING'
                 """, completionImageUrl, orderId, partner.getId());
         if (updated == 0) {
-            throw new ApiException(HttpStatus.CONFLICT, "Đơn không còn ở trạng thái đang chuẩn bị.");
+            throw new ApiException(HttpStatus.CONFLICT, "Không thể cập nhật ảnh cho đơn này.");
+        }
+
+        String orderCode = (String) order.get("order_code");
+        logService.write(partner, "ORDER_PROOF", "orders", orderId,
+                "Cập nhật ảnh hoa hoàn thành cho đơn " + orderCode + ".");
+    }
+
+    @Transactional
+    public void ship(User partner, Long orderId) {
+        Map<String, Object> order = findOrderForUpdate(orderId);
+        if (!partner.getId().equals(nullableNumber(order.get("partner_id")))
+                || !"PROCESSING".equals(order.get("status"))) {
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn không thuộc bạn hoặc không ở trạng thái đang chuẩn bị.");
+        }
+        if (order.get("completion_image_url") == null
+                || ((String) order.get("completion_image_url")).isBlank()) {
+            throw new ApiException(HttpStatus.CONFLICT, "Chưa có minh chứng hoàn thành.");
+        }
+
+        int updated = jdbc.update("""
+                UPDATE orders
+                SET status = 'SHIPPING', shipped_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND partner_id = ? AND status = 'PROCESSING'
+                  AND completion_image_url IS NOT NULL AND completion_image_url <> ''
+                """, orderId, partner.getId());
+        if (updated == 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Chưa có minh chứng hoàn thành hoặc đơn không còn đang chuẩn bị.");
         }
 
         String orderCode = (String) order.get("order_code");
         Long customerId = ((Number) order.get("customer_id")).longValue();
-        logService.write(partner, "ORDER_SHIP", "orders", orderId,
-                "Bàn giao đơn " + orderCode + " kèm ảnh hoa hoàn thành.");
+        logService.write(partner, "ORDER_STATUS", "orders", orderId,
+                "Chuyển đơn " + orderCode + " sang trạng thái SHIPPING.");
         notificationService.notify(customerId, "ORDER_SHIPPED", "Đơn hàng đang được giao",
-                "Đơn " + orderCode + " đã hoàn thành và được bàn giao cho đơn vị vận chuyển.",
+                "Đơn " + orderCode + " đã được bàn giao cho đơn vị vận chuyển.",
                 "account/orders.html");
     }
 
     private Map<String, Object> findOrderForUpdate(Long orderId) {
         List<Map<String, Object>> rows = jdbc.queryForList("""
-                SELECT customer_id, order_code, partner_id, design_request_id, status, payment_status
+                SELECT customer_id, order_code, partner_id, design_request_id, status, payment_status,
+                       completion_image_url
                 FROM orders
                 WHERE id = ?
                 FOR UPDATE

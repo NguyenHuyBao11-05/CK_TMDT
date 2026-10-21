@@ -45,9 +45,15 @@ public class PartnerOrderController {
         return Map.of("message", "Đã bắt đầu thực hiện đơn hàng.");
     }
 
+    @PostMapping("/{orderId}/proof")
+    public Map<String, String> proof(@PathVariable Long orderId, @Valid @RequestBody CompletionImageForm form) {
+        service.saveProof(currentUser.require(Role.PARTNER), orderId, form.completionImageUrl());
+        return Map.of("message", "Đã lưu ảnh hoa hoàn thành.");
+    }
+
     @PostMapping("/{orderId}/ship")
-    public Map<String, String> ship(@PathVariable Long orderId, @Valid @RequestBody CompletionImageForm form) {
-        service.ship(currentUser.require(Role.PARTNER), orderId, form.completionImageUrl());
+    public Map<String, String> ship(@PathVariable Long orderId) {
+        service.ship(currentUser.require(Role.PARTNER), orderId);
         return Map.of("message", "Đã bàn giao đơn hàng cho đơn vị vận chuyển.");
     }
 }

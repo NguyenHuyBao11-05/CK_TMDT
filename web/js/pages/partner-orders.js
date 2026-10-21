@@ -34,10 +34,14 @@
         ? `<button type="button" class="partner-primary-btn" data-start-order="${e(order.id)}"><i class="fa-solid fa-play"></i> Bắt đầu làm</button>`
         : '<span class="order-status pending">Chờ khách thanh toán</span>'
     } else if (order.status === 'PROCESSING') {
-      action = `<label class="small w-100">Ảnh hoa hoàn thành
+      action = `${order.completion_image_url
+          ? `<a href="${e(FW_API.imageUrl(order.completion_image_url))}" target="_blank" rel="noopener">Xem ảnh minh chứng đã lưu</a>`
+          : '<span class="small text-muted-fw">Chưa có ảnh minh chứng</span>'}
+        <label class="small w-100">Ảnh hoa hoàn thành (JPG/PNG, tối đa 2 MB)
           <input class="form-control form-control-sm mt-1" type="file" accept="image/jpeg,image/png" data-completion-image="${e(order.id)}">
         </label>
-        <button type="button" class="partner-primary-btn" data-ship-order="${e(order.id)}"><i class="fa-solid fa-truck"></i> Tải ảnh &amp; bàn giao</button>`
+        <button type="button" class="partner-secondary-btn" data-save-proof="${e(order.id)}"><i class="fa-regular fa-image"></i> Lưu ảnh hoàn thành</button>
+        <button type="button" class="partner-primary-btn" data-ship-order="${e(order.id)}" data-proof-saved="${order.completion_image_url ? 'true' : 'false'}"><i class="fa-solid fa-truck"></i> Bắt đầu giao</button>`
     } else {
       action = `<span class="order-status shipping"><i class="fa-solid fa-truck"></i> Đang vận chuyển</span>
         ${order.completion_image_url ? `<a href="${e(FW_API.imageUrl(order.completion_image_url))}" target="_blank" rel="noopener">Xem ảnh hoàn thành</a>` : ''}`
@@ -123,23 +127,44 @@
       return
     }
 
+    const proofButton = event.target.closest('[data-save-proof]')
+    if (proofButton) {
+      const fileInput = document.querySelector(`[data-completion-image="${proofButton.dataset.saveProof}"]`)
+      const file = fileInput.files[0]
+      if (!file) {
+        FW.toast('Chọn ảnh hoa hoàn thành trước khi lưu.')
+        fileInput.focus()
+        return
+      }
+      if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+        FW.toast('Ảnh minh chứng phải là JPG hoặc PNG và không vượt quá 2 MB.')
+        return
+      }
+      proofButton.disabled = true
+      try {
+        const upload = await FW_API.uploadImage(file)
+        await callServer(`/api/partner/orders/${proofButton.dataset.saveProof}/proof`, {
+          method: 'POST',
+          body: JSON.stringify({ completion_image_url: upload.url }),
+        })
+        FW.toast('Đã lưu ảnh hoa hoàn thành.')
+      } catch (error) {
+        FW.toast(error.message)
+      }
+      await loadOrders()
+      return
+    }
+
     const shipButton = event.target.closest('[data-ship-order]')
     if (!shipButton) return
-    const fileInput = document.querySelector(`[data-completion-image="${shipButton.dataset.shipOrder}"]`)
-    const file = fileInput.files[0]
-    if (!file) {
-      FW.toast('Chọn ảnh hoa hoàn thành trước khi bàn giao đơn.')
-      fileInput.focus()
+    if (shipButton.dataset.proofSaved !== 'true') {
+      FW.toast('Chưa có minh chứng hoàn thành.')
       return
     }
     shipButton.disabled = true
     try {
-      const upload = await FW_API.uploadImage(file)
-      await callServer(`/api/partner/orders/${shipButton.dataset.shipOrder}/ship`, {
-        method: 'POST',
-        body: JSON.stringify({ completion_image_url: upload.url }),
-      })
-      FW.toast('Đã lưu ảnh hoàn thành và bàn giao đơn cho vận chuyển.')
+      await callServer(`/api/partner/orders/${shipButton.dataset.shipOrder}/ship`, { method: 'POST' })
+      FW.toast('Đã bàn giao đơn cho đơn vị vận chuyển.')
     } catch (error) {
       FW.toast(error.message)
     }
