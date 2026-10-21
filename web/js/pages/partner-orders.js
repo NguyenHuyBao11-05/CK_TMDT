@@ -4,6 +4,7 @@
   const e = FW.escapeHtml
   const columns = [
     { status: 'AVAILABLE', title: 'Đơn khả dụng', icon: 'fa-inbox', tone: 'pending' },
+    { status: 'PENDING', title: 'Chờ bắt đầu', icon: 'fa-hourglass-half', tone: 'pending' },
     { status: 'PROCESSING', title: 'Đang chuẩn bị', icon: 'fa-scissors', tone: 'processing' },
     { status: 'SHIPPING', title: 'Đang giao hàng', icon: 'fa-truck', tone: 'shipping' },
   ]
@@ -25,11 +26,22 @@
         <img src="${e(FW_API.imageUrl(item.thumbnail_url))}" alt="">
         <div><strong>${e(item.item_name)} × ${e(item.quantity)}</strong><span>${e(item.material || 'Thiết kế riêng')}</span></div>
       </div>`).join('')
-    const action = order.status === 'AVAILABLE'
-      ? `<button type="button" class="partner-primary-btn" data-accept-order="${e(order.id)}"><i class="fa-solid fa-check"></i> Nhận đơn</button>`
-      : order.status === 'PROCESSING'
-        ? '<span class="order-status processing">Đang chuẩn bị</span>'
-        : '<span class="order-status shipping"><i class="fa-solid fa-truck"></i> Đang vận chuyển</span>'
+    let action
+    if (order.status === 'AVAILABLE') {
+      action = `<button type="button" class="partner-primary-btn" data-accept-order="${e(order.id)}"><i class="fa-solid fa-check"></i> Nhận đơn</button>`
+    } else if (order.status === 'PENDING') {
+      action = order.payment_status === 'PAID'
+        ? `<button type="button" class="partner-primary-btn" data-start-order="${e(order.id)}"><i class="fa-solid fa-play"></i> Bắt đầu làm</button>`
+        : '<span class="order-status pending">Chờ khách thanh toán</span>'
+    } else if (order.status === 'PROCESSING') {
+      action = `<label class="small w-100">Ảnh hoa hoàn thành
+          <input class="form-control form-control-sm mt-1" type="file" accept="image/jpeg,image/png" data-completion-image="${e(order.id)}">
+        </label>
+        <button type="button" class="partner-primary-btn" data-ship-order="${e(order.id)}"><i class="fa-solid fa-truck"></i> Tải ảnh &amp; bàn giao</button>`
+    } else {
+      action = `<span class="order-status shipping"><i class="fa-solid fa-truck"></i> Đang vận chuyển</span>
+        ${order.completion_image_url ? `<a href="${e(FW_API.imageUrl(order.completion_image_url))}" target="_blank" rel="noopener">Xem ảnh hoàn thành</a>` : ''}`
+    }
     return `
       <article class="kanban-order-card">
         <div class="kanban-card-top"><strong>${e(order.order_code)}</strong><span class="order-status ${order.status.toLowerCase()}">${e(orderType(order))}</span></div>
@@ -70,7 +82,7 @@
         callServer('/api/partner/orders'),
       ])
       availableOrders = available
-      orders = mine.filter((order) => order.status === 'PROCESSING' || order.status === 'SHIPPING')
+      orders = mine.filter((order) => order.status === 'PENDING' || order.status === 'PROCESSING' || order.status === 'SHIPPING')
       renderBoard()
     } catch (error) {
       availableOrders = []
@@ -86,17 +98,52 @@
   document.getElementById('refreshOrders').addEventListener('click', () => { void loadOrders() })
   document.getElementById('orderBoard').addEventListener('click', async (event) => {
     const button = event.target.closest('[data-accept-order]')
-    if (!button) return
-    button.disabled = true
-    try {
-      await callServer(`/api/partner/orders/${button.dataset.acceptOrder}/accept`, { method: 'POST' })
-      FW.toast('Đã nhận đơn. Đơn hàng đã chuyển sang trạng thái Đang chuẩn bị.')
+    if (button) {
+      button.disabled = true
+      try {
+        await callServer(`/api/partner/orders/${button.dataset.acceptOrder}/accept`, { method: 'POST' })
+        FW.toast('Đã nhận đơn. Đơn hàng đã chuyển sang trạng thái Đang chuẩn bị.')
+      } catch (error) {
+        FW.toast(error.message)
+      }
       await loadOrders()
-    } catch (error) {
-      button.disabled = false
-      FW.toast(error.message)
-      await loadOrders()
+      return
     }
+
+    const startButton = event.target.closest('[data-start-order]')
+    if (startButton) {
+      startButton.disabled = true
+      try {
+        await callServer(`/api/partner/orders/${startButton.dataset.startOrder}/start`, { method: 'POST' })
+        FW.toast('Đã bắt đầu thực hiện đơn thiết kế riêng.')
+      } catch (error) {
+        FW.toast(error.message)
+      }
+      await loadOrders()
+      return
+    }
+
+    const shipButton = event.target.closest('[data-ship-order]')
+    if (!shipButton) return
+    const fileInput = document.querySelector(`[data-completion-image="${shipButton.dataset.shipOrder}"]`)
+    const file = fileInput.files[0]
+    if (!file) {
+      FW.toast('Chọn ảnh hoa hoàn thành trước khi bàn giao đơn.')
+      fileInput.focus()
+      return
+    }
+    shipButton.disabled = true
+    try {
+      const upload = await FW_API.uploadImage(file)
+      await callServer(`/api/partner/orders/${shipButton.dataset.shipOrder}/ship`, {
+        method: 'POST',
+        body: JSON.stringify({ completion_image_url: upload.url }),
+      })
+      FW.toast('Đã lưu ảnh hoàn thành và bàn giao đơn cho vận chuyển.')
+    } catch (error) {
+      FW.toast(error.message)
+    }
+    await loadOrders()
   })
 
   void loadOrders()

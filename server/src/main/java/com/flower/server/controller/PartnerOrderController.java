@@ -1,9 +1,11 @@
 package com.flower.server.controller;
 
+import com.flower.server.dto.CompletionImageForm;
 import com.flower.server.dto.PartnerOrderView;
 import com.flower.server.entity.Role;
 import com.flower.server.service.CurrentUserService;
 import com.flower.server.service.PartnerOrderService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,5 +37,17 @@ public class PartnerOrderController {
     public Map<String, String> accept(@PathVariable Long orderId) {
         service.accept(currentUser.require(Role.PARTNER), orderId);
         return Map.of("message", "Đã nhận đơn hàng.");
+    }
+
+    @PostMapping("/{orderId}/start")
+    public Map<String, String> start(@PathVariable Long orderId) {
+        service.start(currentUser.require(Role.PARTNER), orderId);
+        return Map.of("message", "Đã bắt đầu thực hiện đơn hàng.");
+    }
+
+    @PostMapping("/{orderId}/ship")
+    public Map<String, String> ship(@PathVariable Long orderId, @Valid @RequestBody CompletionImageForm form) {
+        service.ship(currentUser.require(Role.PARTNER), orderId, form.completionImageUrl());
+        return Map.of("message", "Đã bàn giao đơn hàng cho đơn vị vận chuyển.");
     }
 }

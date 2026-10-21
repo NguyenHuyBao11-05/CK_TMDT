@@ -4,11 +4,14 @@ import com.flower.server.common.ApiException;
 import com.flower.server.dto.PartnerOrderItem;
 import com.flower.server.dto.PartnerOrderView;
 import com.flower.server.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,11 +29,14 @@ public class PartnerOrderService {
     private final JdbcTemplate jdbc;
     private final LogService logService;
     private final NotificationService notificationService;
+    private final Path uploadDir;
 
-    public PartnerOrderService(JdbcTemplate jdbc, LogService logService, NotificationService notificationService) {
+    public PartnerOrderService(JdbcTemplate jdbc, LogService logService, NotificationService notificationService,
+                               @Value("${app.upload-dir}") String uploadDir) {
         this.jdbc = jdbc;
         this.logService = logService;
         this.notificationService = notificationService;
+        this.uploadDir = Path.of(uploadDir).toAbsolutePath().normalize();
     }
 
     @Transactional(readOnly = true)
@@ -91,6 +97,82 @@ public class PartnerOrderService {
         notificationService.notify(customerId, "ORDER_ACCEPTED", "Đơn hàng đã được tiếp nhận",
                 "Đối tác " + partner.getFullName() + " đã nhận đơn " + orderCode + " và bắt đầu chuẩn bị hoa.",
                 "account/orders.html");
+    }
+
+    @Transactional
+    public void start(User partner, Long orderId) {
+        Map<String, Object> order = findOrderForUpdate(orderId);
+        if (!partner.getId().equals(nullableNumber(order.get("partner_id")))
+                || order.get("design_request_id") == null
+                || !"PENDING".equals(order.get("status"))
+                || !"PAID".equals(order.get("payment_status"))) {
+            throw new ApiException(HttpStatus.CONFLICT,
+                    "Đơn thiết kế riêng chưa được thanh toán, không thuộc bạn hoặc không còn chờ bắt đầu.");
+        }
+
+        int updated = jdbc.update("""
+                UPDATE orders
+                SET status = 'PROCESSING'
+                WHERE id = ? AND partner_id = ? AND design_request_id IS NOT NULL
+                  AND status = 'PENDING' AND payment_status = 'PAID'
+                """, orderId, partner.getId());
+        if (updated == 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn không còn ở trạng thái chờ bắt đầu.");
+        }
+
+        String orderCode = (String) order.get("order_code");
+        Long customerId = ((Number) order.get("customer_id")).longValue();
+        logService.write(partner, "ORDER_START", "orders", orderId, "Bắt đầu thực hiện đơn " + orderCode + ".");
+        notificationService.notify(customerId, "ORDER_PROCESSING", "Đối tác bắt đầu thực hiện đơn hàng",
+                "Đối tác " + partner.getFullName() + " đã bắt đầu thực hiện đơn " + orderCode + ".",
+                "account/orders.html");
+    }
+
+    @Transactional
+    public void ship(User partner, Long orderId, String completionImageUrl) {
+        String fileName = completionImageUrl.substring("/uploads/".length());
+        if (!Files.isRegularFile(uploadDir.resolve(fileName).normalize())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Không tìm thấy ảnh hoàn thành đã tải lên.");
+        }
+        Map<String, Object> order = findOrderForUpdate(orderId);
+        if (!partner.getId().equals(nullableNumber(order.get("partner_id")))
+                || !"PROCESSING".equals(order.get("status"))) {
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn không thuộc bạn hoặc không ở trạng thái đang chuẩn bị.");
+        }
+
+        int updated = jdbc.update("""
+                UPDATE orders
+                SET completion_image_url = ?, status = 'SHIPPING', shipped_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND partner_id = ? AND status = 'PROCESSING'
+                """, completionImageUrl, orderId, partner.getId());
+        if (updated == 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn không còn ở trạng thái đang chuẩn bị.");
+        }
+
+        String orderCode = (String) order.get("order_code");
+        Long customerId = ((Number) order.get("customer_id")).longValue();
+        logService.write(partner, "ORDER_SHIP", "orders", orderId,
+                "Bàn giao đơn " + orderCode + " kèm ảnh hoa hoàn thành.");
+        notificationService.notify(customerId, "ORDER_SHIPPED", "Đơn hàng đang được giao",
+                "Đơn " + orderCode + " đã hoàn thành và được bàn giao cho đơn vị vận chuyển.",
+                "account/orders.html");
+    }
+
+    private Map<String, Object> findOrderForUpdate(Long orderId) {
+        List<Map<String, Object>> rows = jdbc.queryForList("""
+                SELECT customer_id, order_code, partner_id, design_request_id, status, payment_status
+                FROM orders
+                WHERE id = ?
+                FOR UPDATE
+                """, orderId);
+        if (rows.isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng.");
+        }
+        return rows.get(0);
+    }
+
+    private static Long nullableNumber(Object value) {
+        return value == null ? null : ((Number) value).longValue();
     }
 
     private List<PartnerOrderView> queryOrders(String source, String condition, Object... parameters) {
