@@ -38,4 +38,10 @@ public class User {
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
+    @Column(name = "login_locked_until")
+    private LocalDateTime loginLockedUntil;
 }

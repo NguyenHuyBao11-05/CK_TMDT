@@ -6,6 +6,8 @@ import com.flower.server.entity.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Optional;
+
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     boolean existsByEmailIgnoreCase(String email);
@@ -15,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     long countByRole(Role role);
 
     long countByStatus(UserStatus status);
+
+    Optional<User> findByEmailIgnoreCase(String email);
 }
