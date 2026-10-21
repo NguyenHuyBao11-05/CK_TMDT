@@ -30,7 +30,13 @@ public class PartnerApplicationService {
 
     @Transactional
     public void apply(User customer, PartnerApplicationForm form) {
-        if (form.bio().trim().length() < 50) {
+        String bio = form.bio().trim();
+        String introduction = bio.lines()
+                .filter(line -> line.startsWith("Giới thiệu:"))
+                .map(line -> line.substring("Giới thiệu:".length()).trim())
+                .findFirst()
+                .orElse(bio);
+        if (introduction.length() < 50) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Phần giới thiệu thương hiệu phải có ít nhất 50 ký tự.");
         }
 
@@ -42,7 +48,7 @@ public class PartnerApplicationService {
         }
 
         profile.setUserId(customer.getId());
-        profile.setBio(form.bio().trim());
+        profile.setBio(bio);
         profile.setPortfolioUrl(form.portfolioUrl().trim());
         profile.setApprovalStatus(PartnerApprovalStatus.PENDING);
         profile.setApprovedBy(null);

@@ -285,6 +285,19 @@ Object.assign(window.FW_API, {
     return callServer('/api/partner/apply', { method: 'POST', body: JSON.stringify(data) })
   },
 
+  getPartnerApplications() {
+    return callServer('/api/admin/partner-approvals')
+  },
+  approvePartnerApplication(userId) {
+    return callServer('/api/admin/partner-approvals/' + userId + '/approve', { method: 'POST' })
+  },
+  rejectPartnerApplication(userId, reason) {
+    return callServer('/api/admin/partner-approvals/' + userId + '/reject', {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  },
+
   getAdminLogs(params) {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
