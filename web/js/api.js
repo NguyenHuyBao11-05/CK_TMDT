@@ -266,6 +266,7 @@ async function callServer(path, options = {}) {
   try {
     res = await fetch(BAO_SERVER + path, {
       ...options,
+      credentials: 'include',
       headers: {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         'X-User-Id': mockUserId(),
@@ -345,5 +346,14 @@ Object.assign(window.FW_API, {
   },
   getSentQuotes() {
     return callServer('/api/partner/quotes')
+  },
+  register(data) {
+    return callServer('/api/auth/register', {method: 'POST', body: JSON.stringify(data)});
+  },
+  verifyRegisterOtp(data) {
+    return callServer('/api/auth/register/verify', {method: 'POST', body: JSON.stringify(data)});
+  },
+  resendRegisterOtp() {
+    return callServer('/api/auth/register/resend', {method: 'POST'});
   },
 })
