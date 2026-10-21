@@ -1,3 +1,4 @@
+// QL02 - Kiểm duyệt sản phẩm do Đối tác đăng.
 (function () {
   'use strict'
 
@@ -56,7 +57,7 @@
     const table = document.getElementById('productTable')
     table.innerHTML = '<div class="partner-empty-state">Đang tải danh sách sản phẩm...</div>'
     try {
-      products = await callServer('/api/admin/product-approvals')
+      products = await FW_API.getProductApprovals()
       document.querySelectorAll('[data-material]').forEach((button) => {
         const material = button.dataset.material
         const count = material ? products.filter((product) => product.material === material).length : products.length
@@ -74,7 +75,7 @@
 
   async function approveProduct(product) {
     try {
-      await callServer(`/api/admin/product-approvals/${product.id}/approve`, { method: 'POST' })
+      await FW_API.approvePartnerProduct(product.id)
       FW.toast(`Đã duyệt "${product.name}", sản phẩm đã hiển thị cho khách.`)
       await loadProducts()
     } catch (error) {
@@ -119,10 +120,7 @@
       const submit = rejectForm.querySelector('[type="submit"]')
       submit.disabled = true
       try {
-        await callServer(`/api/admin/product-approvals/${rejectingId}/reject`, {
-          method: 'POST',
-          body: JSON.stringify({ reason }),
-        })
+        await FW_API.rejectPartnerProduct(rejectingId, reason)
         rejectModal.hide()
         FW.toast('Đã từ chối sản phẩm và gửi lý do cho Đối tác.')
         await loadProducts()

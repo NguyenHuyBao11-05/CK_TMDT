@@ -24,8 +24,8 @@
   <section class="partner-welcome">
     <div>
       <div class="eyebrow">Bảng điều khiển Đối tác</div>
-      <h1 class="partner-title">Chào buổi sáng, Florist Thảo Điền Atelier</h1>
-      <p class="partner-subtitle mb-0"><span class="partner-live-dot"></span> Cửa hàng đang mở cửa · Tỷ lệ hoàn thành đơn tháng này đạt <strong>98,7%</strong></p>
+      <h1 class="partner-title">Xin chào, <span id="partnerName">Đối tác</span></h1>
+      <p class="partner-subtitle mb-0"><span class="partner-live-dot"></span> Tổng quan hoạt động cửa hàng của bạn</p>
     </div>
     <div class="partner-actions">
       <a href="products.html" class="partner-primary-btn"><i class="fa-solid fa-plus"></i> Tạo sản phẩm mới</a>
@@ -33,15 +33,13 @@
   </section>
 
   <div class="partner-stat-grid partner-dashboard-stats" id="statGrid"></div>
+  <div id="orderStatusSummary" class="mb-3" aria-label="Số đơn theo trạng thái"></div>
 
   <section class="partner-panel partner-revenue-panel">
     <div class="partner-panel-header">
       <div>
         <h2 class="partner-panel-title">Doanh thu 7 ngày qua</h2>
         <p class="small text-muted-fw mb-0">Xu hướng bán và đơn đặt hàng theo ngày</p>
-      </div>
-      <div class="partner-actions">
-        <button type="button" class="partner-secondary-btn"><i class="fa-regular fa-calendar"></i> Tuần này</button>
       </div>
     </div>
     <div id="revenueChart" class="partner-chart" aria-label="Biểu đồ doanh thu 7 ngày"></div>
@@ -69,6 +67,7 @@
 <script src="../js/common.js"></script>
 <script src="../js/pages/partner-navigation.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/stats-chart.js"></script>
 <script src="../js/pages/partner-dashboard.js"></script>
 </body>
 </html>

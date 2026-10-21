@@ -1,3 +1,4 @@
+// QL01 - Duyệt hoặc từ chối hồ sơ đăng ký Đối tác.
 (function () {
   'use strict'
 

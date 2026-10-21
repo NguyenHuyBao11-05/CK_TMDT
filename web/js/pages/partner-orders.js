@@ -1,3 +1,4 @@
+// DT03, DT04, DT07, DT08 - Tiếp nhận đơn, lưu minh chứng và bàn giao giao hàng.
 (function () {
   'use strict'
 
@@ -82,8 +83,8 @@
     board.innerHTML = '<div class="partner-empty-state">Đang tải đơn hàng...</div>'
     try {
       const [available, mine] = await Promise.all([
-        callServer('/api/partner/orders/available'),
-        callServer('/api/partner/orders'),
+        FW_API.getAvailablePartnerOrders(),
+        FW_API.getPartnerOrders(),
       ])
       availableOrders = available
       orders = mine.filter((order) => order.status === 'PENDING' || order.status === 'PROCESSING' || order.status === 'SHIPPING')
@@ -105,7 +106,7 @@
     if (button) {
       button.disabled = true
       try {
-        await callServer(`/api/partner/orders/${button.dataset.acceptOrder}/accept`, { method: 'POST' })
+        await FW_API.acceptPartnerOrder(button.dataset.acceptOrder)
         FW.toast('Đã nhận đơn. Đơn hàng đã chuyển sang trạng thái Đang chuẩn bị.')
       } catch (error) {
         FW.toast(error.message)
@@ -118,7 +119,7 @@
     if (startButton) {
       startButton.disabled = true
       try {
-        await callServer(`/api/partner/orders/${startButton.dataset.startOrder}/start`, { method: 'POST' })
+        await FW_API.startPartnerOrder(startButton.dataset.startOrder)
         FW.toast('Đã bắt đầu thực hiện đơn thiết kế riêng.')
       } catch (error) {
         FW.toast(error.message)
@@ -143,10 +144,7 @@
       proofButton.disabled = true
       try {
         const upload = await FW_API.uploadImage(file)
-        await callServer(`/api/partner/orders/${proofButton.dataset.saveProof}/proof`, {
-          method: 'POST',
-          body: JSON.stringify({ completion_image_url: upload.url }),
-        })
+        await FW_API.savePartnerOrderProof(proofButton.dataset.saveProof, upload.url)
         FW.toast('Đã lưu ảnh hoa hoàn thành.')
       } catch (error) {
         FW.toast(error.message)
@@ -163,7 +161,7 @@
     }
     shipButton.disabled = true
     try {
-      await callServer(`/api/partner/orders/${shipButton.dataset.shipOrder}/ship`, { method: 'POST' })
+      await FW_API.shipPartnerOrder(shipButton.dataset.shipOrder)
       FW.toast('Đã bàn giao đơn cho đơn vị vận chuyển.')
     } catch (error) {
       FW.toast(error.message)

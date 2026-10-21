@@ -1,3 +1,4 @@
+// DT01 - Gửi hồ sơ đăng ký Đối tác.
 (function () {
     'use strict'
 

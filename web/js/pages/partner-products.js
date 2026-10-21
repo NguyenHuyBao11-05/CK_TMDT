@@ -1,3 +1,4 @@
+// DT02 - Quản lý sản phẩm của Đối tác.
 (function () {
   'use strict'
 
@@ -96,7 +97,7 @@
     const table = document.getElementById('productList')
     table.innerHTML = '<tr><td colspan="8" class="text-center text-muted-fw py-5">Đang tải sản phẩm...</td></tr>'
     try {
-      products = await callServer('/api/partner/products')
+      products = await FW_API.getPartnerProducts()
       renderStats()
       renderProducts()
     } catch (error) {
@@ -214,10 +215,10 @@
         image_urls: uploadedImages,
       }
       if (editingProduct) {
-        await callServer(`/api/partner/products/${editingProduct.id}`, { method: 'PUT', body: JSON.stringify(data) })
+        await FW_API.updatePartnerProduct(editingProduct.id, data)
         FW.toast('Đã cập nhật sản phẩm.')
       } else {
-        await callServer('/api/partner/products', { method: 'POST', body: JSON.stringify(data) })
+        await FW_API.createPartnerProduct(data)
         FW.toast('Sản phẩm đã được gửi cho Quản lý kiểm duyệt.')
       }
       modal.hide()
@@ -231,6 +232,10 @@
   })
 
   modalElement.addEventListener('hidden.bs.modal', resetEditor)
+  document.getElementById('resetForm').addEventListener('click', (event) => {
+    event.preventDefault()
+    resetEditor()
+  })
   document.getElementById('refreshProducts').addEventListener('click', () => {
     document.getElementById('productSearch').value = ''
     document.getElementById('productMaterialFilter').value = ''
