@@ -11,10 +11,11 @@ main .container2 {
 }
 
 .container2 .user-picture img {
-    width: 100%;
-    height: auto;
+    width: 180px;
+    height: 180px;
     display: block;
     border-radius: 50%;
+    object-fit: cover;
     border: 1px solid var(--fw-forest);
 }
 
