@@ -2,7 +2,10 @@ package com.flower.server.controller;
 
 import com.flower.server.dto.UserRegister;
 import com.flower.server.dto.UserLogin;
+import com.flower.server.entity.User;
 import com.flower.server.service.AuthService;
+import com.flower.server.service.CurrentUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -21,6 +25,7 @@ import java.util.Map;
 @Validated
 public class AuthController {
     private final AuthService authService;
+    private final CurrentUserService currentUserService;
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody UserRegister request, HttpSession session) {
         try {
@@ -72,9 +77,26 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(HttpSession session) {
-        Map<String, Object> user = authService.getCurrentUser(session);
-        if (user == null) {return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Bạn chưa đăng nhập."));}
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> me() {
+        User user = currentUserService.get();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", user.getId());
+        result.put("full_name", user.getFullName());
+        result.put("email", user.getEmail());
+        result.put("phone", user.getPhone());
+        result.put("role", user.getRole().name());
+        result.put("avatar_url", user.getAvatarUrl());
+
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công."));
     }
 }

@@ -6,6 +6,7 @@ import com.flower.server.entity.User;
 import com.flower.server.entity.UserStatus;
 import com.flower.server.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +24,15 @@ public class CurrentUserService {
     }
 
     public User get() {
-        String header = request.getHeader("X-User-Id");
-        if (header == null || header.isBlank()) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Bạn chưa đăng nhập.");
         }
-        User user;
-        try {
-            user = users.findById(Long.parseLong(header.trim())).orElse(null);
-        } catch (NumberFormatException e) {
-            user = null;
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Long id)) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Bạn chưa đăng nhập.");
         }
+        User user = users.findById(id).orElse(null);
         if (user == null) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Tài khoản không tồn tại.");
         }

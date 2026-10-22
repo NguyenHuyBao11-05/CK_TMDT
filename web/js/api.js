@@ -379,6 +379,12 @@ Object.assign(window.FW_API, {
   login({ email, password }) {
     return callServer('/api/auth/login', {method: 'POST', body: JSON.stringify({ email, password })});
   },
+  me() {
+    return callServer('/api/auth/me');
+  },
+  logout() {
+    return callServer("/api/auth/logout", {method: "POST"});
+  },
 })
 
 async function loadAdminMenuCounts() {
