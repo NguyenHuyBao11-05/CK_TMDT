@@ -32,11 +32,6 @@ public record PartnerProductForm(
         @Digits(integer = 12, fraction = 0, message = "Giá ưu đãi không hợp lệ.")
         BigDecimal discountPrice,
 
-        @NotNull(message = "Vui lòng nhập số lượng tồn kho.")
-        @Min(value = 0, message = "Số lượng tồn kho không được âm.")
-        @Max(value = 4294967295L, message = "Số lượng tồn kho vượt giới hạn.")
-        Long stockQuantity,
-
         @NotEmpty(message = "Sản phẩm cần có ít nhất 1 ảnh.")
         @Size(max = 5, message = "Mỗi sản phẩm có tối đa 5 ảnh.")
         List<@NotBlank(message = "Đường dẫn ảnh không hợp lệ.") String> imageUrls

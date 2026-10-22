@@ -20,7 +20,6 @@
       }
 
       const discounted = product.discount_price != null && product.discount_price < product.price;
-      const stock = Number(product.stock_quantity || 0);
       document.title = product.name + ' — Fw12 Floral';
       $('crumbName').textContent = product.name;
       $('pImg').src = imageUrl((product.images && product.images[0]) || product.thumbnail_url);
@@ -33,21 +32,11 @@
       $('pPrice').textContent = FW.formatVnd(discounted ? product.discount_price : product.price);
       $('pOld').textContent = discounted ? FW.formatVnd(product.price) : '';
       $('pDescription').textContent = product.description || 'Chưa có mô tả cho sản phẩm này.';
-      $('pStock').textContent = stock > 0 ? `Còn ${stock} sản phẩm` : 'Hết mẫu hôm nay';
-      $('pStock').className = stock > 0 ? 'small text-forest mb-3' : 'small text-rose mb-3';
+      $('pStock').textContent = 'Đặt theo mẫu, Đối tác sẽ nhận đơn và cắm hoa cho bạn.';
       $('detail').hidden = false;
       $('extra').hidden = false;
 
-      if (stock < 1) {
-        $('addBtn').disabled = true;
-        $('buyBtn').disabled = true;
-        $('qtyPlus').disabled = true;
-        $('qtyMinus').disabled = true;
-        $('addBtn').textContent = 'Đã hết hàng';
-        $('buyBtn').textContent = 'Hết mẫu hôm nay';
-      } else {
-        $('qtyPlus').disabled = false;
-      }
+      $('qtyPlus').disabled = false;
 
       await Promise.allSettled([loadReviews(), loadComments(), loadRelated()]);
     } catch (error) {
@@ -103,16 +92,12 @@
   });
 
   $('qtyPlus').addEventListener('click', () => {
-    const stock = Number(product?.stock_quantity || 0);
-    qty = Math.min(stock, qty + 1);
+    qty = Math.min(50, qty + 1);
     $('qtyVal').textContent = qty;
   });
 
   async function addToCart(goToCart) {
-    if (!product || Number(product.stock_quantity) < 1) {
-      FW.toast('Sản phẩm đã hết mẫu trong ngày.');
-      return;
-    }
+    if (!product) return;
     try {
       await FW.cart.add(product.id, product.name, qty);
       if (goToCart) location.href = FW.url('shop/cart.html');

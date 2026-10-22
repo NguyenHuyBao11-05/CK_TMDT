@@ -13,10 +13,13 @@
         return;
       }
       $('okBody').hidden = false;
+      order.code = order.order_code || order.code;
       $('oCode').textContent = order.code;
       $('oCount').textContent = (order.lines || []).reduce((count, line) => count + Number(line.quantity || 0), 0);
-      $('oTotal').textContent = FW.formatVnd(order.total);
-      const recipient = order.recipient || {};
+      $('oTotal').textContent = FW.formatVnd(order.total_amount ?? order.total);
+      const recipient = order.recipient || {
+        name: order.recipient_name, phone: order.recipient_phone, address: order.delivery_address, note: order.delivery_note
+      };
       $('oShip').textContent = recipient.address
           ? `${recipient.name} · ${recipient.phone} · ${recipient.address}${recipient.note ? ' · ' + recipient.note : ''}`
           : (recipient.note || '—');

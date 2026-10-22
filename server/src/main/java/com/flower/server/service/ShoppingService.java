@@ -15,6 +15,7 @@ import java.util.*;
 
 @Service
 public class ShoppingService {
+    private static final int MAX_QUANTITY = 50;
     private final JdbcTemplate jdbc;
     private final LogService logs;
     private final NotificationService notifications;
@@ -30,7 +31,7 @@ public class ShoppingService {
 
     public List<Map<String,Object>> products(String q, String materials, BigDecimal min, BigDecimal max, String sort, int page) {
         StringBuilder sql = new StringBuilder("""
-            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,p.stock_quantity,
+            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,
                    u.full_name AS partner_name, COALESCE(bs.total_sold,0) AS total_sold,
                    COALESCE(rv.rating,0) AS rating
             FROM products p JOIN users u ON u.id=p.partner_id
@@ -65,7 +66,7 @@ public class ShoppingService {
 
     public List<Map<String,Object>> bestSellers() {
         return jdbc.queryForList("""
-            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,p.stock_quantity,
+            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,
                    u.full_name partner_name,COALESCE(bs.total_sold,0) total_sold,COALESCE(rv.rating,0) rating
             FROM v_best_seller_products bs JOIN products p ON p.id=bs.id JOIN users u ON u.id=p.partner_id
             LEFT JOIN (SELECT product_id,AVG(rating) rating FROM reviews WHERE product_id IS NOT NULL GROUP BY product_id) rv ON rv.product_id=p.id
@@ -75,7 +76,7 @@ public class ShoppingService {
 
     public List<Map<String,Object>> newProducts() {
         return jdbc.queryForList("""
-            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,p.stock_quantity,
+            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,
                    u.full_name partner_name,COALESCE(rv.rating,0) rating,p.created_at
             FROM products p JOIN users u ON u.id=p.partner_id
             LEFT JOIN (SELECT product_id,AVG(rating) rating FROM reviews WHERE product_id IS NOT NULL GROUP BY product_id) rv ON rv.product_id=p.id
@@ -141,12 +142,10 @@ public class ShoppingService {
     @Transactional
     public Map<String,Object> addCartItem(User user,long productId,int quantity,String note) {
         if (quantity < 1) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng phải từ 1 trở lên.");
-        Map<String,Object> p = product(productId);
-        int stock = ((Number)p.get("stock_quantity")).intValue();
-        if (stock < 1 || quantity > stock) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng vượt quá tồn kho hiện có.");
+        product(productId);
         Long cartId = ensureCart(user.getId());
         Integer current = jdbc.query("SELECT quantity FROM cart_items WHERE cart_id=? AND product_id=?", rs -> rs.next()?rs.getInt(1):null,cartId,productId);
-        if (current != null && current + quantity > stock) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng vượt quá tồn kho hiện có.");
+        if ((current == null ? 0 : current) + quantity > MAX_QUANTITY) throw new ApiException(HttpStatus.BAD_REQUEST,"Mỗi mẫu hoa đặt tối đa "+MAX_QUANTITY+" bó.");
         jdbc.update("INSERT INTO cart_items(cart_id,product_id,quantity,note) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity),note=VALUES(note)",cartId,productId,quantity,note == null || note.isBlank()?null:note.trim());
         return cartData(user.getId());
     }
@@ -154,9 +153,8 @@ public class ShoppingService {
     @Transactional
     public Map<String,Object> setCartQuantity(User user,long productId,int quantity) {
         if (quantity < 1) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng phải từ 1 trở lên.");
-        Map<String,Object> p=product(productId);
-        int stock=((Number)p.get("stock_quantity")).intValue();
-        if(quantity>stock) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng vượt quá tồn kho hiện có.");
+        product(productId);
+        if(quantity>MAX_QUANTITY) throw new ApiException(HttpStatus.BAD_REQUEST,"Mỗi mẫu hoa đặt tối đa "+MAX_QUANTITY+" bó.");
         Long cartId=ensureCart(user.getId());
         int changed=jdbc.update("UPDATE cart_items SET quantity=? WHERE cart_id=? AND product_id=?",quantity,cartId,productId);
         if(changed==0) throw new ApiException(HttpStatus.NOT_FOUND,"Sản phẩm không có trong giỏ hàng.");
@@ -221,10 +219,6 @@ public class ShoppingService {
         for(Map<String,Object> line:lines) {
             BigDecimal unit=money(line.get("unit_price")); int qty=((Number)line.get("quantity")).intValue();
             subtotal=subtotal.add(unit.multiply(BigDecimal.valueOf(qty)));
-            if(!quoteOrder) {
-                int stock=((Number)line.get("stock_quantity")).intValue();
-                if(qty>stock || stock<1) throw new ApiException(HttpStatus.BAD_REQUEST,"Sản phẩm \""+line.get("name")+"\" không đủ tồn kho.");
-            }
         }
         BigDecimal discount=BigDecimal.ZERO; Long voucherId=null; String voucherCode=str(body,"voucher_code");
         if(!quoteOrder && !voucherCode.isBlank()) {
@@ -258,9 +252,8 @@ public class ShoppingService {
         List<Map<String,Object>> items=jdbc.queryForList("SELECT product_id,quantity,item_name FROM order_items WHERE order_id=?",orderId);
         for(Map<String,Object> item:items) {
             Long productId=asLong(item.get("product_id")); if(productId==null) continue;
-            int qty=((Number)item.get("quantity")).intValue();
-            int changed=jdbc.update("UPDATE products SET stock_quantity=stock_quantity-? WHERE id=? AND status='APPROVED' AND stock_quantity>=?",qty,productId,qty);
-            if(changed==0) throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm \""+item.get("item_name")+"\" vừa hết hàng hoặc không đủ tồn kho.");
+            Integer approved=jdbc.queryForObject("SELECT COUNT(*) FROM products WHERE id=? AND status='APPROVED'",Integer.class,productId);
+            if(approved==null || approved==0) throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm \""+item.get("item_name")+"\" hiện không còn được bán.");
         }
         jdbc.update("UPDATE orders SET payment_status='PAID',payment_method='BANK_TRANSFER' WHERE id=?",orderId);
         jdbc.update("INSERT INTO payments(order_id,method,amount,status,paid_at) VALUES(?,'BANK_TRANSFER',?,'SUCCESS',NOW())",orderId,order.get("total_amount"));
@@ -330,7 +323,7 @@ public class ShoppingService {
             """,Integer.class,user.getId());
         if(purchased==null || purchased==0) return bestSellers();
         return jdbc.queryForList("""
-            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,p.stock_quantity,
+            SELECT p.id,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,
                    u.full_name partner_name,COALESCE(bs.total_sold,0) total_sold,COALESCE(rv.rating,0) rating
             FROM products p JOIN users u ON u.id=p.partner_id
             LEFT JOIN v_best_seller_products bs ON bs.id=p.id
@@ -372,7 +365,7 @@ public class ShoppingService {
     private Map<String,Object> cartData(Long customerId) {
         Long cartId=ensureCart(customerId);
         List<Map<String,Object>> lines=jdbc.queryForList("""
-            SELECT ci.product_id,ci.quantity,ci.note,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,p.stock_quantity,
+            SELECT ci.product_id,ci.quantity,ci.note,p.name,p.material,p.price,p.discount_price,p.thumbnail_url,
                    u.full_name partner_name,COALESCE(p.discount_price,p.price) unit_price
             FROM cart_items ci JOIN products p ON p.id=ci.product_id JOIN users u ON u.id=p.partner_id
             WHERE ci.cart_id=? AND p.status='APPROVED' ORDER BY ci.created_at DESC

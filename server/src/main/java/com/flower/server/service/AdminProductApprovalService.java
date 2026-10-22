@@ -30,7 +30,7 @@ public class AdminProductApprovalService {
     public List<ProductApprovalItem> list() {
         List<ProductApprovalItem> products = jdbc.query("""
                         SELECT p.id, p.partner_id, u.full_name AS partner_name, p.name, p.material,
-                               p.description, p.price, p.discount_price, p.stock_quantity,
+                               p.description, p.price, p.discount_price,
                                p.thumbnail_url, p.status, p.reject_reason
                         FROM products p
                         JOIN users u ON u.id = p.partner_id
@@ -45,7 +45,6 @@ public class AdminProductApprovalService {
                         rs.getString("description"),
                         rs.getBigDecimal("price"),
                         rs.getBigDecimal("discount_price"),
-                        rs.getLong("stock_quantity"),
                         rs.getString("thumbnail_url"),
                         List.of(),
                         rs.getString("status"),
@@ -53,7 +52,7 @@ public class AdminProductApprovalService {
 
         return products.stream().map(product -> new ProductApprovalItem(
                 product.id(), product.partnerId(), product.partnerName(), product.name(), product.material(),
-                product.description(), product.price(), product.discountPrice(), product.stockQuantity(),
+                product.description(), product.price(), product.discountPrice(),
                 product.thumbnailUrl(),
                 jdbc.queryForList("SELECT image_url FROM product_images WHERE product_id = ? ORDER BY sort_order, id",
                         String.class, product.id()),

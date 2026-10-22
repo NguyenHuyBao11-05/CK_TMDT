@@ -184,19 +184,6 @@ public class AuthService {
         return userResponse(user);
     }
 
-    public Map<String, Object> getCurrentUser(HttpSession session) {
-        Object userId = session.getAttribute("userId");
-        if (!(userId instanceof Long id)) {
-            return null;
-        }
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null || user.getStatus() != UserStatus.ACTIVE) {
-            session.removeAttribute("userId");
-            return null;
-        }
-        return userResponse(user);
-    }
-
     private Map<String, Object> userResponse(User user) {
         return Map.of("id", user.getId(), "full_name", user.getFullName(), "role", user.getRole().name());
     }

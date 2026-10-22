@@ -41,7 +41,7 @@
           <div class="review-product-meta"><span>Mã sản phẩm #${e(product.id)}</span><span class="badge-soft ${statusBadge[product.status]}">${e(statusLabels[product.status] || product.status)}</span></div>
           <div class="review-product-meta"><span>Giá</span><strong>${FW.formatVnd(product.price)}</strong></div>
           <div class="review-product-meta"><span>Giá ưu đãi</span><strong>${product.discount_price == null ? '—' : FW.formatVnd(product.discount_price)}</strong></div>
-          <div class="review-product-note"><i class="fa-solid fa-box me-1"></i>Tồn kho: ${e(product.stock_quantity)} · ${e(product.description || 'Chưa có mô tả')}</div>
+          <div class="review-product-note"><i class="fa-solid fa-align-left me-1"></i>${e(product.description || 'Chưa có mô tả')}</div>
           ${product.reject_reason ? `<div class="review-product-note text-rose"><i class="fa-solid fa-circle-xmark me-1"></i>Lý do: ${e(product.reject_reason)}</div>` : ''}
           ${product.status === 'PENDING' ? `
           <div class="review-product-actions">

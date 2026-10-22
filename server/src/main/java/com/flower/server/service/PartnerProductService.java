@@ -37,7 +37,7 @@ public class PartnerProductService {
     public List<ProductApprovalItem> mine(User partner) {
         List<ProductApprovalItem> products = jdbc.query("""
                         SELECT id, partner_id, name, material, description, price, discount_price,
-                               stock_quantity, thumbnail_url, status, reject_reason
+                               thumbnail_url, status, reject_reason
                         FROM products
                         WHERE partner_id = ?
                         ORDER BY created_at DESC, id DESC
@@ -51,14 +51,13 @@ public class PartnerProductService {
                         rs.getString("description"),
                         rs.getBigDecimal("price"),
                         rs.getBigDecimal("discount_price"),
-                        rs.getLong("stock_quantity"),
                         rs.getString("thumbnail_url"),
                         List.of(),
                         rs.getString("status"),
                         rs.getString("reject_reason")), partner.getId());
         return products.stream().map(product -> new ProductApprovalItem(
                 product.id(), product.partnerId(), product.partnerName(), product.name(), product.material(),
-                product.description(), product.price(), product.discountPrice(), product.stockQuantity(),
+                product.description(), product.price(), product.discountPrice(),
                 product.thumbnailUrl(),
                 jdbc.queryForList(
                         "SELECT image_url FROM product_images WHERE product_id = ? ORDER BY sort_order, id",
@@ -74,9 +73,9 @@ public class PartnerProductService {
         PreparedStatementCreator statementCreator = connection -> {
             PreparedStatement statement = connection.prepareStatement("""
                     INSERT INTO products
-                        (partner_id, name, material, description, price, discount_price, stock_quantity,
+                        (partner_id, name, material, description, price, discount_price,
                          thumbnail_url, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')
                     """, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, partner.getId());
             statement.setString(2, form.name().trim());
@@ -84,8 +83,7 @@ public class PartnerProductService {
             statement.setString(4, blankToNull(form.description()));
             statement.setBigDecimal(5, form.price());
             statement.setBigDecimal(6, form.discountPrice());
-            statement.setLong(7, form.stockQuantity());
-            statement.setString(8, imageUrls.get(0));
+            statement.setString(7, imageUrls.get(0));
             return statement;
         };
         jdbc.update(statementCreator, keyHolder);
@@ -102,7 +100,7 @@ public class PartnerProductService {
     public void update(User partner, Long productId, PartnerProductForm form) {
         validateForm(form);
         Map<String, Object> current = jdbc.queryForMap("""
-                SELECT name, material, description, price, discount_price, stock_quantity,
+                SELECT name, material, description, price, discount_price,
                        thumbnail_url, status
                 FROM products
                 WHERE id = ? AND partner_id = ?
@@ -128,14 +126,14 @@ public class PartnerProductService {
         jdbc.update("""
                 UPDATE products
                 SET name = ?, material = ?, description = ?, price = ?, discount_price = ?,
-                    stock_quantity = ?, thumbnail_url = ?, status = ?,
+                    thumbnail_url = ?, status = ?,
                     approved_by = CASE WHEN ? = 'PENDING' THEN NULL ELSE approved_by END,
                     approved_at = CASE WHEN ? = 'PENDING' THEN NULL ELSE approved_at END,
                     reject_reason = CASE WHEN ? = 'PENDING' THEN NULL ELSE reject_reason END
                 WHERE id = ? AND partner_id = ?
                 """,
                 form.name().trim(), form.material(), blankToNull(form.description()), form.price(),
-                form.discountPrice(), form.stockQuantity(), imageUrls.get(0), status,
+                form.discountPrice(), imageUrls.get(0), status,
                 status, status, status, productId, partner.getId());
         jdbc.update("DELETE FROM product_images WHERE product_id = ?", productId);
         saveImages(productId, imageUrls);

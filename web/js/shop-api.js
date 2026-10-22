@@ -8,12 +8,11 @@
     id: Number(p.id),
     price: money(p.price),
     discount_price: p.discount_price == null ? null : money(p.discount_price),
-    stock_quantity: Number(p.stock_quantity || 0),
     rating: money(p.rating),
     total_sold: Number(p.total_sold || 0),
     partner_name: p.partner_name || p.full_name || '',
     thumbnail_url: p.thumbnail_url || '',
-    badge: p.badge || (Number(p.stock_quantity) === 0 ? 'soldout' : null)
+    badge: p.badge || null
   });
 
   const queryString = (values) => {
@@ -35,7 +34,6 @@
       quantity: Number(line.quantity || 1),
       price: money(line.price),
       discount_price: line.discount_price == null ? null : money(line.discount_price),
-      stock_quantity: Number(line.stock_quantity || 0),
       partner_name: line.partner_name || ''
     };
   }

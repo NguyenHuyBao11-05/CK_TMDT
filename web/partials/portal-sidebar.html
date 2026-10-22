@@ -4,13 +4,15 @@
             <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
             <span class="brand-name">Fw12</span>
         </a>
-        <span class="user-type">Khách hàng</span>
+        <span id="sidebarUserType" class="user-type">Khách hàng</span>
     </div>
     <div class="box-name">
-        <a href="../account/profile.html"><i class="fa-regular fa-circle-user"></i></a>
+        <a href="../account/profile.html">
+            <img id="sidebarAvatar" src="../images/favicon.svg" alt="Ảnh đại diện">
+        </a>
         <div class="name-container">
-            <span class="username">Name</span>
-            <span class="user-rank">User rank</span>
+            <span id="sidebarUsername" class="username">Name</span>
+            <span id="sidebarUserRank" class="user-rank">User rank</span>
         </div>
     </div>
     <ul class="list-nav-items">
@@ -47,7 +49,7 @@
             </a>
         </li>
     </ul>
-    <a class="box-logout d-block text-decoration-none" data-href="account/login.html">
+    <a href="#" id="logoutButton" class="box-logout d-block text-decoration-none">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Đăng xuất</span>
     </a>
