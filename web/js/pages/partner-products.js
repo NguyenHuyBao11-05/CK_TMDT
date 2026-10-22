@@ -31,7 +31,7 @@
     const stats = [
       { label: 'Tổng sản phẩm', value: products.length, note: 'Trong danh mục của bạn', icon: 'fa-boxes-stacked', tone: 'forest' },
       { label: 'Đang bán trực tuyến', value: products.filter((product) => product.status === 'APPROVED').length, note: 'Đã được Quản lý duyệt', icon: 'fa-cart-shopping', tone: 'blue' },
-      { label: 'Hết hàng', value: products.filter((product) => Number(product.stock_quantity) === 0).length, note: 'Cần cập nhật tồn kho', icon: 'fa-box-open', tone: 'gold' },
+      { label: 'Bị từ chối', value: products.filter((product) => product.status === 'REJECTED').length, note: 'Sửa lại rồi gửi duyệt lại', icon: 'fa-circle-xmark', tone: 'gold' },
       { label: 'Chờ kiểm duyệt', value: products.filter((product) => product.status === 'PENDING').length, note: 'Đang chờ phê duyệt', icon: 'fa-clipboard-check', tone: 'rose' },
     ]
     document.getElementById('productStats').innerHTML = stats.map((item) => `
@@ -71,7 +71,6 @@
         <td><span class="material-pill">${e(product.material)}</span></td>
         <td><strong>${FW.formatVnd(product.price)}</strong></td>
         <td>${product.discount_price == null ? '<span class="text-muted-fw">—</span>' : `<strong>${FW.formatVnd(product.discount_price)}</strong>`}</td>
-        <td><span class="stock-indicator ${product.stock_quantity > 0 ? '' : 'empty'}">${product.stock_quantity > 0 ? '●' : '○'} ${e(product.stock_quantity)}</span></td>
         <td><span class="product-status ${statusClass(product.status)}">${e(statusLabels[product.status] || product.status)}</span></td>
         <td class="text-nowrap"><button type="button" class="partner-row-action" aria-label="Chỉnh sửa" data-edit-product="${e(product.id)}"><i class="fa-solid fa-pen"></i></button></td>
       </tr>
@@ -82,15 +81,13 @@
     const query = document.getElementById('productSearch').value.trim().toLocaleLowerCase('vi')
     const material = document.getElementById('productMaterialFilter').value
     const status = document.getElementById('productStatus').value
-    const stock = document.getElementById('productStockFilter').value
     const filtered = products.filter((product) =>
       (!query || `${product.id} ${product.name} ${product.material}`.toLocaleLowerCase('vi').includes(query)) &&
       (!material || product.material === material) &&
-      (!status || product.status === status) &&
-      (!stock || (stock === 'empty' ? Number(product.stock_quantity) === 0 : Number(product.stock_quantity) > 0)))
+      (!status || product.status === status))
     document.getElementById('productList').innerHTML = filtered.length
       ? productRows(filtered)
-      : '<tr><td colspan="8" class="text-center text-muted-fw py-5">Không tìm thấy sản phẩm phù hợp.</td></tr>'
+      : '<tr><td colspan="7" class="text-center text-muted-fw py-5">Không tìm thấy sản phẩm phù hợp.</td></tr>'
   }
 
   async function loadProducts() {
@@ -132,7 +129,6 @@
     document.getElementById('productName').value = product.name
     document.getElementById('productMaterial').value = product.material
     document.getElementById('productPrice').value = product.price
-    document.getElementById('productStockQuantity').value = product.stock_quantity
     document.getElementById('productDiscountPrice').value = product.discount_price ?? ''
     document.getElementById('productDescription').value = product.description || ''
     fileInput.value = ''
@@ -211,7 +207,6 @@
         description: document.getElementById('productDescription').value.trim(),
         price,
         discount_price: discountPrice,
-        stock_quantity: Number(document.getElementById('productStockQuantity').value),
         image_urls: uploadedImages,
       }
       if (editingProduct) {
@@ -240,10 +235,9 @@
     document.getElementById('productSearch').value = ''
     document.getElementById('productMaterialFilter').value = ''
     document.getElementById('productStatus').value = ''
-    document.getElementById('productStockFilter').value = ''
     void loadProducts()
   })
-  ;['productSearch', 'productMaterialFilter', 'productStatus', 'productStockFilter'].forEach((id) => {
+  ;['productSearch', 'productMaterialFilter', 'productStatus'].forEach((id) => {
     const element = document.getElementById(id)
     element.addEventListener(id === 'productSearch' ? 'input' : 'change', renderProducts)
   })

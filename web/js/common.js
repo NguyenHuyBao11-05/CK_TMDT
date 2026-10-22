@@ -44,7 +44,7 @@
       const e = FW.escapeHtml
       const hasDiscount = p.discount_price != null && p.discount_price < p.price
       const percent = hasDiscount ? Math.round((1 - p.discount_price / p.price) * 100) : 0
-      const badgeText = { best: 'Bán chạy nhất', new: 'Mới', sale: `Tiết kiệm ${percent}%`, soldout: 'Hết mẫu hôm nay' }[p.badge]
+      const badgeText = { best: 'Bán chạy nhất', new: 'Mới', sale: `Tiết kiệm ${percent}%` }[p.badge]
       const detailUrl = FW.url(`shop/product-detail.html?id=${encodeURIComponent(p.id)}`)
 
       return `
@@ -67,8 +67,7 @@
                 ${hasDiscount ? `<span class="product-old-price">${FW.formatVnd(p.price)}</span>` : ''}
               </div>
               <button type="button" class="btn btn-cart" data-add-to-cart="${e(p.id)}"
-                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ"
-                      ${Number(p.stock_quantity) < 1 ? 'disabled title="Hết mẫu hôm nay"' : ''}>
+                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ">
                 <i class="fa-solid fa-cart-plus"></i>
               </button>
             </div>

@@ -401,14 +401,82 @@ async function loadAdminMenuCounts() {
 
 document.addEventListener('fw:partials-loaded', loadAdminMenuCounts)
 
+let currentUser = null
+
+const ROLE_HOME = {
+  CUSTOMER: { label: 'Khách hàng', page: 'account/dashboard.html' },
+  PARTNER: { label: 'Đối tác', page: 'partner/dashboard.html' },
+  ADMIN: { label: 'Admin', page: 'admin/statistics.html' },
+  MANAGER: { label: 'Quản lý', page: 'admin/statistics.html' },
+}
+
 function isLoggedIn() {
-  if (document.body.classList.contains('admin-page')) return true
+  return !!currentUser || document.body.classList.contains('admin-page')
+}
+
+async function loadCurrentUser() {
   try {
-    return !!localStorage.getItem('fw_user_id')
+    currentUser = await FW_API.me()
   } catch (e) {
-    return false
+    currentUser = null
+  }
+  if (!currentUser) return
+
+  const home = ROLE_HOME[currentUser.role] || ROLE_HOME.CUSTOMER
+  try {
+    localStorage.setItem('fw_user_id', currentUser.id)
+    if (currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER') localStorage.setItem('fw_admin_role', currentUser.role.toLowerCase())
+  } catch (e) {}
+
+  document.querySelectorAll('[data-guest-link]').forEach(function (el) { el.hidden = true; el.classList.add('d-none') })
+  document.querySelectorAll('[data-user-menu]').forEach(function (el) { el.hidden = false })
+  document.querySelectorAll('[data-user-name]').forEach(function (el) { el.textContent = currentUser.full_name })
+  document.querySelectorAll('[data-user-role]').forEach(function (el) { el.textContent = 'Đăng nhập với vai trò ' + home.label })
+  document.querySelectorAll('[data-user-home]').forEach(function (el) { el.href = FW.url(home.page) })
+
+  const avatarBox = document.getElementById('a-header-avatar')
+  const avatar = document.getElementById('headerAvatar')
+  if (avatarBox) avatarBox.style.display = 'block'
+  if (avatar) {
+    avatar.onerror = function () { avatar.onerror = null; avatar.src = FW.url('images/favicon.svg') }
+    avatar.src = currentUser.avatar_url ? FW_API.imageUrl(currentUser.avatar_url) : FW.url('images/favicon.svg')
+  }
+
+  const sidebarName = document.querySelector('.sidebar .username')
+  if (sidebarName) sidebarName.textContent = currentUser.full_name
+
+  if (document.body.classList.contains('admin-page') && home.page === 'admin/statistics.html') {
+    const role = currentUser.role.toLowerCase()
+    document.body.dataset.role = role
+    const roleSwitch = document.getElementById('roleSwitch')
+    if (roleSwitch) {
+      roleSwitch.value = role
+      roleSwitch.closest('label').hidden = true
+    }
+    ;['adminUserName', 'topbarName'].forEach(function (id) {
+      const el = document.getElementById(id)
+      if (el) el.textContent = currentUser.full_name
+    })
+    const roleLabel = document.getElementById('adminUserRole')
+    if (roleLabel) roleLabel.textContent = home.label
+    const email = document.getElementById('topbarEmail')
+    if (email) email.textContent = home.label
   }
 }
+
+document.addEventListener('click', async function (event) {
+  const button = event.target.closest('[data-logout]')
+  if (!button) return
+  event.preventDefault()
+  try {
+    await FW_API.logout()
+  } catch (e) {}
+  try {
+    localStorage.removeItem('fw_user_id')
+    localStorage.removeItem('fw_admin_role')
+  } catch (e) {}
+  location.href = FW.url('account/login.html')
+})
 
 function timeAgo(value) {
   const minutes = Math.floor((Date.now() - new Date(value)) / 60000)
@@ -451,7 +519,8 @@ async function loadNotifications() {
   }
 }
 
-document.addEventListener('fw:partials-loaded', function () {
+document.addEventListener('fw:partials-loaded', async function () {
+  await loadCurrentUser()
   const boxes = document.querySelectorAll('[data-notif-box]')
   if (!boxes.length || !isLoggedIn()) return
   boxes.forEach(function (box) { box.hidden = false })

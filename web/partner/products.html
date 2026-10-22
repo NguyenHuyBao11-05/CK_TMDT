@@ -25,7 +25,7 @@
     <div>
       <div class="eyebrow">Danh mục sản phẩm</div>
       <h1 class="partner-title">Sản phẩm của tôi</h1>
-      <p class="partner-subtitle">Quản lý mẫu hoa, giá bán, chất liệu, số lượng tồn kho và trạng thái kiểm duyệt.</p>
+      <p class="partner-subtitle">Quản lý mẫu hoa, giá bán, chất liệu và trạng thái kiểm duyệt.</p>
     </div>
     <div class="partner-actions">
       <button type="button" class="partner-primary-btn" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-solid fa-plus"></i> Tạo sản phẩm mới</button>
@@ -39,12 +39,11 @@
       <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="productSearch" type="search" placeholder="Tìm theo tên mẫu hoa, mã SKU hoặc từ khóa hoa tươi..."></label>
       <select id="productMaterialFilter" class="form-select" aria-label="Lọc theo chất liệu"><option value="">Chất liệu: Tất cả</option><option>Hoa thật</option><option>Hoa nhung</option><option>Hoa giấy</option></select>
       <select id="productStatus" class="form-select" aria-label="Lọc theo trạng thái"><option value="">Trạng thái: Tất cả</option><option value="APPROVED">Đang hiển thị</option><option value="PENDING">Chờ duyệt</option><option value="REJECTED">Bị từ chối</option></select>
-      <select id="productStockFilter" class="form-select" aria-label="Lọc theo số lượng tồn kho"><option value="">Tồn kho: Tất cả</option><option value="available">Còn hàng</option><option value="empty">Hết hàng</option></select>
       <button type="button" class="partner-icon-button" id="refreshProducts" aria-label="Tải lại"><i class="fa-solid fa-rotate"></i></button>
     </div>
     <div class="table-responsive">
       <table class="partner-table partner-products-table">
-        <thead><tr><th>Mã</th><th>Sản phẩm</th><th>Chất liệu</th><th>Giá</th><th>Giá ưu đãi</th><th>Số lượng tồn</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <thead><tr><th>Mã</th><th>Sản phẩm</th><th>Chất liệu</th><th>Giá</th><th>Giá ưu đãi</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
         <tbody id="productList"></tbody>
       </table>
     </div>
@@ -77,10 +76,6 @@
           <div>
             <label class="form-label" for="productPrice">Giá bán</label>
             <input id="productPrice" class="form-control" type="number" min="50000" step="1" placeholder="850000" required>
-          </div>
-          <div>
-            <label class="form-label" for="productStockQuantity">Số lượng tồn kho</label>
-            <input id="productStockQuantity" class="form-control" type="number" min="0" placeholder="15" required>
           </div>
           <div>
             <label class="form-label" for="productDiscountPrice">Giá ưu đãi (không bắt buộc)</label>

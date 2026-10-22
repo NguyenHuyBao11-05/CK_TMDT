@@ -57,6 +57,11 @@ loginForm.addEventListener("submit", async (event) => {
             password: passwordInput.value
         });
 
+        try {
+            localStorage.setItem("fw_user_id", user.id);
+            if (user.role === "ADMIN" || user.role === "MANAGER") localStorage.setItem("fw_admin_role", user.role.toLowerCase());
+        } catch (e) {}
+
         switch (user.role) {
             case "CUSTOMER":
                 location.href = FW.url("account/dashboard.html");

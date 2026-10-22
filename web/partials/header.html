@@ -37,9 +37,22 @@
               </button>
               <div class="dropdown-menu dropdown-menu-end p-0 shadow" data-notif-menu style="width: 340px; max-height: 440px; overflow-y: auto"><div class="p-3 small text-muted-fw">Đang tải...</div></div>
             </div>
-            <a id="headerLoginLink" data-href="account/login.html" class="text-body fw-semibold text-decoration-none small">Đăng nhập</a>
-            <a id="headerRegisterLink" data-href="account/register.html" class="btn btn-peach btn-sm px-3">Đăng ký</a>
-            <a id="a-header-avatar" href="../account/profile.html"><img id="headerAvatar" src="../images/favicon.svg" alt="Ảnh đại diện"></a>
+            <a id="headerLoginLink" data-href="account/login.html" class="text-body fw-semibold text-decoration-none small" data-guest-link>Đăng nhập</a>
+            <a id="headerRegisterLink" data-href="account/register.html" class="btn btn-peach btn-sm px-3" data-guest-link>Đăng ký</a>
+            <div class="dropdown" data-user-menu hidden>
+              <button type="button" class="btn btn-sm d-flex align-items-center gap-2 border-0 bg-transparent p-0" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản">
+                <span id="a-header-avatar"><img id="headerAvatar" alt="Ảnh đại diện"></span>
+                <span class="small fw-semibold text-truncate d-none d-md-inline" style="max-width: 140px" data-user-name></span>
+                <i class="fa-solid fa-chevron-down small text-muted-fw"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><span class="dropdown-item-text small text-muted-fw" data-user-role></span></li>
+                <li><a class="dropdown-item" data-user-home><i class="fa-solid fa-border-all me-2"></i>Trang của tôi</a></li>
+                <li><a class="dropdown-item" data-href="account/profile.html"><i class="fa-regular fa-user me-2"></i>Hồ sơ cá nhân</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button type="button" class="dropdown-item text-rose" data-logout><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Đăng xuất</button></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

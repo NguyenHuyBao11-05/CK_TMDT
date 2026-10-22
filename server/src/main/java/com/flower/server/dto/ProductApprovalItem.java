@@ -12,7 +12,6 @@ public record ProductApprovalItem(
         String description,
         BigDecimal price,
         BigDecimal discountPrice,
-        Long stockQuantity,
         String thumbnailUrl,
         List<String> imageUrls,
         String status,

@@ -53,14 +53,11 @@
             <div class="font-serif">${name}</div>
             <div class="small text-muted-fw">${FW.escapeHtml(line.partner_name)}</div>
             <div class="text-rose fw-bold">${FW.formatVnd(price(line))}</div>
-            <div class="small ${Number(line.stock_quantity) > 0 ? 'text-forest' : 'text-rose'}">
-              ${Number(line.stock_quantity) > 0 ? `Còn ${line.stock_quantity}` : 'Hết mẫu hôm nay'}
-            </div>
           </div>
           <div class="d-flex align-items-center gap-2">
             <button class="btn btn-ghost px-3" data-qty="${id}" data-d="-1" aria-label="Giảm số lượng" ${line.quantity <= 1 ? 'disabled' : ''}>−</button>
             <span aria-label="Số lượng">${line.quantity}</span>
-            <button class="btn btn-ghost px-3" data-qty="${id}" data-d="1" aria-label="Tăng số lượng" ${line.quantity >= line.stock_quantity ? 'disabled' : ''}>+</button>
+            <button class="btn btn-ghost px-3" data-qty="${id}" data-d="1" aria-label="Tăng số lượng" ${line.quantity >= 50 ? 'disabled' : ''}>+</button>
           </div>
           <button class="btn btn-ghost" data-del="${id}" aria-label="Xoá ${name} khỏi giỏ"><i class="fa-solid fa-trash"></i></button>
         </div>`;
