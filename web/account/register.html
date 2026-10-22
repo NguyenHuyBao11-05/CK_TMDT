@@ -30,7 +30,7 @@
             <!-- Name -->
             <div class="form-group">
                 <label for="name" class="form-label">Họ và tên</label>
-                <div class="input-group">
+                <div class="input-box">
                     <i class="fa-regular fa-user"></i>
                     <input type="text" id="name" name="name" class="form-text-input" placeholder="Nhập họ và tên"
                            required>
@@ -39,16 +39,24 @@
             <!-- Email -->
             <div class="form-group">
                 <label for="email" class="form-label">Email</label>
-                <div class="input-group">
+                <div class="input-box">
                     <i class="fa-regular fa-envelope"></i>
                     <input type="email" id="email" name="email" class="form-text-input" placeholder="Nhập email"
                            required>
                 </div>
             </div>
+            <!-- Sdt -->
+            <div class="form-group">
+                <label for="phone" class="form-label">Số điện thoại (không bắt buộc)</label>
+                <div class="input-box">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="phone" name="phone" class="form-text-input" placeholder="Nhập số điện thoại">
+                </div>
+            </div>
             <!-- Password -->
             <div class="form-group">
                 <label for="password" class="form-label">Mật khẩu</label>
-                <div class="input-group">
+                <div class="input-box">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="password" name="password" class="form-text-input"
                            placeholder="Nhập mật khẩu" required>
@@ -61,7 +69,7 @@
             <!-- Confirm password -->
             <div class="form-group">
                 <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                <div class="input-group">
+                <div class="input-box">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="confirmPassword" name="confirmPassword" class="form-text-input"
                            placeholder="Nhập lại mật khẩu" required>
@@ -80,10 +88,24 @@
             </button>
         </form>
         <!-- Login -->
-        <div class="register-text">
+        <div class="register-text" id="registerText">
             Đã có tài khoản?
             <a href="login.html">Đăng nhập</a>
         </div>
+    </div>
+    <div id="otpSection" hidden>
+        <h2>Xác thực email</h2>
+        <p>Nhập mã OTP đã được gửi đến email của bạn.</p>
+
+        <form id="verifyOtpForm">
+            <div class="form-group">
+                <label for="otp" class="form-label">Mã OTP</label>
+                <input type="text" id="otp" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Nhập mã OTP" required>
+            </div>
+            <button type="submit" id="verifyOtpButton">Xác nhận OTP</button>
+        </form>
+        <button type="button" id="resendOtpButton" disabled>Gửi lại mã (60s)</button>
+        <p id="otpMessage" role="status"></p>
     </div>
 </main>
 

@@ -26,21 +26,22 @@
     margin-bottom: 8px;
 }
 
-.form-group .input-group {
+.form-group .input-box {
     position: relative;
     display: flex;
     align-items: center;
     width: 400px;
+    border-radius: 10px;
 }
 
-.form-group .input-group > i {
+.form-group .input-box > i {
     position: absolute;
     left: 15px;
     color: var(--fw-muted);
     z-index: 2;
 }
 
-.form-group .input-group .form-text-input {
+.form-group .input-box .form-text-input {
     height: 42px;
     width: 100%;
     padding: 0 45px;
@@ -49,7 +50,7 @@
     outline: none;
 }
 
-.form-group .input-group .form-text-input:focus {
+.form-group .input-box .form-text-input:focus {
     border: 2px solid var(--fw-forest);
     box-shadow: var(--fw-shadow);
 }
@@ -117,7 +118,6 @@
 }
 
 /* ---------- Register ---------- */
-
 .register-text {
     margin-top: 25px;
     color: var(--fw-muted);
@@ -132,4 +132,149 @@
 
 .register-text a {
     text-decoration: underline;
+}
+
+/* ---------- OTP verify ---------- */
+#otpSection {
+    width: 100%;
+    max-width: 420px;
+    margin: 32px auto;
+    padding: 32px;
+    background: var(--fw-surface);
+    border: 1px solid var(--fw-cream-2);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+#otpSection[hidden] {
+    display: none;
+}
+
+#otpSection h2 {
+    margin: 0 0 10px;
+    color: var(--fw-ink);
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+}
+
+#otpSection > p:not(#otpMessage) {
+    margin: 0 0 28px;
+    color: var(--fw-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+#verifyOtpForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#verifyOtpForm .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+#verifyOtpForm .form-label {
+    color: var(--fw-ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#verifyOtpForm #otp {
+    width: 100%;
+    height: 54px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    outline: none;
+    background: #fafafa;
+    color: #25372c;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 8px;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#verifyOtpForm #otp::placeholder {
+    color: var(--fw-muted);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+#verifyOtpForm #otp:focus {
+    border-color: var(--fw-forest);
+    background: var(--fw-cream);
+    box-shadow: 0 0 0 3px rgba(103, 242, 65, 0.2);
+}
+
+/* Nút xác nhận */
+#verifyOtpButton {
+    width: 100%;
+    min-height: 48px;
+    padding: 13px 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--fw-forest);
+    color: var(--fw-surface);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#verifyOtpButton:hover:not(:disabled) {
+    background: var(--fw-forest);
+    transform: translateY(-1px);
+}
+
+#verifyOtpButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Nút gửi lại OTP */
+#resendOtpButton {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--fw-cream);
+    border-radius: 10px;
+    background: var(--fw-surface);
+    color: var(--fw-muted);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#resendOtpButton:hover:not(:disabled) {
+    border-color: var(--fw-forest);
+    background: var(--fw-cream);
+}
+
+#resendOtpButton:disabled {
+    color: var(--fw-muted);
+    background: var(--fw-cream);
+    cursor: not-allowed;
+}
+
+#otpMessage {
+    margin: 16px 0 0;
+    color: var(--fw-muted);
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
