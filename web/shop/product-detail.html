@@ -36,7 +36,9 @@
           <div class="small text-muted-fw mb-1"><i class="fa-solid fa-store me-1"></i><span id="pPartner"></span> · <span id="pMaterial"></span></div>
           <h1 id="pName" class="h3 font-serif"></h1>
           <div class="mb-3"><i class="fa-solid fa-star text-rose me-1"></i><span id="pRating"></span><span id="pSold" class="text-muted-fw ms-2"></span></div>
-          <div class="mb-4"><span id="pPrice" class="h4 text-rose me-2"></span><span id="pOld" class="product-old-price"></span></div>
+          <div class="mb-2"><span id="pPrice" class="h4 text-rose me-2"></span><span id="pOld" class="product-old-price"></span></div>
+          <p id="pStock" class="small text-forest mb-3"></p>
+          <p id="pDescription" class="text-muted-fw mb-4"></p>
           <div class="d-flex align-items-center gap-2 mb-3">
             <span>Số lượng</span>
             <button type="button" class="btn btn-ghost px-3" id="qtyMinus" aria-label="Giảm số lượng">−</button>
@@ -58,13 +60,17 @@
         <div class="col-lg-6">
           <h2 class="h5 font-serif mb-3">Bình luận</h2>
           <form id="commentForm" class="mb-3" hidden>
-            <textarea name="content" class="form-control mb-2" rows="3" maxlength="500" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm" aria-label="Nội dung bình luận"></textarea>
+            <textarea name="content" class="form-control mb-2" rows="3" maxlength="1000" minlength="5" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm" aria-label="Nội dung bình luận"></textarea>
             <button class="btn btn-forest" type="submit">Gửi bình luận</button>
           </form>
           <p id="commentLock" class="small text-muted-fw p-3 bg-white border rounded-4" hidden>Chỉ khách đã mua sản phẩm này mới bình luận được.</p>
           <div id="commentList" class="d-grid gap-3"></div>
         </div>
       </div>
+      <section id="relatedSection" class="mt-5" hidden>
+        <h2 class="h4 font-serif mb-3">Có thể bạn cũng thích</h2>
+        <div id="relatedList" class="row g-3"></div>
+      </section>
     </div>
   </section>
 </main>
@@ -74,6 +80,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/shop-api.js"></script>
 <script src="../js/pages/shop-product-detail.js"></script>
 </body>
 </html>

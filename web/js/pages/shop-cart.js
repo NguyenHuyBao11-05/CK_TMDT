@@ -1,72 +1,127 @@
 (function () {
-  'use strict'
-  const $ = (id) => document.getElementById(id)
-  let products = [], voucher = null
+  'use strict';
 
-  const unit = (p) => p.discount_price ?? p.price
-  const subtotal = () => FW.cart.items().reduce((s, i) => s + unit(products.find((p) => p.id === i.product_id)) * i.quantity, 0)
+  const $ = (id) => document.getElementById(id);
+  let cart = { lines: [], subtotal: 0 };
+  let voucherCode = null;
+  let discount = 0;
+
+  function price(line) {
+    return Number(line.unit_price || 0);
+  }
+
+  async function refreshVoucher() {
+    discount = 0;
+    if (!voucherCode || !cart.lines.length) return;
+    const result = await FW_API.validateVoucher(voucherCode);
+    if (result.ok) {
+      voucherCode = result.code;
+      discount = Number(result.discount || 0);
+      $('voucherMsg').className = 'small mb-3 text-forest';
+      $('voucherMsg').textContent = `Đã áp mã ${result.code}, giảm ${FW.formatVnd(discount)}.`;
+    } else {
+      voucherCode = null;
+      $('voucherMsg').className = 'small mb-3 text-rose';
+      $('voucherMsg').textContent = result.message;
+    }
+  }
 
   async function render() {
-    const items = FW.cart.items()
-    $('cartEmpty').hidden = items.length > 0
-    $('cartBody').hidden = items.length === 0
-    if (!items.length) return
-    products = await FW_API.getProductsByIds(items.map((i) => i.product_id))
-    $('cartLines').innerHTML = items.map((i) => {
-      const p = products.find((x) => x.id === i.product_id)
-      const name = FW.escapeHtml(p.name)
-      return `<div class="d-flex gap-3 p-3 bg-white border rounded-4 align-items-center">
-        <img src="${FW.escapeHtml(p.thumbnail_url)}" alt="${name}" width="88" height="88" class="rounded-3 object-fit-cover">
-        <div class="flex-grow-1">
-          <div class="font-serif">${name}</div>
-          <div class="small text-muted-fw">${FW.escapeHtml(p.partner_name)}</div>
-          <div class="text-rose fw-bold">${FW.formatVnd(unit(p))}</div>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-ghost px-3" data-qty="${p.id}" data-d="-1" aria-label="Giảm số lượng">−</button>
-          <span aria-label="Số lượng">${i.quantity}</span>
-          <button class="btn btn-ghost px-3" data-qty="${p.id}" data-d="1" aria-label="Tăng số lượng">+</button>
-        </div>
-        <button class="btn btn-ghost" data-del="${p.id}" aria-label="Xoá ${name} khỏi giỏ"><i class="fa-solid fa-trash"></i></button>
-      </div>`
-    }).join('')
-    await totals()
+    $('cartLines').innerHTML = '<p class="text-muted-fw text-center py-4">Đang tải giỏ hàng...</p>';
+    try {
+      cart = await FW_API.getCart();
+      $('cartEmpty').hidden = cart.lines.length > 0;
+      $('cartBody').hidden = cart.lines.length === 0;
+      if (!cart.lines.length) {
+        $('cartLines').innerHTML = '';
+        $('subtotal').textContent = FW.formatVnd(0);
+        $('discount').textContent = '0 đ';
+        $('total').textContent = FW.formatVnd(0);
+        return;
+      }
+
+      try { voucherCode = localStorage.getItem('fw_voucher'); } catch (_) { voucherCode = null; }
+      await refreshVoucher();
+
+      $('cartLines').innerHTML = cart.lines.map((line) => {
+        const name = FW.escapeHtml(line.name);
+        const image = FW.escapeHtml(FW_API.imageUrl ? FW_API.imageUrl(line.thumbnail_url) : line.thumbnail_url);
+        const id = Number(line.product_id);
+        return `<div class="d-flex gap-3 p-3 bg-white border rounded-4 align-items-center">
+          <img src="${image}" alt="${name}" width="88" height="88" class="rounded-3 object-fit-cover">
+          <div class="flex-grow-1">
+            <div class="font-serif">${name}</div>
+            <div class="small text-muted-fw">${FW.escapeHtml(line.partner_name)}</div>
+            <div class="text-rose fw-bold">${FW.formatVnd(price(line))}</div>
+            <div class="small ${Number(line.stock_quantity) > 0 ? 'text-forest' : 'text-rose'}">
+              ${Number(line.stock_quantity) > 0 ? `Còn ${line.stock_quantity}` : 'Hết mẫu hôm nay'}
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-ghost px-3" data-qty="${id}" data-d="-1" aria-label="Giảm số lượng" ${line.quantity <= 1 ? 'disabled' : ''}>−</button>
+            <span aria-label="Số lượng">${line.quantity}</span>
+            <button class="btn btn-ghost px-3" data-qty="${id}" data-d="1" aria-label="Tăng số lượng" ${line.quantity >= line.stock_quantity ? 'disabled' : ''}>+</button>
+          </div>
+          <button class="btn btn-ghost" data-del="${id}" aria-label="Xoá ${name} khỏi giỏ"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+      }).join('');
+
+      await totals();
+    } catch (error) {
+      $('cartEmpty').hidden = true;
+      $('cartBody').hidden = false;
+      $('cartLines').innerHTML = `<p class="text-rose text-center py-4">${FW.escapeHtml(error.message || 'Không tải được giỏ hàng.')}</p>`;
+    }
   }
 
   async function totals() {
-    const sub = subtotal()
-    let discount = 0
-    if (voucher) {
-      const r = await FW_API.validateVoucher(voucher, sub)
-      if (r.ok) discount = r.discount
-      else { voucher = null; $('voucherMsg').className = 'small mb-3 text-rose'; $('voucherMsg').textContent = r.message }
-    }
-    try { voucher ? localStorage.setItem('fw_voucher', voucher) : localStorage.removeItem('fw_voucher') } catch {}
-    $('subtotal').textContent = FW.formatVnd(sub)
-    $('discount').textContent = discount ? '− ' + FW.formatVnd(discount) : '0 đ'
-    $('total').textContent = FW.formatVnd(sub - discount)
+    await refreshVoucher();
+    const subtotal = Number(cart.subtotal || 0);
+    const totalDiscount = Math.min(discount, subtotal);
+    $('subtotal').textContent = FW.formatVnd(subtotal);
+    $('discount').textContent = totalDiscount ? '− ' + FW.formatVnd(totalDiscount) : '0 đ';
+    $('total').textContent = FW.formatVnd(Math.max(0, subtotal - totalDiscount));
+    try {
+      voucherCode ? localStorage.setItem('fw_voucher', voucherCode) : localStorage.removeItem('fw_voucher');
+    } catch (_) {}
   }
 
-  $('cartLines').addEventListener('click', (e) => {
-    const q = e.target.closest('[data-qty]'), d = e.target.closest('[data-del]')
-    if (q) {
-      const id = Number(q.dataset.qty)
-      const cur = FW.cart.items().find((i) => i.product_id === id).quantity
-      FW.cart.setQty(id, cur + Number(q.dataset.d))
-    } else if (d) FW.cart.remove(Number(d.dataset.del))
-    else return
-    render()
-  })
+  $('cartLines').addEventListener('click', async (event) => {
+    const qtyButton = event.target.closest('[data-qty]');
+    const deleteButton = event.target.closest('[data-del]');
+    try {
+      if (qtyButton) {
+        const line = cart.lines.find((x) => Number(x.product_id) === Number(qtyButton.dataset.qty));
+        if (!line) return;
+        const next = Number(line.quantity) + Number(qtyButton.dataset.d);
+        if (next < 1) return;
+        cart = await FW_API.updateCartQuantity(line.product_id, next);
+      } else if (deleteButton) {
+        cart = await FW_API.removeCartItem(deleteButton.dataset.del);
+      } else return;
+      await render();
+    } catch (error) {
+      FW.toast(error.message || 'Không cập nhật được giỏ hàng.');
+    }
+  });
 
-  $('voucherForm').addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const code = e.target.code.value
-    const r = await FW_API.validateVoucher(code, subtotal())
-    $('voucherMsg').className = 'small mb-3 ' + (r.ok ? 'text-forest' : 'text-rose')
-    $('voucherMsg').textContent = r.ok ? `Đã áp mã ${r.code}, giảm ${FW.formatVnd(r.discount)}.` : r.message
-    voucher = r.ok ? r.code : null
-    totals()
-  })
+  $('voucherForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const code = event.target.elements.code.value.trim();
+    const result = await FW_API.validateVoucher(code);
+    if (result.ok) {
+      voucherCode = result.code;
+      discount = Number(result.discount || 0);
+      $('voucherMsg').className = 'small mb-3 text-forest';
+      $('voucherMsg').textContent = `Đã áp mã ${result.code}, giảm ${FW.formatVnd(discount)}.`;
+    } else {
+      voucherCode = null;
+      discount = 0;
+      $('voucherMsg').className = 'small mb-3 text-rose';
+      $('voucherMsg').textContent = result.message;
+    }
+    await totals();
+  });
 
-  render()
-})()
+  render();
+})();
