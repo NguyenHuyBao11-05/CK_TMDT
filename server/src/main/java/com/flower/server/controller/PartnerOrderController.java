@@ -54,6 +54,6 @@ public class PartnerOrderController {
     @PostMapping("/{orderId}/ship")
     public Map<String, String> ship(@PathVariable Long orderId) {
         service.ship(currentUser.require(Role.PARTNER), orderId);
-        return Map.of("message", "Đã bàn giao đơn hàng cho đơn vị vận chuyển.");
+        return Map.of("message", "Đã chuyển đơn hàng sang Đang giao.");
     }
 }

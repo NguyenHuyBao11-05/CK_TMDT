@@ -262,7 +262,7 @@ public class ShoppingService {
             int changed=jdbc.update("UPDATE products SET stock_quantity=stock_quantity-? WHERE id=? AND status='APPROVED' AND stock_quantity>=?",qty,productId,qty);
             if(changed==0) throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm \""+item.get("item_name")+"\" vừa hết hàng hoặc không đủ tồn kho.");
         }
-        jdbc.update("UPDATE orders SET payment_status='PAID',status='PROCESSING',payment_method='BANK_TRANSFER' WHERE id=?",orderId);
+        jdbc.update("UPDATE orders SET payment_status='PAID',payment_method='BANK_TRANSFER' WHERE id=?",orderId);
         jdbc.update("INSERT INTO payments(order_id,method,amount,status,paid_at) VALUES(?,'BANK_TRANSFER',?,'SUCCESS',NOW())",orderId,order.get("total_amount"));
         if(order.get("voucher_id")!=null) jdbc.update("UPDATE vouchers SET used_count=used_count+1 WHERE id=? AND (usage_limit IS NULL OR used_count<usage_limit)",order.get("voucher_id"));
         if(order.get("design_request_id")==null) {
