@@ -44,13 +44,13 @@
       const e = FW.escapeHtml
       const hasDiscount = p.discount_price != null && p.discount_price < p.price
       const percent = hasDiscount ? Math.round((1 - p.discount_price / p.price) * 100) : 0
-      const badgeText = { best: 'Bán chạy nhất', new: 'Mới', sale: `Tiết kiệm ${percent}%` }[p.badge]
+      const badgeText = { best: 'Bán chạy nhất', new: 'Mới', sale: `Tiết kiệm ${percent}%`, soldout: 'Hết mẫu hôm nay' }[p.badge]
       const detailUrl = FW.url(`shop/product-detail.html?id=${encodeURIComponent(p.id)}`)
 
       return `
         <article class="product-card">
           <a class="product-thumb d-block" href="${detailUrl}">
-            <img src="${e(p.thumbnail_url)}" alt="${e(p.name)}" loading="lazy">
+            <img src="${e(window.FW_API?.imageUrl ? window.FW_API.imageUrl(p.thumbnail_url) : p.thumbnail_url)}" alt="${e(p.name)}" loading="lazy">
             ${badgeText ? `<span class="product-badge ${e(p.badge)}">${badgeText}</span>` : ''}
             <span class="product-rating"><i class="fa-solid fa-star text-rose me-1"></i>${Number(p.rating).toFixed(1)}</span>
           </a>
@@ -67,7 +67,8 @@
                 ${hasDiscount ? `<span class="product-old-price">${FW.formatVnd(p.price)}</span>` : ''}
               </div>
               <button type="button" class="btn btn-cart" data-add-to-cart="${e(p.id)}"
-                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ">
+                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ"
+                      ${Number(p.stock_quantity) < 1 ? 'disabled title="Hết mẫu hôm nay"' : ''}>
                 <i class="fa-solid fa-cart-plus"></i>
               </button>
             </div>
@@ -86,12 +87,19 @@
       count() {
         return FW.cart.items().reduce((n, i) => n + i.quantity, 0)
       },
-      add(productId, name, quantity = 1) {
-        const items = FW.cart.items()
-        const line = items.find((i) => i.product_id === Number(productId) && !i.quote_id)
-        if (line) line.quantity += quantity
-        else items.push({ product_id: Number(productId), quantity })
-        FW.cart.save(items)
+      async add(productId, name, quantity = 1) {
+        if (window.FW_API?.addCartItem) {
+          const cart = await window.FW_API.addCartItem(Number(productId), Number(quantity))
+          FW.cart.save((cart.lines || []).map((line) => ({
+            product_id: Number(line.product_id), quantity: Number(line.quantity)
+          })))
+        } else {
+          const items = FW.cart.items()
+          const line = items.find((i) => i.product_id === Number(productId) && !i.quote_id)
+          if (line) line.quantity += quantity
+          else items.push({ product_id: Number(productId), quantity })
+          FW.cart.save(items)
+        }
         FW.toast(`Đã thêm "${name}" vào giỏ hàng`)
       },
       setQty(productId, quantity) {
@@ -168,9 +176,17 @@
     FW.cart.renderBadge()
   }
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', async (e) => {
     const btn = e.target.closest('[data-add-to-cart]')
-    if (btn) FW.cart.add(btn.dataset.addToCart, btn.dataset.name)
+    if (!btn) return
+    btn.disabled = true
+    try {
+      await FW.cart.add(btn.dataset.addToCart, btn.dataset.name)
+    } catch (error) {
+      FW.toast(error.message || 'Không thể thêm sản phẩm vào giỏ.')
+    } finally {
+      btn.disabled = false
+    }
   })
 
   async function init() {
