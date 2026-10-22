@@ -23,7 +23,7 @@
 <main class="partner-main">
   <header class="partner-header">
     <div>
-      <div class="eyebrow">Atelier portfolio · cập nhật 15 phút trước</div>
+      <div class="eyebrow">Danh mục sản phẩm</div>
       <h1 class="partner-title">Sản phẩm của tôi</h1>
       <p class="partner-subtitle">Quản lý mẫu hoa, giá bán, chất liệu, số lượng tồn kho và trạng thái kiểm duyệt.</p>
     </div>
@@ -64,7 +64,7 @@
           <div class="partner-form-grid">
           <div class="full">
             <label class="form-label" for="productName">Tên sản phẩm</label>
-            <input id="productName" class="form-control" type="text" placeholder="VD: Bó Tulip Pastel Mơ Mộng" required>
+            <input id="productName" class="form-control" type="text" maxlength="200" placeholder="VD: Bó Tulip Pastel Mơ Mộng" required>
           </div>
           <div>
             <label class="form-label" for="productMaterial">Chất liệu</label>
@@ -76,7 +76,7 @@
           </div>
           <div>
             <label class="form-label" for="productPrice">Giá bán</label>
-            <input id="productPrice" class="form-control" type="number" min="1" placeholder="850000" required>
+            <input id="productPrice" class="form-control" type="number" min="50000" step="1" placeholder="850000" required>
           </div>
           <div>
             <label class="form-label" for="productStockQuantity">Số lượng tồn kho</label>
@@ -84,11 +84,13 @@
           </div>
           <div>
             <label class="form-label" for="productDiscountPrice">Giá ưu đãi (không bắt buộc)</label>
-            <input id="productDiscountPrice" class="form-control" type="number" min="1" placeholder="Để trống nếu không giảm">
+            <input id="productDiscountPrice" class="form-control" type="number" min="1" step="1" placeholder="Để trống nếu không giảm">
           </div>
           <div class="full">
-            <label class="form-label" for="productThumbnailUrl">Đường dẫn ảnh đại diện</label>
-            <input id="productThumbnailUrl" class="form-control" type="url" placeholder="https://...">
+            <label class="form-label" for="productImages">Ảnh sản phẩm <span class="text-rose">*</span></label>
+            <input id="productImages" class="form-control" type="file" accept="image/jpeg,image/png" multiple>
+            <small class="text-muted-fw">Tải từ 1 đến 5 ảnh JPG/PNG, mỗi ảnh tối đa 2MB. Ảnh đầu tiên làm ảnh đại diện.</small>
+            <div id="productImagePreview" class="d-flex flex-wrap gap-2 mt-2"></div>
           </div>
           <div class="full">
             <label class="form-label" for="productDescription">Mô tả</label>

@@ -169,81 +169,64 @@
 
     // Phong — Cổng Đối tác, kiểm duyệt & thống kê
     getPartnerDashboard() {
-      return fake({
-        summary: [
-          { label: 'Đơn đang xử lý', value: 28, unit: 'đơn', trend: '+6%', icon: 'fa-box-open', tone: 'forest' },
-          { label: 'Doanh thu tháng', value: 182000000, unit: 'đ', trend: '+12%', icon: 'fa-wallet', tone: 'rose' },
-          { label: 'Mẫu hoa đang bán', value: 36, unit: 'sản phẩm', trend: '+4%', icon: 'fa-seedling', tone: 'gold' },
-          { label: 'Tỷ lệ hoàn thành', value: 94, unit: '%', trend: '+3%', icon: 'fa-chart-line', tone: 'blue' },
-        ],
-        orders: [
-          { id: '#FW-1014', customer: 'Nguyễn Thị Lan', item: 'Bó hoa cưới pastel', total: 1800000, status: 'PENDING', time: '20 phút trước' },
-          { id: '#FW-1015', customer: 'Lê Gia Huy', item: 'Lẵng hoa khai trương', total: 2950000, status: 'PROCESSING', time: '1 giờ trước' },
-          { id: '#FW-1016', customer: 'Trần Minh Anh', item: 'Giỏ hoa sự kiện', total: 2200000, status: 'SHIPPING', time: '2 giờ trước' },
-        ],
-      })
+      return callServer('/api/partner/dashboard')
     },
 
     getPartnerOrders() {
-      return fake([
-        { id: '#FW-1008', customer: 'Phạm Thu Hảo', item: 'Bó hoa cưới hồng pastel', total: 1850000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
-        { id: '#FW-1007', customer: 'Minh Khang', item: 'Giỏ hoa sinh nhật tone vàng', total: 750000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
-        { id: '#FW-1006', customer: 'Ngọc Trâm', item: 'Bình hoa Tulip Cát tường', total: 2100000, status: 'PENDING', date: '14/10/2026', action: 'Xác nhận đơn' },
-        { id: '#FW-1009', customer: 'Nguyễn Huy Bảo', item: 'Lẵng hoa sinh nhật', total: 2100000, status: 'PROCESSING', date: '15/10/2026', action: 'Đang thực hiện' },
-        { id: '#FW-1013', customer: 'Lê Minh Phương', item: 'Bó Tulip Trắng Serenity 21 cành', total: 1450000, status: 'PROCESSING', date: '15/10/2026', action: 'Cập nhật ảnh hoàn thành' },
-        { id: '#FW-1010', customer: 'Võ Minh Tâm', item: 'Bình hoa tươi', total: 1320000, status: 'SHIPPING', date: '15/10/2026', action: 'Cập nhật giao hàng' },
-        { id: '#FW-1011', customer: 'Đặng Thảo My', item: 'Giỏ hoa khai trương', total: 2600000, status: 'RECEIVED', date: '12/10/2026', action: 'Xem chi tiết' },
-        { id: '#FW-1012', customer: 'Trần Thanh Tùng', item: 'Bó hoa mừng thành công', total: 1500000, status: 'CANCELLED', date: '10/10/2026', action: 'Xem lý do' },
-      ])
+      return callServer('/api/partner/orders')
     },
 
     getPartnerProducts() {
-      return fake([
-        { id: 21, partner_id: 2, name: 'Bó Hoa Tulip Pastel Mơ Mộng', material: 'Hoa thật', description: 'Bó tulip tone pastel tươi mới, thích hợp làm quà tặng.', price: 850000, discount_price: null, stock_quantity: 15, thumbnail_url: img('white-tulips.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-10 10:00:00', reject_reason: null, created_at: '2026-10-01 09:00:00', updated_at: '2026-10-10 10:00:00' },
-        { id: 22, partner_id: 2, name: 'Giỏ Hoa Hồng Juliet Quý Phái', material: 'Hoa thật', description: 'Giỏ hoa hồng Juliet thanh lịch.', price: 1450000, discount_price: 1290000, stock_quantity: 8, thumbnail_url: img('sunshine-basket.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-10 10:00:00', reject_reason: null, created_at: '2026-10-02 09:00:00', updated_at: '2026-10-10 10:00:00' },
-        { id: 23, partner_id: 2, name: 'Kệ Khai Trương Cam Có Hội Sunburst', material: 'Hoa thật', description: 'Kệ hoa khai trương màu cam vàng rực rỡ.', price: 2800000, discount_price: null, stock_quantity: 3, thumbnail_url: img('grand-opening.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-11 10:00:00', reject_reason: null, created_at: '2026-10-03 09:00:00', updated_at: '2026-10-11 10:00:00' },
-        { id: 24, partner_id: 2, name: 'Bình Cắm Tú Cầu Xanh Lam Nhật Bản', material: 'Hoa nhung', description: 'Bình hoa xanh lam dùng trang trí không gian.', price: 1890000, discount_price: null, stock_quantity: 20, thumbnail_url: img('green-hydrangea.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-11 10:00:00', reject_reason: null, created_at: '2026-10-04 09:00:00', updated_at: '2026-10-11 10:00:00' },
-        { id: 25, partner_id: 2, name: 'Bó Cúc Tana Tinh Khôi & Baby Trắng', material: 'Hoa giấy', description: 'Bó hoa giấy trắng phong cách nhẹ nhàng.', price: 420000, discount_price: null, stock_quantity: 0, thumbnail_url: img('yellow-basket.jpg'), status: 'APPROVED', approved_by: 1, approved_at: '2026-10-12 10:00:00', reject_reason: null, created_at: '2026-10-05 09:00:00', updated_at: '2026-10-12 10:00:00' },
-        { id: 26, partner_id: 2, name: 'Chậu Lan Hồ Điệp Hoàng Gia 9 Cành VIP', material: 'Hoa thật', description: 'Chậu lan hồ điệp sang trọng.', price: 3950000, discount_price: null, stock_quantity: 3, thumbnail_url: img('lily-of-valley.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 09:00:00', updated_at: '2026-10-14 09:00:00' },
-      ])
+      return callServer('/api/partner/products')
     },
 
     getPartnerApprovals() {
-      return fake([
-        { id: 'PT-014', shop: 'Florist Thảo Điền Atelier', owner: 'Nguyễn Huy Bảo', city: 'TP.HCM', submitted: '12/10/2026', score: 'Rất tốt', risk: 'Thấp' },
-        { id: 'PT-015', shop: 'Lan Tỏa Floral', owner: 'Trần Hoài My', city: 'Đà Nẵng', submitted: '13/10/2026', score: 'Đạt', risk: 'Trung bình' },
-        { id: 'PT-016', shop: 'Mộc Lan Studio', owner: 'Lý Gia Hân', city: 'Hà Nội', submitted: '14/10/2026', score: 'Cần bổ sung', risk: 'Cao' },
-      ])
+      return callServer('/api/admin/partner-approvals')
     },
 
     getProductApprovals() {
-      return fake([
-        { id: 81, partner_id: 2, name: 'Bình Tulip Trắng Hà Lan', material: 'Hoa thật', description: 'Bình tulip trắng cắm thủ công.', price: 1850000, discount_price: null, stock_quantity: 10, thumbnail_url: img('white-tulips.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 09:00:00', updated_at: '2026-10-14 09:00:00' },
-        { id: 82, partner_id: 3, name: 'Hộp Hoa Mùa Điệp Lên Đèn', material: 'Hoa thật', description: 'Hộp hoa phối màu mùa thu.', price: 1250000, discount_price: null, stock_quantity: 8, thumbnail_url: img('red-roses.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-14 10:00:00', updated_at: '2026-10-14 10:00:00' },
-        { id: 83, partner_id: 4, name: 'Kệ Khai Trương Tường 2 Tầng', material: 'Hoa thật', description: 'Kệ hoa khai trương tông màu rực rỡ.', price: 2700000, discount_price: null, stock_quantity: 5, thumbnail_url: img('grand-opening.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-13 09:00:00', updated_at: '2026-10-13 09:00:00' },
-        { id: 84, partner_id: 5, name: 'Hoa Cưới Cổ Điển Pure Peony', material: 'Hoa thật', description: 'Hoa cưới phong cách cổ điển.', price: 2100000, discount_price: null, stock_quantity: 6, thumbnail_url: img('lily-of-valley.jpg'), status: 'PENDING', approved_by: null, approved_at: null, reject_reason: null, created_at: '2026-10-13 11:00:00', updated_at: '2026-10-13 11:00:00' },
-        { id: 85, partner_id: 6, name: 'Giỏ Hoa Nắng Ban Mai', material: 'Hoa nhung', description: 'Giỏ hoa tone vàng cam.', price: 950000, discount_price: null, stock_quantity: 4, thumbnail_url: img('sunshine-basket.jpg'), status: 'REJECTED', approved_by: 1, approved_at: '2026-10-12 11:00:00', reject_reason: 'Vui lòng bổ sung ảnh đại diện rõ nét.', created_at: '2026-10-12 09:00:00', updated_at: '2026-10-12 11:00:00' },
-      ])
+      return callServer('/api/admin/product-approvals')
     },
 
-    getPartnerStats() {
-      return fake({
-        gross: 182000000,
-        orders: 726,
-        completion: 94,
-        pendingApprovals: 12,
-        monthly: [42, 58, 66, 71, 83, 78, 91],
-        byStatus: {
-          pending: 18,
-          processing: 26,
-          shipping: 21,
-          received: 63,
-          cancelled: 7,
-        },
-      })
-    },
   }
 })()
+
+// Phong — Cổng Đối tác, kiểm duyệt & thống kê
+Object.assign(window.FW_API, {
+  getAvailablePartnerOrders() {
+    return callServer('/api/partner/orders/available')
+  },
+  acceptPartnerOrder(orderId) {
+    return callServer(`/api/partner/orders/${orderId}/accept`, { method: 'POST' })
+  },
+  startPartnerOrder(orderId) {
+    return callServer(`/api/partner/orders/${orderId}/start`, { method: 'POST' })
+  },
+  savePartnerOrderProof(orderId, completionImageUrl) {
+    return callServer(`/api/partner/orders/${orderId}/proof`, {
+      method: 'POST',
+      body: JSON.stringify({ completion_image_url: completionImageUrl }),
+    })
+  },
+  shipPartnerOrder(orderId) {
+    return callServer(`/api/partner/orders/${orderId}/ship`, { method: 'POST' })
+  },
+  createPartnerProduct(data) {
+    return callServer('/api/partner/products', { method: 'POST', body: JSON.stringify(data) })
+  },
+  updatePartnerProduct(productId, data) {
+    return callServer(`/api/partner/products/${productId}`, { method: 'PUT', body: JSON.stringify(data) })
+  },
+  approvePartnerProduct(productId) {
+    return callServer(`/api/admin/product-approvals/${productId}/approve`, { method: 'POST' })
+  },
+  rejectPartnerProduct(productId, reason) {
+    return callServer(`/api/admin/product-approvals/${productId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  },
+})
 
 // Bảo — Diễn đàn thiết kế riêng, quản trị tài khoản & nhật ký
 
@@ -281,12 +264,37 @@ async function callServer(path, options = {}) {
 }
 
 Object.assign(window.FW_API, {
+  applyPartner(data) {
+    return callServer('/api/partner/apply', { method: 'POST', body: JSON.stringify(data) })
+  },
+
+  getPartnerApplications() {
+    return callServer('/api/admin/partner-approvals')
+  },
+  approvePartnerApplication(userId) {
+    return callServer('/api/admin/partner-approvals/' + userId + '/approve', { method: 'POST' })
+  },
+  rejectPartnerApplication(userId, reason) {
+    return callServer('/api/admin/partner-approvals/' + userId + '/reject', {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  },
+
   getAdminLogs(params) {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
       if (value !== '' && value != null) query.set(key, value)
     })
     return callServer('/api/admin/logs?' + query)
+  },
+  getAdminOrderStats(params) {
+    const query = new URLSearchParams(params)
+    return callServer('/api/admin/stats/orders?' + query)
+  },
+  getAdminRevenueStats(params) {
+    const query = new URLSearchParams(params)
+    return callServer('/api/admin/stats/revenue?' + query)
   },
 
   getAdminUsers(params) {
