@@ -44,7 +44,7 @@
         <button type="button" class="partner-secondary-btn" data-save-proof="${e(order.id)}"><i class="fa-regular fa-image"></i> Lưu ảnh hoàn thành</button>
         <button type="button" class="partner-primary-btn" data-ship-order="${e(order.id)}" data-proof-saved="${order.completion_image_url ? 'true' : 'false'}"><i class="fa-solid fa-truck"></i> Bắt đầu giao</button>`
     } else {
-      action = `<span class="order-status shipping"><i class="fa-solid fa-truck"></i> Đang vận chuyển</span>
+      action = `<span class="order-status shipping"><i class="fa-solid fa-truck"></i> Đang giao</span>
         ${order.completion_image_url ? `<a href="${e(FW_API.imageUrl(order.completion_image_url))}" target="_blank" rel="noopener">Xem ảnh hoàn thành</a>` : ''}`
     }
     return `
@@ -162,7 +162,7 @@
     shipButton.disabled = true
     try {
       await FW_API.shipPartnerOrder(shipButton.dataset.shipOrder)
-      FW.toast('Đã bàn giao đơn cho đơn vị vận chuyển.')
+      FW.toast('Đã chuyển đơn sang Đang giao.')
     } catch (error) {
       FW.toast(error.message)
     }

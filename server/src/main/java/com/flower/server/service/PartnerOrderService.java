@@ -181,7 +181,7 @@ public class PartnerOrderService {
         logService.write(partner, "ORDER_STATUS", "orders", orderId,
                 "Chuyển đơn " + orderCode + " sang trạng thái SHIPPING.");
         notificationService.notify(customerId, "ORDER_SHIPPED", "Đơn hàng đang được giao",
-                "Đơn " + orderCode + " đã được bàn giao cho đơn vị vận chuyển.",
+                "Đơn " + orderCode + " đã được Đối tác bắt đầu giao.",
                 "account/orders.html");
     }
 
