@@ -10,40 +10,8 @@ togglePassword.addEventListener("click", () => {
     togglePassword.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
 });
 
-// const DEMO_ACCOUNTS = {
-//     'admin@nhanh.vn': { id: 1, adminRole: 'admin', page: 'admin/statistics.html' },
-//     'manager@nhanh.vn': { id: 2, adminRole: 'manager', page: 'admin/statistics.html' },
-//     'thaodien.atelier@gmail.com': { id: 7, page: 'partner/dashboard.html' },
-//     'nangbanmai.hoa@gmail.com': { id: 8, page: 'partner/dashboard.html' },
-// };
-//
-// function goAfterLogin(email) {
-//     const account = DEMO_ACCOUNTS[email.trim().toLowerCase()] || { id: 3, page: 'account/dashboard.html' };
-//     try {
-//         localStorage.setItem("fw_user_id", account.id);
-//         if (account.adminRole) localStorage.setItem("fw_admin_role", account.adminRole);
-//     } catch (e) {}
-//     location.href = FW.url(account.page);
-// }
-//
-// document.getElementById("loginForm").addEventListener("submit", (event) => {
-//     event.preventDefault();
-//     goAfterLogin(document.getElementById("email").value);
-// });
-//
-// document.getElementById("googleLogin").addEventListener("click", () => {
-//     goAfterLogin("lanphuong@gmail.com");
-// });
-
-
 let loginError = document.getElementById("loginError");
-if (!loginError) {
-    loginError = document.createElement("p");
-    loginError.id = "loginError";
-    loginError.className = "login-error";
-    loginError.setAttribute("role", "alert");
-    loginForm.appendChild(loginError);
-}
+
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     loginError.textContent = "";
@@ -77,7 +45,8 @@ loginForm.addEventListener("submit", async (event) => {
                 loginError.textContent = "Vai trò tài khoản không hợp lệ.";
         }
     } catch (error) {
-        loginError.textContent = error.message || 'Không thể đăng nhập. Vui lòng thử lại.';
+        loginError.textContent = error.message;
+        loginError.style.display = "block";
     } finally {
         if (submitButton) {
             submitButton.disabled = false;
@@ -85,6 +54,51 @@ loginForm.addEventListener("submit", async (event) => {
     }
 });
 
-googleLogin?.addEventListener("click", () => {
-    loginError.textContent = "Đăng nhập bằng Google hiện chưa được triển khai.";
+
+const GOOGLE_CLIENT_ID = "303315410038-nb00bbjo9fqh2g28oklb9bsrhag72ds0.apps.googleusercontent.com";
+googleLogin.addEventListener("click", () => {
+    if (!window.google?.accounts?.id) {
+        loginError.textContent = "Google Identity Services chưa tải xong. Vui lòng thử lại.";
+        loginError.style.display = "block";
+        return;
+    }
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: async (response) => {
+            try {
+                loginError.textContent = "";
+                loginError.style.display = "none";
+
+                const token = response.credential;
+                const user = await FW_API.loginGoogle({token});
+
+                localStorage.setItem("fw_user_id", user.id);
+                switch (user.role) {
+                    case "CUSTOMER":
+                        location.href = FW.url("account/dashboard.html");
+                        break;
+                    case "PARTNER":
+                        location.href = FW.url("partner/dashboard.html");
+                        break;
+                    case "ADMIN":
+                    case "MANAGER":
+                        localStorage.setItem("fw_admin_role", user.role.toLowerCase());
+                        location.href = FW.url("admin/statistics.html");
+                        break;
+                    default:
+                        loginError.textContent = "Vai trò tài khoản không hợp lệ.";
+                        loginError.style.display = "block";
+                }
+            } catch (error) {
+                loginError.textContent = error.message;
+                loginError.style.display = "block";
+            }
+        }
+    });
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+            loginError.textContent = "Không thể mở đăng nhập Google. Vui lòng thử lại.";
+            loginError.style.display = "block";
+        }
+    });
 });
