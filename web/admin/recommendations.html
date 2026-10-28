@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mô hình gợi ý — Fw12 Admin</title>
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-page" data-nav="recommendations" data-page-role="admin">
+
+<div id="admin-sidebar"></div>
+<div id="admin-topbar"></div>
+
+<main class="admin-content">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+      <div class="admin-breadcrumb">Hệ thống › <span>Mô hình gợi ý</span></div>
+      <h1 class="admin-title">Mô hình gợi ý sản phẩm</h1>
+      <p class="text-muted-fw mb-0">Học từ lịch sử mua và đánh giá của khách để gợi ý "Sản phẩm liên quan" và "Có thể bạn sẽ thích". Tự huấn luyện lại lúc 2 giờ sáng mỗi ngày.</p>
+    </div>
+    <button type="button" id="trainButton" class="btn btn-forest flex-shrink-0">
+      <i class="fa-solid fa-rotate me-1"></i>Huấn luyện lại
+    </button>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label" id="hitLabel">Hit rate@4</div><div class="stat-value" id="statHit">—</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-bullseye"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label" id="precisionLabel">Precision@4</div><div class="stat-value" id="statPrecision">—</div></div>
+        <span class="stat-icon gold"><i class="fa-solid fa-crosshairs"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">So với gợi ý "bán chạy"</div><div class="stat-value" id="statBaseline">—</div></div>
+        <span class="stat-icon rose"><i class="fa-solid fa-scale-unbalanced"></i></span>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div><div class="stat-label">Dữ liệu huấn luyện</div><div class="stat-value" id="statData">—</div></div>
+        <span class="stat-icon"><i class="fa-solid fa-database"></i></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="small text-muted-fw mb-4" id="latestInfo"></p>
+
+  <div class="row g-4">
+    <div class="col-xl-7">
+      <div class="admin-panel">
+        <div class="admin-toolbar"><h2 class="h6 mb-0">Các cặp sản phẩm mô hình học được</h2></div>
+        <div class="table-responsive">
+          <table class="table admin-table">
+            <thead>
+              <tr><th>Sản phẩm</th><th>Hay mua cùng</th><th class="text-end">Từ lịch sử mua</th><th class="text-end">Điểm tổng</th></tr>
+            </thead>
+            <tbody id="pairTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-5">
+      <div class="admin-panel">
+        <div class="admin-toolbar"><h2 class="h6 mb-0">Lịch sử huấn luyện</h2></div>
+        <div class="table-responsive">
+          <table class="table admin-table">
+            <thead>
+              <tr><th>Thời gian</th><th>Cách chạy</th><th class="text-end">Lượt mua</th><th class="text-end">Hit rate</th></tr>
+            </thead>
+            <tbody id="runTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="no-access">
+  <i class="fa-solid fa-lock d-block"></i>
+  <h1 class="h3">Bạn không có quyền truy cập trang này</h1>
+  <p class="text-muted-fw">Trang Mô hình gợi ý chỉ dành cho Admin.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/admin.js"></script>
+<script src="../js/pages/admin-recommendations.js"></script>
+</body>
+</html>

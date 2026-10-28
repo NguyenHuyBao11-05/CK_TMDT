@@ -367,6 +367,12 @@ Object.assign(window.FW_API, {
   getAdminMenuCounts() {
     return callServer('/api/admin/menu-counts')
   },
+  getRecommendationModel() {
+    return callServer('/api/admin/recommendations')
+  },
+  trainRecommendationModel() {
+    return callServer('/api/admin/recommendations/train', { method: 'POST' })
+  },
   register(data) {
     return callServer('/api/auth/register', {method: 'POST', body: JSON.stringify(data)});
   },

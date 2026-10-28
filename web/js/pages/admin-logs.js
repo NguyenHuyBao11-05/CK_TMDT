@@ -22,6 +22,7 @@ const ACTION_LABEL = {
   ORDER_CANCEL: 'Huỷ đơn hàng',
   ORDER_AUTO_RECEIVED: 'Tự động xác nhận đã nhận',
   COMPLAINT_CREATE: 'Gửi khiếu nại',
+  RECOMMEND_TRAIN: 'Huấn luyện mô hình gợi ý',
 }
 
 const ROLE_BADGE = {

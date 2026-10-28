@@ -3,6 +3,7 @@ package com.flower.server.controller;
 import com.flower.server.entity.Role;
 import com.flower.server.entity.User;
 import com.flower.server.service.CurrentUserService;
+import com.flower.server.service.RecommendationService;
 import com.flower.server.service.ShoppingService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -18,9 +19,10 @@ import java.util.Map;
 public class ShoppingController {
     private final ShoppingService service;
     private final CurrentUserService currentUser;
+    private final RecommendationService recommender;
 
-    public ShoppingController(ShoppingService service, CurrentUserService currentUser) {
-        this.service=service; this.currentUser=currentUser;
+    public ShoppingController(ShoppingService service, CurrentUserService currentUser, RecommendationService recommender) {
+        this.service=service; this.currentUser=currentUser; this.recommender=recommender;
     }
 
     @GetMapping("/api/products")
@@ -41,9 +43,14 @@ public class ShoppingController {
     public Map<String,String> addComment(@PathVariable long id,@Valid @RequestBody CommentForm form){
         service.addComment(currentUser.require(Role.CUSTOMER),id,form.content());return Map.of("message","Đã gửi bình luận.");
     }
-    @GetMapping("/api/products/{id}/related") public List<Map<String,Object>> related(@PathVariable long id){return service.related(id);}
+    @GetMapping("/api/products/{id}/related") public List<Map<String,Object>> related(@PathVariable long id){
+        service.product(id);List<Map<String,Object>> list=recommender.similar(id);return list.isEmpty()?service.related(id):list;
+    }
     @GetMapping("/api/products/recommendations")
-    public List<Map<String,Object>> recommendations(){return service.recommendations(currentUser.require(Role.CUSTOMER));}
+    public List<Map<String,Object>> recommendations(){
+        User u=currentUser.require(Role.CUSTOMER);List<Map<String,Object>> list=recommender.forCustomer(u.getId());
+        return list.isEmpty()?service.recommendations(u):list;
+    }
 
     @GetMapping("/api/cart") public Map<String,Object> cart(){return service.cart(currentUser.require(Role.CUSTOMER));}
     @PostMapping("/api/cart/items") public Map<String,Object> addCart(@Valid @RequestBody CartItemForm form){
