@@ -29,6 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService {
     private static final String PENDING_KEY = "PENDING_REGISTER";
+    private static final String PENDING_RESET_KEY = "PENDING_PASSWORD_RESET";
     private static final long OTP_LIFETIME = 5 * 60 * 1000L;
     private static final long RESEND_COOLDOWN = 60 * 1000L;
     private static final int MAX_ATTEMPTS = 5;
@@ -47,6 +48,7 @@ public class AuthService {
     @Value("${spring.mail.username}")
     private String mailFrom;
 
+    // ===================== register =====================
     public void register(UserRegister request, HttpSession session) {
         String email = request.email().trim();
         if (userRepository.existsByEmailIgnoreCase(email)) {
@@ -147,6 +149,7 @@ public class AuthService {
         return message;
     }
 
+    // ===================== login =====================
     public Map<String, Object> login(UserLogin request, HttpSession session) {
         String email = request.getEmail() == null ? "" : request.getEmail().trim();
         String password = request.getPassword();
@@ -190,7 +193,7 @@ public class AuthService {
         user.setLoginLockedUntil(null);
         userRepository.save(user);
         session.setAttribute("userId", user.getId());
-        logService.write(user, "LOGIN", "users", user.getId(), "{ " + user.getId() + ", " + user.getFullName() + ", " + user.getRole() + " }");
+        logService.write(user, "LOGIN", "users", user.getId(), "Đăng nhập thành công");
 
         return userResponse(user);
     }
@@ -199,7 +202,7 @@ public class AuthService {
         return Map.of("id", user.getId(), "full_name", user.getFullName(), "role", user.getRole().name());
     }
 
-
+    // ===================== google login =====================
     public Map<String, Object> loginWithGoogle(GoogleLoginRequest request, HttpSession session) {
         final GoogleIdToken.Payload payload;
         try {
@@ -254,16 +257,128 @@ public class AuthService {
         }
 
         session.setAttribute("userId", user.getId());
-        logService.write(user, "LOGIN", "users", user.getId(), "{ " + user.getId() + ", " + user.getFullName() + ", " + user.getRole() + " }");
+        logService.write(user, "LOGIN", "users", user.getId(), "Đăng nhập bằng google");
         return userResponse(user);
     }
 
+    // ===================== forget password =====================
+    public void forgotPassword(String rawEmail, HttpSession session) {
+        String email = rawEmail == null ? "" : rawEmail.trim();
+        long now = System.currentTimeMillis();
+        PendingPasswordReset pending = (PendingPasswordReset) session.getAttribute(PENDING_RESET_KEY);
+
+        if (pending != null && pending.email.equalsIgnoreCase(email)) {
+            pending.sendTimes.removeIf(time -> now - time >= 60 * 60 * 1000L);
+            if (now - pending.lastSentAt < RESEND_COOLDOWN) {
+                throw new IllegalArgumentException("Vui lòng đợi 60 giây trước khi gửi lại mã.");
+            }
+            if (pending.sendTimes.size() >= MAX_SENDS_PER_HOUR) {
+                throw new IllegalArgumentException("Bạn đã yêu cầu quá nhiều mã OTP. Vui lòng thử lại sau.");
+            }
+        } else {
+            pending = new PendingPasswordReset();
+            pending.email = email;
+            pending.sendTimes = new ArrayList<>();
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+
+        pending.otp = null;
+        pending.expiresAt = 0;
+        pending.attempts = 0;
+        pending.lastSentAt = now;
+        pending.sendTimes.add(now);
+
+        if (user != null && user.getAuthProvider() == AuthProvider.GOOGLE) {
+            sendPasswordResetMail(email, "Hướng dẫn đăng nhập FW12", "Tài khoản của bạn sử dụng đăng nhập Google.\n" + "Vui lòng đăng nhập bằng Google.");
+        } else if (user != null && user.getAuthProvider() == AuthProvider.LOCAL && user.getStatus() == UserStatus.ACTIVE) {
+            String otp = String.format("%06d", random.nextInt(1_000_000));
+            sendPasswordResetMail(email, "Mã OTP đặt lại mật khẩu FW12",
+                    "Mã OTP đặt lại mật khẩu của bạn là: " + otp + "\n"
+                            + "Mã có hiệu lực trong 5 phút.\n"
+                            + "Nếu bạn không yêu cầu đặt lại mật khẩu, "
+                            + "hãy bỏ qua email này."
+            );
+            pending.otp = otp;
+            pending.expiresAt = now + OTP_LIFETIME;
+        }
+        session.setAttribute(PENDING_RESET_KEY, pending);
+    }
+
+    public void resetPassword(String rawEmail, String otp, String password, HttpSession session) {
+        String email = rawEmail == null ? "" : rawEmail.trim();
+        PendingPasswordReset pending = (PendingPasswordReset) session.getAttribute(PENDING_RESET_KEY);
+        if (pending == null || !pending.email.equalsIgnoreCase(email)) {
+            throw new IllegalArgumentException("Yêu cầu đã hết hạn. Vui lòng thực hiện lại.");
+        }
+        long now = System.currentTimeMillis();
+        if (pending.attempts >= MAX_ATTEMPTS) {
+            session.removeAttribute(PENDING_RESET_KEY);
+            throw new IllegalArgumentException("Bạn đã nhập sai OTP quá số lần cho phép.");
+        }
+
+        if (pending.otp == null) {
+            throw new IllegalArgumentException("OTP không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (now > pending.expiresAt) {
+            session.removeAttribute(PENDING_RESET_KEY);
+            throw new IllegalArgumentException("Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.");
+        }
+
+        if (otp == null || !otp.matches("\\d{6}") || !otp.equals(pending.otp)) {
+            pending.attempts++;
+            if (pending.attempts >= MAX_ATTEMPTS) {
+                session.removeAttribute(PENDING_RESET_KEY);
+            }
+            throw new IllegalArgumentException("Mã OTP không chính xác.");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new IllegalArgumentException("OTP không hợp lệ hoặc đã hết hạn."));
+        if (user.getAuthProvider() != AuthProvider.LOCAL || user.getStatus() != UserStatus.ACTIVE) {
+            session.removeAttribute(PENDING_RESET_KEY);
+            throw new IllegalArgumentException("Không thể đặt lại mật khẩu cho tài khoản này.");
+        }
+
+        if (password == null || password.length() < 8 || password.length() > 72 || !password.matches("(?s)(?=.*[A-Za-z])(?=.*\\d).+")) {
+            throw new IllegalArgumentException("Mật khẩu phải có từ 8 đến 72 ký tự, gồm chữ và số.");
+        }
+        user.setPasswordHash(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        logService.write(user, "USER_RESET_PASSWORD", "users", user.getId(), "Người dùng đặt lại mật khẩu thành công.");
+        session.removeAttribute(PENDING_RESET_KEY);
+    }
+
+    private void sendPasswordResetMail(String email, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailFrom);
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setText(content + "\n\nFW12");
+        mailSender.send(message);
+    }
+
+    public void logout(User user) {
+        logService.write(user, "LOGOUT", "users", user.getId(), "Người dùng đăng xuất.");
+    }
 
     private static class PendingRegistration {
         private String username;
         private String email;
         private String phone;
         private String passwordHash;
+        private String otp;
+
+        private long expiresAt;
+        private long lastSentAt;
+        private int attempts;
+
+        private List<Long> sendTimes;
+    }
+
+    private static class PendingPasswordReset {
+        private String email;
         private String otp;
 
         private long expiresAt;
