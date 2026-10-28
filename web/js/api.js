@@ -528,19 +528,19 @@ function renderNotifications(data) {
     badge.hidden = data.unread_count === 0
   })
   const header = '<div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">'
-    + '<strong class="small">Thông báo</strong>'
-    + (data.unread_count ? '<button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-notif-read-all>Đánh dấu đã đọc hết</button>' : '')
-    + '</div>'
+      + '<strong class="small">Thông báo</strong>'
+      + (data.unread_count ? '<button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-notif-read-all>Đánh dấu đã đọc hết</button>' : '')
+      + '</div>'
   const items = data.items.length
-    ? data.items.map(function (n) {
-      return '<button type="button" class="dropdown-item text-wrap py-2 border-bottom' + (n.read ? '' : ' fw-semibold') + '" data-notif-id="' + n.id + '" data-notif-link="' + e(n.link_url || '') + '"'
-        + (n.read ? '' : ' style="background: var(--fw-cream, #fdf8f3)"') + '>'
-        + '<div class="small">' + (n.read ? '' : '<i class="fa-solid fa-circle text-rose me-1" style="font-size: 7px; vertical-align: middle"></i>') + e(n.title) + '</div>'
-        + (n.content ? '<div class="small text-muted-fw fw-normal">' + e(n.content) + '</div>' : '')
-        + '<div class="text-muted-fw fw-normal" style="font-size: 11px">' + timeAgo(n.created_at) + '</div>'
-        + '</button>'
-    }).join('')
-    : '<div class="p-3 small text-muted-fw text-center">Chưa có thông báo nào.</div>'
+      ? data.items.map(function (n) {
+        return '<button type="button" class="dropdown-item text-wrap py-2 border-bottom' + (n.read ? '' : ' fw-semibold') + '" data-notif-id="' + n.id + '" data-notif-link="' + e(n.link_url || '') + '"'
+            + (n.read ? '' : ' style="background: var(--fw-cream, #fdf8f3)"') + '>'
+            + '<div class="small">' + (n.read ? '' : '<i class="fa-solid fa-circle text-rose me-1" style="font-size: 7px; vertical-align: middle"></i>') + e(n.title) + '</div>'
+            + (n.content ? '<div class="small text-muted-fw fw-normal">' + e(n.content) + '</div>' : '')
+            + '<div class="text-muted-fw fw-normal" style="font-size: 11px">' + timeAgo(n.created_at) + '</div>'
+            + '</button>'
+      }).join('')
+      : '<div class="p-3 small text-muted-fw text-center">Chưa có thông báo nào.</div>'
   document.querySelectorAll('[data-notif-menu]').forEach(function (menu) { menu.innerHTML = header + items })
 }
 
@@ -583,3 +583,38 @@ document.addEventListener('click', async function (event) {
 document.addEventListener('change', function (event) {
   if (event.target.id === 'roleSwitch') loadNotifications()
 })
+
+Object.assign(window.FW_API, {
+  async getVouchers() {
+    const rows = await callServer('/api/admin/vouchers');
+    return (rows || []).map((v) => ({
+      ...v,
+      type: v.discount_type,
+      value: Number(v.discount_value || 0),
+      min_order: Number(v.min_order_amount || 0),
+      is_active: v.status === 'ACTIVE',
+    }));
+  },
+  async saveVoucher(v) {
+    try {
+      const body = {
+        code: String(v.code || '').trim().toUpperCase(),
+        type: v.type === 'AMOUNT' ? 'FIXED' : v.type,
+        value: Number(v.value),
+        min_order: Number(v.min_order || 0),
+        max_discount: v.max_discount == null || v.max_discount === '' ? null : Number(v.max_discount),
+      };
+      const path = v.id ? '/api/admin/vouchers/' + encodeURIComponent(v.id) : '/api/admin/vouchers';
+      await callServer(path, { method: v.id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+      return { ok: true, message: v.id ? 'Đã cập nhật voucher.' : 'Đã thêm voucher.' };
+    } catch (error) {
+      return { ok: false, message: error.message || 'Không lưu được voucher.' };
+    }
+  },
+  async toggleVoucher(code) {
+    return callServer('/api/admin/vouchers/code/' + encodeURIComponent(code) + '/toggle', { method: 'POST' });
+  },
+  async deleteVoucher(code) {
+    return callServer('/api/admin/vouchers/code/' + encodeURIComponent(code), { method: 'DELETE' });
+  },
+});

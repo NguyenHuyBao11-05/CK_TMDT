@@ -40,6 +40,9 @@
       $('invoiceMsg').textContent = result.message || (result.ok
           ? 'Đã gửi hoá đơn, bạn kiểm tra email nhé.'
           : 'Không gửi được hoá đơn.');
+    } catch (error) {
+      $('invoiceMsg').className = 'small mt-2 mb-0 text-rose';
+      $('invoiceMsg').textContent = error.message || 'Không gửi được hoá đơn. Vui lòng thử lại.';
     } finally {
       if (button) button.disabled = false;
     }
