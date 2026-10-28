@@ -40,13 +40,14 @@ public class PartnerQuoteService {
 
     @Transactional(readOnly = true)
     public List<ForumItem> forum(User partner) {
-        List<DesignRequest> list = requests.findByStatusAndDesiredDateAfterOrderByCreatedAtDesc(RequestStatus.OPEN, LocalDateTime.now());
+        List<DesignRequest> list = requests.findByStatusAndHiddenAtIsNullAndDesiredDateAfterOrderByCreatedAtDesc(RequestStatus.OPEN, LocalDateTime.now());
         if (list.isEmpty()) {
             return List.of();
         }
         Map<Long, List<DesignQuote>> quotesByRequest = quotes
                 .findByRequestIdInOrderByPriceAsc(list.stream().map(DesignRequest::getId).toList())
                 .stream()
+                .filter(q -> q.getHiddenAt() == null)
                 .collect(Collectors.groupingBy(q -> q.getRequest().getId()));
 
         return list.stream().map(r -> {
@@ -71,6 +72,9 @@ public class PartnerQuoteService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy yêu cầu."));
         if (request.getStatus() != RequestStatus.OPEN) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Yêu cầu này đã đóng, không nhận báo giá nữa.");
+        }
+        if (request.getHiddenAt() != null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Yêu cầu này đã bị Quản lý ẩn khỏi diễn đàn.");
         }
         if (request.getSelectedQuoteId() != null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Yêu cầu đã có Đối tác được chọn.");
@@ -118,6 +122,12 @@ public class PartnerQuoteService {
     }
 
     private String resultNote(DesignQuote quote, DesignRequest request) {
+        if (quote.getHiddenAt() != null) {
+            return "Báo giá đã bị Quản lý ẩn: " + quote.getHiddenReason();
+        }
+        if (request.getHiddenAt() != null) {
+            return "Yêu cầu đã bị Quản lý ẩn khỏi diễn đàn: " + request.getHiddenReason();
+        }
         if (quote.getStatus() == QuoteStatus.SELECTED) {
             return request.getStatus() == RequestStatus.CONFIRMED
                     ? "Khách đã xác nhận đặt theo báo giá của bạn. Hãy chờ khách thanh toán rồi bắt đầu thực hiện."

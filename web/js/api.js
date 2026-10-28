@@ -303,6 +303,28 @@ Object.assign(window.FW_API, {
   trainRecommendationModel() {
     return callServer('/api/admin/recommendations/train', { method: 'POST' })
   },
+  getAdminForum(params) {
+    const query = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== '' && value != null) query.set(key, value)
+    })
+    return callServer('/api/admin/forum?' + query)
+  },
+  getAdminForumRequest(id) {
+    return callServer('/api/admin/forum/' + id)
+  },
+  hideAdminForumRequest(id, reason) {
+    return callServer('/api/admin/forum/' + id + '/hide', { method: 'POST', body: JSON.stringify({ reason }) })
+  },
+  unhideAdminForumRequest(id) {
+    return callServer('/api/admin/forum/' + id + '/unhide', { method: 'POST' })
+  },
+  hideAdminForumQuote(id, reason) {
+    return callServer('/api/admin/forum/quotes/' + id + '/hide', { method: 'POST', body: JSON.stringify({ reason }) })
+  },
+  unhideAdminForumQuote(id) {
+    return callServer('/api/admin/forum/quotes/' + id + '/unhide', { method: 'POST' })
+  },
 
   getAdminUsers(params) {
     const query = new URLSearchParams()
