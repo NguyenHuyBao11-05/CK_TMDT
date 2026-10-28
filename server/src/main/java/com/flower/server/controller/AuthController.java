@@ -1,5 +1,6 @@
 package com.flower.server.controller;
 
+import com.flower.server.dto.GoogleLoginRequest;
 import com.flower.server.dto.UserRegister;
 import com.flower.server.dto.UserLogin;
 import com.flower.server.entity.User;
@@ -70,9 +71,20 @@ public class AuthController {
         try {
             return ResponseEntity.ok(authService.login(request, session));
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.LOCKED).body(Map.of("message", "Tài khoản đã bị khoá"));
+            return ResponseEntity.status(HttpStatus.LOCKED).body(Map.of("message", e.getMessage()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Email hoặc mật khẩu không đúng"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> loginGoogle(@Valid @RequestBody GoogleLoginRequest request, HttpSession session) {
+        try {
+            return ResponseEntity.ok(authService.loginWithGoogle(request, session));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.LOCKED).body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
         }
     }
 

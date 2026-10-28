@@ -252,7 +252,7 @@ async function callServer(path, options = {}) {
       credentials: 'include',
       headers: {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-        'X-User-Id': mockUserId(),
+        // 'X-User-Id': mockUserId(),
         ...options.headers,
       },
     })
@@ -373,6 +373,10 @@ Object.assign(window.FW_API, {
   getAdminMenuCounts() {
     return callServer('/api/admin/menu-counts')
   },
+})
+
+// Tâm — Tài khoản, hậu mãi & khiếu nại
+Object.assign(window.FW_API, {
   register(data) {
     return callServer('/api/auth/register', {method: 'POST', body: JSON.stringify(data)});
   },
@@ -384,6 +388,9 @@ Object.assign(window.FW_API, {
   },
   login({ email, password }) {
     return callServer('/api/auth/login', {method: 'POST', body: JSON.stringify({ email, password })});
+  },
+  loginGoogle: function ({token}) {
+    return callServer("/api/auth/google", {method: "POST", body: JSON.stringify({token})});
   },
   me() {
     return callServer('/api/auth/me');
@@ -417,7 +424,8 @@ const ROLE_HOME = {
 }
 
 function isLoggedIn() {
-  return !!currentUser || document.body.classList.contains('admin-page')
+  // return !!currentUser || document.body.classList.contains('admin-page')
+  return callServer("/api/auth/me", { method: "GET" }).then(() => true).catch(() => false);
 }
 
 async function loadCurrentUser() {

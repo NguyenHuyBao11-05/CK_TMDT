@@ -278,3 +278,11 @@
     text-align: center;
     overflow-wrap: anywhere;
 }
+
+#loginError {
+    display: none;
+    margin-top: 10px;
+    color: var(--fw-rose);
+    text-align: center;
+    font-size: 16px;
+}
