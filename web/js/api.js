@@ -446,8 +446,7 @@ const ROLE_HOME = {
 }
 
 function isLoggedIn() {
-  // return !!currentUser || document.body.classList.contains('admin-page')
-  return callServer("/api/auth/me", { method: "GET" }).then(() => true).catch(() => false);
+  return !!currentUser
 }
 
 async function loadCurrentUser() {
