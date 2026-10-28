@@ -13,7 +13,7 @@ public interface DesignRequestRepository extends JpaRepository<DesignRequest, Lo
     List<DesignRequest> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 
     @EntityGraph(attributePaths = "customer")
-    List<DesignRequest> findByStatusAndDesiredDateAfterOrderByCreatedAtDesc(RequestStatus status, LocalDateTime now);
+    List<DesignRequest> findByStatusAndHiddenAtIsNullAndDesiredDateAfterOrderByCreatedAtDesc(RequestStatus status, LocalDateTime now);
 
     @EntityGraph(attributePaths = "customer")
     List<DesignRequest> findByStatusAndDesiredDateBefore(RequestStatus status, LocalDateTime now);

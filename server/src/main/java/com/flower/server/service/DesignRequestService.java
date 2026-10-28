@@ -76,6 +76,7 @@ public class DesignRequestService {
         Map<Long, List<DesignQuote>> quotesByRequest = quotes
                 .findByRequestIdInOrderByPriceAsc(list.stream().map(DesignRequest::getId).toList())
                 .stream()
+                .filter(q -> q.getHiddenAt() == null)
                 .collect(Collectors.groupingBy(q -> q.getRequest().getId()));
 
         return list.stream().map(r -> {
@@ -94,7 +95,8 @@ public class DesignRequestService {
                     r.getSelectedQuoteId(),
                     selected == null ? null : selected.getPartner().getFullName(),
                     selected == null ? null : selected.getPrice(),
-                    orderStatus(r));
+                    orderStatus(r),
+                    r.getHiddenReason());
         }).toList();
     }
 
@@ -102,13 +104,14 @@ public class DesignRequestService {
     public RequestDetail detail(User customer, Long id) {
         DesignRequest r = findOwned(customer, id);
         List<QuoteItem> list = quotes.findByRequestId(id).stream()
+                .filter(q -> q.getHiddenAt() == null)
                 .sorted(Comparator.comparing(DesignQuote::getPrice))
                 .map(QuoteItem::from)
                 .toList();
         return new RequestDetail(
                 r.getId(), r.getTitle(), r.getOccasion(), r.getMaterialPreference(), r.getColorPreference(),
                 r.getBudget(), r.getQuantity(), r.getDescription(), r.getReferenceImageUrl(), r.getDesiredDate(),
-                r.getStatus().name(), r.getCreatedAt(), r.getSelectedQuoteId(), orderStatus(r), list);
+                r.getStatus().name(), r.getCreatedAt(), r.getSelectedQuoteId(), orderStatus(r), r.getHiddenReason(), list);
     }
 
     @Transactional
@@ -117,9 +120,10 @@ public class DesignRequestService {
         if (request.getStatus() != RequestStatus.OPEN) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Yêu cầu này không còn nhận chọn báo giá.");
         }
+        requireVisible(request);
         List<DesignQuote> list = quotes.findByRequestId(id);
         DesignQuote chosen = list.stream()
-                .filter(q -> q.getId().equals(quoteId))
+                .filter(q -> q.getId().equals(quoteId) && q.getHiddenAt() == null)
                 .findFirst()
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy báo giá."));
         if (chosen.getStatus() == QuoteStatus.REJECTED) {
@@ -146,6 +150,7 @@ public class DesignRequestService {
         if (request.getSelectedQuoteId() == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Vui lòng chọn 1 báo giá trước khi xác nhận.");
         }
+        requireVisible(request);
 
         request.setStatus(RequestStatus.CONFIRMED);
         for (DesignQuote quote : quotes.findByRequestId(id)) {
@@ -204,6 +209,12 @@ public class DesignRequestService {
         }
         logService.write(customer, "REQUEST_CANCEL", "design_requests", id,
                 "Huỷ yêu cầu thiết kế \"" + request.getTitle() + "\".");
+    }
+
+    private static void requireVisible(DesignRequest request) {
+        if (request.getHiddenAt() != null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Yêu cầu đã bị Quản lý ẩn: " + request.getHiddenReason());
+        }
     }
 
     private DesignRequest findOwned(User customer, Long id) {

@@ -35,7 +35,7 @@ function chooseButton(q) {
   if (q.id === request.selected_quote_id) {
     return '<button type="button" class="btn btn-forest w-100" disabled><i class="fa-solid fa-check me-1"></i>Đã chọn</button>'
   }
-  if (request.status !== 'OPEN' || q.status === 'REJECTED') {
+  if (request.status !== 'OPEN' || q.status === 'REJECTED' || request.hidden_reason) {
     return '<button type="button" class="btn btn-ghost w-100" disabled>Không được chọn</button>'
   }
   return '<button type="button" class="btn btn-peach w-100" data-choose="' + q.id + '">' + (request.selected_quote_id ? 'Chọn báo giá này thay thế' : 'Chọn báo giá này') + ' <i class="fa-solid fa-arrow-right ms-1"></i></button>'
@@ -63,7 +63,7 @@ function renderSummary() {
   document.getElementById('requestDescription').textContent = request.description
   document.getElementById('requestBudget').textContent = FW.formatVnd(request.budget)
   document.getElementById('quoteCount').textContent = request.quotes.length + ' đề xuất'
-  document.getElementById('rejectAllBtn').disabled = request.status !== 'OPEN' || request.quotes.length === 0
+  document.getElementById('rejectAllBtn').disabled = request.status !== 'OPEN' || request.quotes.length === 0 || !!request.hidden_reason
 }
 
 function renderBanners() {
@@ -72,7 +72,9 @@ function renderBanners() {
   const action = document.getElementById('selectedAction')
   const q = selectedQuote()
   document.getElementById('cancelledBanner').hidden = request.status !== 'CANCELLED'
-  banner.hidden = !q || request.status === 'CANCELLED'
+  document.getElementById('hiddenBanner').hidden = !request.hidden_reason
+  document.getElementById('hiddenReason').textContent = request.hidden_reason || ''
+  banner.hidden = !q || request.status === 'CANCELLED' || !!request.hidden_reason
   if (!q) return
 
   if (request.status === 'OPEN') {

@@ -23,6 +23,10 @@ const ACTION_LABEL = {
   ORDER_AUTO_RECEIVED: 'Tự động xác nhận đã nhận',
   COMPLAINT_CREATE: 'Gửi khiếu nại',
   RECOMMEND_TRAIN: 'Huấn luyện mô hình gợi ý',
+  REQUEST_HIDE: 'Ẩn yêu cầu thiết kế',
+  REQUEST_UNHIDE: 'Hiện lại yêu cầu thiết kế',
+  QUOTE_HIDE: 'Ẩn báo giá',
+  QUOTE_UNHIDE: 'Hiện lại báo giá',
 }
 
 const ROLE_BADGE = {

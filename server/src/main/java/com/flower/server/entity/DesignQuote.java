@@ -33,5 +33,8 @@ public class DesignQuote {
     @Enumerated(EnumType.STRING)
     private QuoteStatus status = QuoteStatus.PENDING;
 
+    private String hiddenReason;
+    private LocalDateTime hiddenAt;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }
