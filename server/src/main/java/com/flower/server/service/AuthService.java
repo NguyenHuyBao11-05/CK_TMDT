@@ -155,6 +155,12 @@ public class AuthService {
             logService.write(null, "LOGIN_FAILED", "users", null, "Đăng nhập thất bại do thông tin xác thực không chính xác.");
             throw new IllegalArgumentException("Email hoặc mật khẩu không đúng");
         }
+
+        if (user.getStatus() == UserStatus.LOCKED) {
+            logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do tài khoản bị khóa.");
+            throw new IllegalStateException("Tài khoản đã bị khóa.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         if (user.getLoginLockedUntil() != null && now.isBefore(user.getLoginLockedUntil())) {
             if (password == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
@@ -196,12 +202,13 @@ public class AuthService {
 
     public Map<String, Object> loginWithGoogle(GoogleLoginRequest request, HttpSession session) {
         final GoogleIdToken.Payload payload;
-        try {GoogleIdToken token = googleIdTokenVerifier.verify(request.getToken());
+        try {
+            GoogleIdToken token = googleIdTokenVerifier.verify(request.getToken());
             if (token == null) {
                 throw new IllegalArgumentException("Google ID token không hợp lệ hoặc đã hết hạn.");
             }
             payload = token.getPayload();
-        } catch (IOException | java.security.GeneralSecurityException e) {
+        } catch (IOException | java.security.GeneralSecurityException | RuntimeException e) {
             throw new IllegalArgumentException("Không thể xác minh tài khoản Google.");
         }
         String googleId = payload.getSubject();
@@ -235,6 +242,11 @@ public class AuthService {
             user = userRepository.save(user);
         }
 
+        if (user.getStatus() == UserStatus.LOCKED) {
+            logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập Google thất bại do tài khoản bị khóa.");
+            throw new IllegalStateException("Tài khoản đã bị khóa.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         if (user.getLoginLockedUntil() != null && now.isBefore(user.getLoginLockedUntil())) {
             logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do tài khoản đang bị khóa tạm thời.");
@@ -245,6 +257,7 @@ public class AuthService {
         logService.write(user, "LOGIN", "users", user.getId(), "{ " + user.getId() + ", " + user.getFullName() + ", " + user.getRole() + " }");
         return userResponse(user);
     }
+
 
     private static class PendingRegistration {
         private String username;
