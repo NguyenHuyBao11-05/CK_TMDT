@@ -36,5 +36,8 @@ public class DesignRequest {
 
     private Long selectedQuoteId;
 
+    private String hiddenReason;
+    private LocalDateTime hiddenAt;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }

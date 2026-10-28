@@ -19,6 +19,7 @@ public record RequestDetail(
         LocalDateTime createdAt,
         Long selectedQuoteId,
         String orderStatus,
+        String hiddenReason,
         List<QuoteItem> quotes
 ) {
 }

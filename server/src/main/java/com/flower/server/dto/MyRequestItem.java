@@ -23,6 +23,7 @@ public record MyRequestItem(
         Long selectedQuoteId,
         String selectedPartnerName,
         BigDecimal selectedPrice,
-        String orderStatus
+        String orderStatus,
+        String hiddenReason
 ) {
 }

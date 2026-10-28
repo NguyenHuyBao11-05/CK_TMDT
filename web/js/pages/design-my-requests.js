@@ -131,6 +131,11 @@ function renderList() {
       content = cancelledContent(r)
     }
 
+    if (r.hidden_reason) {
+      badge = '<span class="state-badge cancelled">Đã bị ẩn</span>'
+      content = '<div class="alert alert-warning small py-2"><i class="fa-solid fa-eye-slash me-1"></i>Yêu cầu đã bị Quản lý ẩn khỏi diễn đàn. Lý do: ' + e(r.hidden_reason) + '</div>' + content
+    }
+
     html += `
       <article class="my-request ${r.status === 'CANCELLED' ? 'cancelled' : ''}">
         <div class="row g-4">
