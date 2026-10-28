@@ -14,6 +14,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.flower.server.dto.GoogleLoginRequest;
+import java.io.IOException;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -37,6 +41,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     private final SecureRandom random = new SecureRandom();
+    private final GoogleIdTokenVerifier googleIdTokenVerifier;
 
     private final LogService logService;
     @Value("${spring.mail.username}")
@@ -57,7 +62,7 @@ public class AuthService {
         session.setAttribute(PENDING_KEY, pending);
     }
 
-    public void verifyOtp(String otp,HttpSession session) {
+    public void verifyOtp(String otp, HttpSession session) {
         PendingRegistration pending = getPending(session);
         if (System.currentTimeMillis() > pending.expiresAt) {
             session.removeAttribute(PENDING_KEY);
@@ -135,10 +140,10 @@ public class AuthService {
         message.setTo(pending.email);
         message.setSubject("Mã OTP xác minh tài khoản FW12");
         message.setText("Xin chào " + pending.username + ",\n\n"
-                        + "Mã OTP đăng ký tài khoản của bạn là: " + otp + "\n"
-                        + "Mã có hiệu lực trong 5 phút.\n"
-                        + "Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.\n\n"
-                        + "FW12");
+                + "Mã OTP đăng ký tài khoản của bạn là: " + otp + "\n"
+                + "Mã có hiệu lực trong 5 phút.\n"
+                + "Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.\n\n"
+                + "FW12");
         return message;
     }
 
@@ -146,17 +151,24 @@ public class AuthService {
         String email = request.getEmail() == null ? "" : request.getEmail().trim();
         String password = request.getPassword();
         User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
-        if (user == null) {logService.write(null, "LOGIN_FAILED", "users", null, "Đăng nhập thất bại do thông tin xác thực không chính xác.");
+        if (user == null) {
+            logService.write(null, "LOGIN_FAILED", "users", null, "Đăng nhập thất bại do thông tin xác thực không chính xác.");
             throw new IllegalArgumentException("Email hoặc mật khẩu không đúng");
         }
+
         if (user.getStatus() == UserStatus.LOCKED) {
             logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do tài khoản bị khóa.");
-            throw new IllegalStateException("Tài khoản đã bị khoá");
+            throw new IllegalStateException("Tài khoản đã bị khóa.");
         }
+
         LocalDateTime now = LocalDateTime.now();
         if (user.getLoginLockedUntil() != null && now.isBefore(user.getLoginLockedUntil())) {
+            if (password == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
+                logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do thông tin xác thực không chính xác.");
+                throw new IllegalArgumentException("Email hoặc mật khẩu không đúng");
+            }
             logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do tài khoản đang bị khóa tạm thời.");
-            throw new IllegalArgumentException("Không thể đăng nhập. Vui lòng thử lại sau.");
+            throw new IllegalStateException("Tài khoản đang bị khoá.");
         }
         if (user.getLoginLockedUntil() != null) {
             user.setFailedLoginAttempts(0);
@@ -170,16 +182,15 @@ public class AuthService {
             }
             userRepository.save(user);
             logService.write(user, "LOGIN_FAILED", "users", user.getId(), attempts >= MAX_LOGIN_ATTEMPTS
-                            ? "Đăng nhập thất bại 5 lần liên tiếp, khóa đăng nhập 15 phút."
-                            : "Đăng nhập thất bại do thông tin xác thực không chính xác.");
+                    ? "Đăng nhập thất bại 5 lần liên tiếp, khóa đăng nhập 15 phút."
+                    : "Đăng nhập thất bại do thông tin xác thực không chính xác.");
             throw new IllegalArgumentException("Email hoặc mật khẩu không đúng");
         }
-
         user.setFailedLoginAttempts(0);
         user.setLoginLockedUntil(null);
         userRepository.save(user);
         session.setAttribute("userId", user.getId());
-        logService.write(user, "LOGIN", "users", user.getId(), "Người dùng đăng nhập thành công.");
+        logService.write(user, "LOGIN", "users", user.getId(), "{ " + user.getId() + ", " + user.getFullName() + ", " + user.getRole() + " }");
 
         return userResponse(user);
     }
@@ -187,6 +198,66 @@ public class AuthService {
     private Map<String, Object> userResponse(User user) {
         return Map.of("id", user.getId(), "full_name", user.getFullName(), "role", user.getRole().name());
     }
+
+
+    public Map<String, Object> loginWithGoogle(GoogleLoginRequest request, HttpSession session) {
+        final GoogleIdToken.Payload payload;
+        try {
+            GoogleIdToken token = googleIdTokenVerifier.verify(request.getToken());
+            if (token == null) {
+                throw new IllegalArgumentException("Google ID token không hợp lệ hoặc đã hết hạn.");
+            }
+            payload = token.getPayload();
+        } catch (IOException | java.security.GeneralSecurityException | RuntimeException e) {
+            throw new IllegalArgumentException("Không thể xác minh tài khoản Google.");
+        }
+        String googleId = payload.getSubject();
+        String email = payload.getEmail();
+        if (googleId == null || email == null || !Boolean.TRUE.equals(payload.getEmailVerified())) {
+            throw new IllegalArgumentException("Tài khoản Google chưa xác minh email.");
+        }
+
+        User user = userRepository.findByGoogleId(googleId).orElse(null);
+        if (user == null) {
+            user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+            if (user != null) {
+                if (user.getGoogleId() == null || user.getGoogleId().isBlank()) {
+                    user.setGoogleId(googleId);
+                    userRepository.save(user);
+                } else if (!user.getGoogleId().equals(googleId)) {
+                    throw new IllegalArgumentException("Email này đã liên kết với tài khoản Google khác.");
+                }
+            }
+        }
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setFullName(payload.get("name") == null ? email.substring(0, email.indexOf('@')) : payload.get("name").toString());
+            user.setGoogleId(googleId);
+            user.setAuthProvider(AuthProvider.GOOGLE);
+            user.setRole(Role.CUSTOMER);
+            user.setStatus(UserStatus.ACTIVE);
+            user.setPasswordHash(null);
+            user = userRepository.save(user);
+        }
+
+        if (user.getStatus() == UserStatus.LOCKED) {
+            logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập Google thất bại do tài khoản bị khóa.");
+            throw new IllegalStateException("Tài khoản đã bị khóa.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (user.getLoginLockedUntil() != null && now.isBefore(user.getLoginLockedUntil())) {
+            logService.write(user, "LOGIN_FAILED", "users", user.getId(), "Đăng nhập thất bại do tài khoản đang bị khóa tạm thời.");
+            throw new IllegalStateException("Tài khoản đang bị khoá.");
+        }
+
+        session.setAttribute("userId", user.getId());
+        logService.write(user, "LOGIN", "users", user.getId(), "{ " + user.getId() + ", " + user.getFullName() + ", " + user.getRole() + " }");
+        return userResponse(user);
+    }
+
 
     private static class PendingRegistration {
         private String username;

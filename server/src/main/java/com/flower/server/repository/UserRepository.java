@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     long countByStatus(UserStatus status);
 
     Optional<User> findByEmailIgnoreCase(String email);
+
+    Optional<User> findByGoogleId(String googleId);
 }
