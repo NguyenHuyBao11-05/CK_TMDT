@@ -42,10 +42,7 @@ function startResendCountdown(seconds = 60) {
     resendButton.disabled = true;
 
     function updateCountdown() {
-        const remaining = Math.max(
-            0,
-            Math.ceil((resendAvailableAt - Date.now()) / 1000)
-        );
+        const remaining = Math.max(0, Math.ceil((resendAvailableAt - Date.now()) / 1000));
         if (remaining <= 0) {
             clearInterval(countdownTimer);
             countdownTimer = null;
@@ -150,8 +147,4 @@ resendButton.addEventListener('click', async () => {
         showOtpMessage(error.message || 'Không thể gửi lại OTP. Vui lòng thử sau.');
         resendButton.disabled = true;
     }
-});
-
-document.getElementById('googleRegister')?.addEventListener('click', () => {
-    alert('Chức năng đăng ký Google chưa được tích hợp.');
 });

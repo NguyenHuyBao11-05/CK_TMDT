@@ -420,6 +420,12 @@ Object.assign(window.FW_API, {
   logout() {
     return callServer("/api/auth/logout", {method: "POST"});
   },
+  forgotPassword({email}) {
+    return callServer('/api/auth/forgot-password', {method: 'POST', body: JSON.stringify({ email })});
+  },
+  resetPassword({email, otp, password}) {
+    return callServer('/api/auth/reset-password', {method: 'POST', body: JSON.stringify({email, otp, password})});
+  },
 })
 
 async function loadAdminMenuCounts() {

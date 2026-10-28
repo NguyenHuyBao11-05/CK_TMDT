@@ -135,9 +135,9 @@
 }
 
 /* ---------- OTP verify ---------- */
-#otpSection {
+#otpSection, #rePassSection {
     width: 100%;
-    max-width: 420px;
+    max-width: 465px;
     margin: 32px auto;
     padding: 32px;
     background: var(--fw-surface);
@@ -148,11 +148,11 @@
     font-family: inherit;
 }
 
-#otpSection[hidden] {
+#otpSection[hidden], #rePassSection[hidden] {
     display: none;
 }
 
-#otpSection h2 {
+#otpSection h2, #rePassSection h2 {
     margin: 0 0 10px;
     color: var(--fw-ink);
     font-size: 26px;
@@ -160,7 +160,8 @@
     text-align: center;
 }
 
-#otpSection > p:not(#otpMessage) {
+#otpSection > p:not(#otpMessage),
+#rePassSection > p:not(#rePassMessage) {
     margin: 0 0 28px;
     color: var(--fw-muted);
     font-size: 14px;
@@ -168,57 +169,62 @@
     text-align: center;
 }
 
-#verifyOtpForm {
+#verifyOtpForm,
+#rePassForm {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-#verifyOtpForm .form-group {
+#verifyOtpForm .form-group,
+#rePassForm .form-group{
     display: flex;
     flex-direction: column;
     gap: 9px;
 }
 
-#verifyOtpForm .form-label {
+#verifyOtpForm .form-label,
+#rePassForm .form-label {
     color: var(--fw-ink);
     font-size: 14px;
     font-weight: 600;
 }
 
-#verifyOtpForm #otp {
+#verifyOtpForm #otp,
+#rePassForm #otp {
     width: 100%;
     height: 54px;
     padding: 12px 16px;
     box-sizing: border-box;
-    border: 1px solid #d8d8d8;
+    border: 1px solid var(--fw-sage-soft);
     border-radius: 10px;
     outline: none;
-    background: #fafafa;
+    background: var(--fw-surface);
     color: #25372c;
     font-family: inherit;
     font-size: 22px;
     font-weight: 600;
-    letter-spacing: 8px;
     text-align: center;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#verifyOtpForm #otp::placeholder {
+#verifyOtpForm #otp::placeholder
+#rePassForm #otp::placeholder{
     color: var(--fw-muted);
     font-size: 14px;
     font-weight: 400;
-    letter-spacing: 0;
 }
 
-#verifyOtpForm #otp:focus {
+#verifyOtpForm #otp:focus
+#rePassForm #otp:focus{
     border-color: var(--fw-forest);
     background: var(--fw-cream);
     box-shadow: 0 0 0 3px rgba(103, 242, 65, 0.2);
 }
 
 /* Nút xác nhận */
-#verifyOtpButton {
+#verifyOtpButton,
+#changePassButton {
     width: 100%;
     min-height: 48px;
     padding: 13px 18px;
@@ -227,17 +233,18 @@
     background: var(--fw-forest);
     color: var(--fw-surface);
     font-size: 15px;
-    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
 
-#verifyOtpButton:hover:not(:disabled) {
+#verifyOtpButton:hover:not(:disabled),
+#changePassButton:hover:not(:disabled) {
     background: var(--fw-forest);
     transform: translateY(-1px);
 }
 
-#verifyOtpButton:disabled {
+#verifyOtpButton:disabled,
+#changePassButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -270,7 +277,7 @@
     cursor: not-allowed;
 }
 
-#otpMessage {
+#otpMessage, #rePassMessage {
     margin: 16px 0 0;
     color: var(--fw-muted);
     font-size: 13px;

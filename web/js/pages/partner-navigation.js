@@ -11,6 +11,7 @@
       { item: '.nav-item.design', label: 'Diễn đàn yêu cầu', path: 'design/forum.html', icon: 'fa-palette', nav: 'forum' },
       { item: '.nav-item.sent-quotes', label: 'Báo giá đã gửi', path: 'design/sent-quotes.html', icon: 'fa-file-invoice-dollar', nav: 'sent-quotes' },
       { item: '.nav-item.complaint', label: 'Sản phẩm của tôi', path: 'partner/products.html', icon: 'fa-seedling', nav: 'products' },
+      { item: '.nav-item.complaint', label: 'Khiếu nại', path: 'partner/complaints.html', icon: 'fa-solid fa-person-circle-exclamation', nav: 'complaints' },
     ]
     const current = document.body.dataset.partnerNav
 
