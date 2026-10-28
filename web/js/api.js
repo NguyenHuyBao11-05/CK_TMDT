@@ -297,6 +297,12 @@ Object.assign(window.FW_API, {
     const query = new URLSearchParams(params)
     return callServer('/api/admin/stats/revenue?' + query)
   },
+  getRecommendationModel() {
+    return callServer('/api/admin/recommendations')
+  },
+  trainRecommendationModel() {
+    return callServer('/api/admin/recommendations/train', { method: 'POST' })
+  },
 
   getAdminUsers(params) {
     const query = new URLSearchParams()
