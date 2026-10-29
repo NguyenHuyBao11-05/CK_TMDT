@@ -1,6 +1,7 @@
 package com.flower.server.service;
 
 import com.flower.server.common.ApiException;
+import com.flower.server.dto.HideForm;
 import com.flower.server.dto.ProductApprovalItem;
 import com.flower.server.dto.RejectProductForm;
 import com.flower.server.entity.User;
@@ -14,6 +15,8 @@ import java.util.Map;
 
 @Service
 public class AdminProductApprovalService {
+
+    private static final String HIDDEN_REASON_PREFIX = "~ADMIN_HIDDEN~";
 
     private final JdbcTemplate jdbc;
     private final LogService logService;
@@ -31,7 +34,11 @@ public class AdminProductApprovalService {
         List<ProductApprovalItem> products = jdbc.query("""
                         SELECT p.id, p.partner_id, u.full_name AS partner_name, p.name, p.material,
                                p.description, p.price, p.discount_price,
-                               p.thumbnail_url, p.status, p.reject_reason
+                               p.thumbnail_url,
+                               CASE WHEN p.status = 'REJECTED' AND LEFT(p.reject_reason, 14) = '~ADMIN_HIDDEN~'
+                                    THEN 'HIDDEN' ELSE p.status END AS status,
+                               CASE WHEN p.status = 'REJECTED' AND LEFT(p.reject_reason, 14) = '~ADMIN_HIDDEN~'
+                                    THEN SUBSTRING(p.reject_reason, 15) ELSE p.reject_reason END AS reject_reason
                         FROM products p
                         JOIN users u ON u.id = p.partner_id
                         ORDER BY CASE p.status WHEN 'PENDING' THEN 0 ELSE 1 END, p.created_at DESC, p.id DESC
@@ -104,6 +111,75 @@ public class AdminProductApprovalService {
         notificationService.notify(partnerId, "PRODUCT_REJECTED", "Sản phẩm cần được chỉnh sửa",
                 "Sản phẩm \"" + name + "\" chưa được duyệt. Lý do: " + reason,
                 "partner/products.html");
+    }
+
+    @Transactional
+    public void hide(User manager, Long productId, HideForm form) {
+        String reason = form.reason().trim();
+        if (reason.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Vui lòng nhập lý do ẩn.");
+        }
+        if (reason.length() + HIDDEN_REASON_PREFIX.length() > 500) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Lý do ẩn không được vượt quá 486 ký tự.");
+        }
+
+        Map<String, Object> product = findProduct(productId);
+        if (!"APPROVED".equals(product.get("status"))) {
+            throw new ApiException(HttpStatus.CONFLICT, "Chỉ có thể ẩn mẫu hoa đã duyệt và đang hiển thị.");
+        }
+        int updated = jdbc.update("""
+                UPDATE products SET status = 'REJECTED', reject_reason = ?
+                WHERE id = ? AND status = 'APPROVED'
+                """, HIDDEN_REASON_PREFIX + reason, productId);
+        if (updated == 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Mẫu hoa đã thay đổi trạng thái.");
+        }
+
+        Long partnerId = ((Number) product.get("partner_id")).longValue();
+        String name = (String) product.get("name");
+        logService.write(manager, "PRODUCT_HIDE", "products", productId,
+                "Ẩn mẫu hoa \"" + name + "\". Lý do: " + reason);
+        notificationService.notify(partnerId, "PRODUCT_HIDDEN", "Mẫu hoa đã bị ẩn",
+                "Mẫu hoa \"" + name + "\" đã bị ẩn. Lý do: " + reason,
+                "partner/products.html");
+    }
+
+    @Transactional
+    public void show(User manager, Long productId) {
+        Map<String, Object> product = findProduct(productId);
+        if (!isHidden(product)) {
+            throw new ApiException(HttpStatus.CONFLICT, "Mẫu hoa không ở trạng thái bị ẩn.");
+        }
+        int updated = jdbc.update("""
+                UPDATE products SET status = 'APPROVED', reject_reason = NULL
+                WHERE id = ? AND status = 'REJECTED' AND LEFT(reject_reason, 14) = '~ADMIN_HIDDEN~'
+                """, productId);
+        if (updated == 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Mẫu hoa đã thay đổi trạng thái.");
+        }
+
+        Long partnerId = ((Number) product.get("partner_id")).longValue();
+        String name = (String) product.get("name");
+        logService.write(manager, "PRODUCT_SHOW", "products", productId,
+                "Hiển thị lại mẫu hoa \"" + name + "\".");
+        notificationService.notify(partnerId, "PRODUCT_RESTORED", "Mẫu hoa đã được hiển thị lại",
+                "Mẫu hoa \"" + name + "\" đã được Quản lý cho phép hiển thị trở lại.",
+                "partner/products.html");
+    }
+
+    private Map<String, Object> findProduct(Long productId) {
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "SELECT id, partner_id, name, status, reject_reason FROM products WHERE id = ? FOR UPDATE", productId);
+        if (rows.isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu hoa.");
+        }
+        return rows.get(0);
+    }
+
+    private static boolean isHidden(Map<String, Object> product) {
+        return "REJECTED".equals(product.get("status"))
+                && product.get("reject_reason") instanceof String reason
+                && reason.startsWith(HIDDEN_REASON_PREFIX);
     }
 
     private Map<String, Object> findPendingProduct(Long productId) {

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý đơn hàng — Fw12 Admin</title>
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/partner-review.css">
+  <link rel="stylesheet" href="../css/admin-orders.css">
+</head>
+<body class="admin-page" data-nav="orders" data-page-role="manager">
+<div id="admin-sidebar"></div>
+<div id="admin-topbar"></div>
+
+<main class="admin-content">
+  <div class="admin-breadcrumb">Vận hành › <span>Quản lý đơn hàng</span></div>
+  <div class="order-admin-heading">
+    <div>
+      <h1 class="admin-title">Quản lý đơn hàng</h1>
+      <p class="text-muted-fw mb-0">Theo dõi đơn, thanh toán, hoá đơn và ảnh minh chứng; chỉ huỷ đơn đang chờ chưa có Đối tác nhận.</p>
+    </div>
+    <button class="btn btn-outline-success rounded-pill" type="button" id="refreshOrders"><i class="fa-solid fa-rotate me-1"></i>Làm mới</button>
+  </div>
+
+  <div class="review-kpis order-admin-kpis">
+    <div><span>TỔNG ĐƠN</span><strong id="statTotal">0 <small>đơn</small></strong></div>
+    <div><span>CHỜ XỬ LÝ</span><strong id="statPending">0 <small>đơn</small></strong></div>
+    <div><span>ĐANG THỰC HIỆN</span><strong id="statProcessing">0 <small>đơn</small></strong></div>
+    <div><span>ĐÃ HUỶ</span><strong id="statCancelled">0 <small>đơn</small></strong></div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="order-admin-toolbar">
+      <label class="partner-search"><i class="fa-solid fa-magnifying-glass"></i><input id="orderSearch" type="search" placeholder="Tìm mã đơn, khách hàng, món hoa..."></label>
+      <select class="form-select" id="orderStatus" aria-label="Lọc trạng thái đơn">
+        <option value="">Tất cả trạng thái</option>
+        <option value="PENDING">Chờ xử lý</option>
+        <option value="PROCESSING">Đang chuẩn bị</option>
+        <option value="SHIPPING">Đang giao</option>
+        <option value="RECEIVED">Đã nhận</option>
+        <option value="CANCELLED">Đã huỷ</option>
+      </select>
+      <select class="form-select" id="paymentStatus" aria-label="Lọc trạng thái thanh toán">
+        <option value="">Tất cả thanh toán</option>
+        <option value="UNPAID">Chưa thanh toán</option>
+        <option value="PAID">Đã thanh toán</option>
+      </select>
+    </div>
+    <div class="table-responsive">
+      <table class="table admin-table order-admin-table">
+        <thead><tr><th>Đơn hàng</th><th>Khách hàng</th><th>Ngày đặt</th><th>Thanh toán</th><th>Đối tác</th><th>Tổng tiền</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="orderRows"><tr><td colspan="8" class="text-center text-muted-fw py-5">Đang tải đơn hàng...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="order-admin-footer" id="orderCount"></div>
+  </div>
+</main>
+
+<div class="no-access">
+  <i class="fa-solid fa-lock d-block"></i>
+  <h1 class="h3">Bạn không có quyền truy cập trang này</h1>
+  <p class="text-muted-fw">Trang Quản lý đơn hàng chỉ dành cho Quản lý.</p>
+</div>
+
+<div class="modal fade admin-modal" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="orderDetailTitle">Chi tiết đơn hàng</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body" id="orderDetailBody"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Đóng</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/admin.js"></script>
+<script src="../js/pages/admin-orders.js"></script>
+</body>
+</html>

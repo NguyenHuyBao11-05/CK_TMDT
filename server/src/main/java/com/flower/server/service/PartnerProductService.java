@@ -37,7 +37,11 @@ public class PartnerProductService {
     public List<ProductApprovalItem> mine(User partner) {
         List<ProductApprovalItem> products = jdbc.query("""
                         SELECT id, partner_id, name, material, description, price, discount_price,
-                               thumbnail_url, status, reject_reason
+                               thumbnail_url,
+                               CASE WHEN status = 'REJECTED' AND LEFT(reject_reason, 14) = '~ADMIN_HIDDEN~'
+                                    THEN 'HIDDEN' ELSE status END AS status,
+                               CASE WHEN status = 'REJECTED' AND LEFT(reject_reason, 14) = '~ADMIN_HIDDEN~'
+                                    THEN SUBSTRING(reject_reason, 15) ELSE reject_reason END AS reject_reason
                         FROM products
                         WHERE partner_id = ?
                         ORDER BY created_at DESC, id DESC

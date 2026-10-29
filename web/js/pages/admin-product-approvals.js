@@ -3,18 +3,22 @@
   'use strict'
 
   const e = FW.escapeHtml
-  const statusLabels = { PENDING: 'Chờ duyệt', APPROVED: 'Đã duyệt', REJECTED: 'Bị từ chối' }
-  const statusBadge = { PENDING: 'gold', APPROVED: 'green', REJECTED: 'rose' }
+  const statusLabels = { PENDING: 'Chờ duyệt', APPROVED: 'Đã duyệt', HIDDEN: 'Đang ẩn', REJECTED: 'Bị từ chối' }
+  const statusBadge = { PENDING: 'gold', APPROVED: 'green', HIDDEN: 'rose', REJECTED: 'rose' }
   const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'))
   const rejectForm = document.getElementById('rejectForm')
+  const hideModal = new bootstrap.Modal(document.getElementById('hideProductModal'))
+  const hideForm = document.getElementById('hideProductForm')
   let products = []
   let activeMaterial = ''
+  let activeTab = 'review'
   let rejectingId = null
+  let hidingId = null
 
   function renderStats() {
     const count = (status) => products.filter((product) => product.status === status).length
     document.getElementById('statPending').innerHTML = `${count('PENDING')} <small>mẫu</small>`
-    document.getElementById('statApproved').innerHTML = `${count('APPROVED')} <small>mẫu</small>`
+    document.getElementById('statApproved').innerHTML = `${count('APPROVED') + count('HIDDEN')} <small>mẫu</small>`
     document.getElementById('statRejected').innerHTML = `${count('REJECTED')} <small>mẫu</small>`
     document.getElementById('statTotal').innerHTML = `${products.length} <small>mẫu</small>`
   }
@@ -22,6 +26,7 @@
   function renderProducts() {
     const query = document.getElementById('approvalSearch').value.trim().toLocaleLowerCase('vi')
     const visible = products.filter((product) =>
+      (activeTab === 'review' || product.status === 'APPROVED' || product.status === 'HIDDEN') &&
       (!activeMaterial || product.material === activeMaterial) &&
       (!query || `${product.id} ${product.partner_id} ${product.partner_name} ${product.name} ${product.material}`.toLocaleLowerCase('vi').includes(query)))
 
@@ -47,6 +52,12 @@
           <div class="review-product-actions">
             <button type="button" class="approve" data-review-action="approve" data-product-id="${e(product.id)}"><i class="fa-solid fa-circle-check me-1"></i>Phê duyệt</button>
             <button type="button" class="edit" data-review-action="reject" data-product-id="${e(product.id)}"><i class="fa-solid fa-circle-xmark me-1"></i>Từ chối</button>
+          </div>` : product.status === 'APPROVED' && activeTab === 'approved' ? `
+          <div class="review-product-actions">
+            <button type="button" class="edit" data-review-action="hide" data-product-id="${e(product.id)}"><i class="fa-solid fa-eye-slash me-1"></i>Ẩn mẫu vi phạm</button>
+          </div>` : product.status === 'HIDDEN' && activeTab === 'approved' ? `
+          <div class="review-product-actions">
+            <button type="button" class="approve" data-review-action="show" data-product-id="${e(product.id)}"><i class="fa-solid fa-eye me-1"></i>Hiển thị lại</button>
           </div>` : ''}
         </div>
       </article>`
@@ -84,7 +95,39 @@
     }
   }
 
+  async function setProductVisibility(product, visible, reason) {
+    try {
+      if (visible) {
+        await FW_API.showPartnerProduct(product.id)
+        FW.toast(`Đã hiển thị lại "${product.name}".`)
+      } else {
+        await FW_API.hidePartnerProduct(product.id, reason)
+        hideModal.hide()
+        FW.toast(`Đã ẩn "${product.name}" và thông báo lý do cho Đối tác.`)
+      }
+      await loadProducts()
+    } catch (error) {
+      FW.toast(error.message)
+      renderProducts()
+    }
+  }
+
   async function init() {
+    document.querySelectorAll('[data-product-tab]').forEach((button) => {
+      button.addEventListener('click', () => {
+        activeTab = button.dataset.productTab
+        document.querySelectorAll('[data-product-tab]').forEach((tab) => {
+          const selected = tab === button
+          tab.classList.toggle('active', selected)
+          tab.setAttribute('aria-selected', String(selected))
+        })
+        document.getElementById('productTabDescription').textContent = activeTab === 'review'
+          ? 'Theo dõi tất cả mẫu hoa và xử lý các mẫu đang chờ duyệt.'
+          : 'Quản lý các mẫu hoa đã duyệt; mẫu bị ẩn vẫn có thể được hiển thị lại.'
+        renderProducts()
+      })
+    })
+
     document.querySelectorAll('[data-material]').forEach((button) => {
       button.addEventListener('click', () => {
         document.querySelectorAll('[data-material]').forEach((item) => item.classList.remove('active'))
@@ -105,11 +148,39 @@
         void approveProduct(product)
         return
       }
+      if (button.dataset.reviewAction === 'show') {
+        button.disabled = true
+        void setProductVisibility(product, true)
+        return
+      }
+      if (button.dataset.reviewAction === 'hide') {
+        hidingId = product.id
+        hideForm.reset()
+        hideForm.classList.remove('was-validated')
+        document.getElementById('hideProductName').textContent = product.name
+        hideModal.show()
+        return
+      }
       rejectingId = product.id
       rejectForm.reset()
       rejectForm.classList.remove('was-validated')
       document.getElementById('rejectProductName').textContent = product.name
       rejectModal.show()
+    })
+
+    hideForm.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      hideForm.classList.add('was-validated')
+      const reason = document.getElementById('hideProductReason').value.trim()
+      if (!reason) return
+      const submit = hideForm.querySelector('[type="submit"]')
+      submit.disabled = true
+      try {
+        const product = products.find((item) => item.id === hidingId)
+        if (product) await setProductVisibility(product, false, reason)
+      } finally {
+        submit.disabled = false
+      }
     })
 
     rejectForm.addEventListener('submit', async (event) => {

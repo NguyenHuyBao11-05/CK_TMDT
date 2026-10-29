@@ -43,6 +43,15 @@
     <button type="button" class="review-filter" data-material="Hoa giấy">Hoa giấy</button>
   </div>
 
+  <div class="review-page-tabs" role="tablist" aria-label="Quản lý mẫu hoa">
+    <button class="active" type="button" role="tab" aria-selected="true" data-product-tab="review">
+      <i class="fa-solid fa-clipboard-check me-1"></i>Kiểm duyệt mẫu hoa
+    </button>
+    <button type="button" role="tab" aria-selected="false" data-product-tab="approved">
+      <i class="fa-solid fa-seedling me-1"></i>Mẫu hoa đã duyệt
+    </button>
+  </div>
+  <p class="text-muted-fw small mb-3" id="productTabDescription">Theo dõi tất cả mẫu hoa và xử lý các mẫu đang chờ duyệt.</p>
   <div class="review-product-grid" id="productTable"></div>
 
 </main>
@@ -69,6 +78,27 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Huỷ</button>
         <button type="submit" class="btn btn-danger rounded-pill">Từ chối</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade admin-modal" id="hideProductModal" tabindex="-1" aria-labelledby="hideProductTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="hideProductForm" novalidate>
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="hideProductTitle">Ẩn mẫu hoa vi phạm</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted-fw" id="hideProductName"></p>
+        <label for="hideProductReason" class="form-label">Lý do ẩn <span class="text-rose">*</span></label>
+        <textarea id="hideProductReason" class="form-control" rows="3" maxlength="500" required placeholder="Nêu rõ nội dung vi phạm để Đối tác biết và xử lý."></textarea>
+        <div class="invalid-feedback">Vui lòng nhập lý do ẩn, tối đa 500 ký tự.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Đóng</button>
+        <button type="submit" class="btn btn-danger rounded-pill">Ẩn mẫu hoa</button>
       </div>
     </form>
   </div>
