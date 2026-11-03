@@ -279,7 +279,7 @@
 
 #otpMessage, #rePassMessage {
     margin: 16px 0 0;
-    color: var(--fw-muted);
+    color: var(--fw-muted) !important;
     font-size: 13px;
     line-height: 1.6;
     text-align: center;

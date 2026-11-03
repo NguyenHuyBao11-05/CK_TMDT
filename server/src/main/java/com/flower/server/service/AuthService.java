@@ -264,44 +264,53 @@ public class AuthService {
     // ===================== forget password =====================
     public void forgotPassword(String rawEmail, HttpSession session) {
         String email = rawEmail == null ? "" : rawEmail.trim();
-        long now = System.currentTimeMillis();
-        PendingPasswordReset pending = (PendingPasswordReset) session.getAttribute(PENDING_RESET_KEY);
 
-        if (pending != null && pending.email.equalsIgnoreCase(email)) {
-            pending.sendTimes.removeIf(time -> now - time >= 60 * 60 * 1000L);
-            if (now - pending.lastSentAt < RESEND_COOLDOWN) {
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng nhập email.");
+        }
+
+        long now = System.currentTimeMillis();
+        PendingPasswordReset oldPending = (PendingPasswordReset) session.getAttribute(PENDING_RESET_KEY);
+        PendingPasswordReset pending;
+
+        if (oldPending != null && oldPending.email.equalsIgnoreCase(email)) {
+            if (oldPending.sendTimes == null) {
+                oldPending.sendTimes = new ArrayList<>();
+            }
+            oldPending.sendTimes.removeIf(time -> now - time >= 60 * 60 * 1000L);
+            if (now - oldPending.lastSentAt < RESEND_COOLDOWN) {
                 throw new IllegalArgumentException("Vui lòng đợi 60 giây trước khi gửi lại mã.");
             }
-            if (pending.sendTimes.size() >= MAX_SENDS_PER_HOUR) {
+            if (oldPending.sendTimes.size() >= MAX_SENDS_PER_HOUR) {
                 throw new IllegalArgumentException("Bạn đã yêu cầu quá nhiều mã OTP. Vui lòng thử lại sau.");
             }
+            pending = oldPending;
         } else {
             pending = new PendingPasswordReset();
             pending.email = email;
             pending.sendTimes = new ArrayList<>();
+            pending.lastSentAt = 0;
         }
-
         User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
 
-        pending.otp = null;
-        pending.expiresAt = 0;
-        pending.attempts = 0;
-        pending.lastSentAt = now;
-        pending.sendTimes.add(now);
-
+        String otp = null;
         if (user != null && user.getAuthProvider() == AuthProvider.GOOGLE) {
             sendPasswordResetMail(email, "Hướng dẫn đăng nhập FW12", "Tài khoản của bạn sử dụng đăng nhập Google.\n" + "Vui lòng đăng nhập bằng Google.");
         } else if (user != null && user.getAuthProvider() == AuthProvider.LOCAL && user.getStatus() == UserStatus.ACTIVE) {
-            String otp = String.format("%06d", random.nextInt(1_000_000));
+            otp = String.format("%06d", random.nextInt(1_000_000));
             sendPasswordResetMail(email, "Mã OTP đặt lại mật khẩu FW12",
                     "Mã OTP đặt lại mật khẩu của bạn là: " + otp + "\n"
                             + "Mã có hiệu lực trong 5 phút.\n"
                             + "Nếu bạn không yêu cầu đặt lại mật khẩu, "
                             + "hãy bỏ qua email này."
             );
-            pending.otp = otp;
-            pending.expiresAt = now + OTP_LIFETIME;
         }
+
+        pending.otp = otp;
+        pending.expiresAt = otp != null ? now + OTP_LIFETIME : 0;
+        pending.attempts = 0;
+        pending.lastSentAt = now;
+        pending.sendTimes.add(now);
         session.setAttribute(PENDING_RESET_KEY, pending);
     }
 

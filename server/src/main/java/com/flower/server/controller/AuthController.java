@@ -110,7 +110,6 @@ public class AuthController {
         try {
             authService.logout(currentUserService.get());
         } catch (Exception e) {
-            System.out.println("idk");
         } finally {
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -120,15 +119,16 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công."));
     }
 
-
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request, HttpSession session) {
         try {
             authService.forgotPassword(request.email(), session);
-        } catch (IllegalArgumentException | org.springframework.mail.MailException e) {
             return ResponseEntity.ok(Map.of("message", "Nếu email có tài khoản, mã xác nhận đã được gửi"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (org.springframework.mail.MailException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Không thể gửi email lúc này. Vui lòng thử lại sau."));
         }
-        return ResponseEntity.ok(Map.of("message", "Nếu email có tài khoản, mã xác nhận đã được gửi"));
     }
 
     @PostMapping("/reset-password")

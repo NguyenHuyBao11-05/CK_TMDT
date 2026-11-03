@@ -95,7 +95,16 @@ forgotPasswordForm.addEventListener("submit", async (event) => {
         otpInput.focus();
 
     } catch (error) {
-
+        let message = "Không thể gửi email. Vui lòng thử lại sau.";
+        if (error.response) {
+            const data = error.response.data;
+            if (data && data.message) {
+                message = data.message;
+            }
+        } else if (error.message) {
+            message = error.message;
+        }
+        showLoginMessage(message);
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Đặt lại mật khẩu";
@@ -164,7 +173,13 @@ resendOtpButton.addEventListener('click', async () => {
         showRePassMessage("Nếu email có tài khoản, mã xác nhận đã được gửi.");
         startResendCountdown(60);
     } catch (error) {
-        showRePassMessage(error.message || 'Không thể gửi lại OTP. Vui lòng thử sau.');
-        resendOtpButton.disabled = true;
+        let message = 'Không thể gửi lại OTP. Vui lòng thử sau.'
+        if (error.response?.data?.message) {
+            message = error.response.data.message;
+        } else if (error.message) {
+            message = error.message;
+        }
+        showRePassMessage(message);
+        resendOtpButton.disabled = false;
     }
 });
