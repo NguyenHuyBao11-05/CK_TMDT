@@ -3,6 +3,8 @@ package com.flower.server.controller;
 import com.flower.server.dto.GoogleLoginRequest;
 import com.flower.server.dto.UserRegister;
 import com.flower.server.dto.UserLogin;
+import com.flower.server.dto.ForgotPasswordRequest;
+import com.flower.server.dto.ResetPasswordRequest;
 import com.flower.server.entity.User;
 import com.flower.server.service.AuthService;
 import com.flower.server.service.CurrentUserService;
@@ -105,10 +107,37 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
+        try {
+            authService.logout(currentUserService.get());
+        } catch (Exception e) {
+        } finally {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
         }
         return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công."));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request, HttpSession session) {
+        try {
+            authService.forgotPassword(request.email(), session);
+            return ResponseEntity.ok(Map.of("message", "Nếu email có tài khoản, mã xác nhận đã được gửi"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (org.springframework.mail.MailException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Không thể gửi email lúc này. Vui lòng thử lại sau."));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request, HttpSession session) {
+        try {
+            authService.resetPassword(request.email(), request.otp(), request.password(), session);
+            return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 }

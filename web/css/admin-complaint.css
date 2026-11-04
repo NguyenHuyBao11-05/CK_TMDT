@@ -395,8 +395,8 @@ section {
 }
 
 .section-main .start-header .complaint-status {
-    background: var(--fw-peach);
-    color: var(--fw-rose);
+    background: var(--fw-cream-2);
+    color: var(--fw-muted);
 }
 
 .section-main .start-header .complaint-id {
@@ -418,13 +418,12 @@ section {
     width: 170px;
     gap: 12px;
     padding: 12px;
-    border: 1px solid var(--fw-peach);
     border-radius: 10px;
     background: var(--fw-cream-2);
 }
 
 .section-main .start-header .right-box > i {
-    color: var(--fw-rose);
+    color: var(--fw-forest);
     font-size: 18px;
 }
 
@@ -439,8 +438,8 @@ section {
     font-size: 10px;
 }
 
-.section-main .start-header .red-text {
-    color: var(--fw-rose);
+.section-main .start-header .green-text {
+    color: var(--fw-forest);
     font-size: 14px;
     font-weight: 800;
 }
@@ -562,6 +561,30 @@ section {
     font-size: 10px;
 }
 
+.section-main .florist-answer-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 22px;
+    border-radius: 17px;
+    background: var(--fw-cream-2);
+}
+
+.section-main .florist-answer-box .upper-title {
+    color: var(--fw-ink);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.section-main .florist-answer-box .description {
+    color: var(--fw-ink);
+    width: 100%;
+    background: var(--fw-surface);
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 12px;
+}
+
 .section-main .decision-box {
     display: flex;
     flex-direction: column;
@@ -591,6 +614,7 @@ section {
 
 .section-main .decision-box .description {
     color: var(--fw-ink);
+    width: 100%;
     background: var(--fw-surface);
     padding: 16px;
     border-radius: 16px;
@@ -617,14 +641,14 @@ section {
     border: none;
 }
 
-.section-main .decision-box .refund-button {
+.section-main .decision-box .req-partner-fix-button {
     width: 60%;
-    background: var(--fw-rose);
+    background: var(--fw-forest);
     color: var(--fw-surface);
 }
 
-.section-main .decision-box .refund-button:hover {
-    background: var(--fw-peach-darker);
+.section-main .decision-box .req-partner-fix-button:hover {
+    background: var(--fw-forest-dark);
 }
 
 .section-main .decision-box .close-complaint-button {
