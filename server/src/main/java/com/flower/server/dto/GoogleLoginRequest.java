@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class GoogleLoginRequest {
 
-    @NotBlank
+    @NotBlank(message = "Thiếu token google")
     private String token;
 
     public String getToken() {
