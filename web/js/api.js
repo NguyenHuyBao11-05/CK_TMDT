@@ -455,13 +455,26 @@ function isLoggedIn() {
   return !!currentUser
 }
 
+function clearShoppingStorage() {
+  try {
+    ['fw_cart_items', 'fw_voucher', 'fw_checkout', 'fw_pending_order'].forEach(function (key) { localStorage.removeItem(key) })
+  } catch (e) {}
+  FW.cart.renderBadge()
+}
+
 async function loadCurrentUser() {
   try {
     currentUser = await FW_API.me()
   } catch (e) {
     currentUser = null
   }
-  if (!currentUser) return
+  if (!currentUser) {
+    clearShoppingStorage()
+    return
+  }
+  let previousId = null
+  try { previousId = localStorage.getItem('fw_user_id') } catch (e) {}
+  if (previousId && previousId !== String(currentUser.id)) clearShoppingStorage()
 
   const home = ROLE_HOME[currentUser.role] || ROLE_HOME.CUSTOMER
   try {
