@@ -426,6 +426,15 @@ Object.assign(window.FW_API, {
   resetPassword({email, otp, password}) {
     return callServer('/api/auth/reset-password', {method: 'POST', body: JSON.stringify({email, otp, password})});
   },
+  getProfile() {
+    return callServer('/api/account/profile');
+  },
+  updateProfile(data) {
+    return callServer('/api/account/update-profile', {method: 'PUT', body: JSON.stringify(data)});
+  },
+    changePassword(data) {
+      return callServer('/api/account/change-password', {method: 'POST', body: JSON.stringify(data)})
+    },
 })
 
 async function loadAdminMenuCounts() {

@@ -25,32 +25,103 @@
     <div class="container2">
         <div class="user-picture">
             <img id="profileAvatar" src="../images/favicon.svg" alt="avatar">
+            <button type="button" id="changeAvatarButton"
+                    class="change-avatar-button" hidden>
+                <i class="fa-solid fa-edit"></i>
+            </button>
+            <input type="file" id="avatarInput" accept="image/*" hidden>
         </div>
         <div class="user-content">
-            <section class="content-card">
+            <section class="content-card profile-card">
                 <div class="section-heading">
                     <div>
                         <h2>Thông tin cá nhân</h2>
-                        <p>Cập nhật thông tin để nhận hoa đúng người, đúng nơi.</p>
                     </div>
-                    <button type="button" class="change-button"><i class="fa-regular fa-pen-to-square"></i>Chỉnh sửa
+                    <button type="button" class="change-button" id="editProfileButton"><i
+                            class="fa-regular fa-pen-to-square"></i>Chỉnh sửa
                     </button>
                 </div>
 
-                <div class="profile-details">
-                    <div class="detail-item">
-                        <span class="label">Họ và tên</span>
-                        <span class="content" id="profileName">...</span>
+                <form id="profileForm">
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <span class="label">Email</span>
+                            <span class="content" id="profileEmail">...</span>
+                        </div>
+                        <div class="detail-item">
+                            <label class="label" for="profileNameInput">Họ và tên</label>
+                            <input type="text" class="form-control profile-input" id="profileNameInput" maxlength="150"
+                                   required disabled hidden>
+                            <span class="content" id="profileName">...</span>
+                        </div>
+                        <div class="detail-item">
+                            <label class="label" for="profilePhoneInput">Số điện thoại</label>
+                            <input type="tel" class="form-control profile-input" id="profilePhoneInput" maxlength="10"
+                                   pattern="0[0-9]{9}" placeholder="Nhập số điện thoại" disabled hidden>
+                            <span class="content" id="profilePhone">...</span>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Email</span>
-                        <span class="content" id="profileEmail">...</span>
+                    <div id="profileMessage" class="mt-3" role="status"></div>
+
+                    <div id="profileActions" class="mt-3" hidden>
+                        <button type="submit" class="btn btn-primary" id="saveProfileButton">Lưu thay đổi</button>
+                        <button type="button" class="btn btn-outline-secondary" id="cancelProfileButton">Hủy</button>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Số điện thoại</span>
-                        <span class="content" id="profilePhone">...</span>
+                </form>
+                <button type="button" class="change-button" id="showPasswordButton">
+                    <i class="fa-solid fa-lock"></i>Đổi mật khẩu
+                </button>
+            </section>
+
+            <section class="content-card password-card">
+                <div class="section-heading">
+                    <div>
+                        <h2>Đổi mật khẩu</h2>
                     </div>
                 </div>
+
+                <form id="changePasswordForm">
+                    <div class="password-fields">
+                        <div class="password-item">
+                            <label for="currentPassword">Mật khẩu hiện tại</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="currentPassword" name="currentPassword" class="form-control"
+                                       placeholder="Nhập mật khẩu hiện tại" required>
+                                <button type="button" class="toggle-password" data-target="currentPassword">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="password-item">
+                            <label for="newPassword">Mật khẩu mới</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="newPassword" name="newPassword" class="form-control"
+                                       placeholder="Nhập mật khẩu mới" minlength="8" required>
+                                <button type="button" class="toggle-password" data-target="newPassword">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                            <span class="password-hint">Tối thiểu 8 ký tự, bao gồm cả chữ cái và chữ số.</span>
+                        </div>
+                        <div class="password-item">
+                            <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                                       placeholder="Nhập lại mật khẩu mới" required>
+                                <button type="button" class="toggle-password" data-target="confirmPassword">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="passwordMessage" class="password-message" role="status"></div>
+                    <div class="password-actions">
+                        <button type="submit" class="btn btn-primary" id="changePasswordButton">
+                            <i class="fa-solid fa-key"></i>Đổi mật khẩu
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="cancelPasswordButton">Hủy</button>
+                    </div>
+                </form>
             </section>
         </div>
     </div>
