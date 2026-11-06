@@ -16,7 +16,7 @@ public class LogService {
             "auth", List.of("LOGIN", "LOGOUT"),
             "account", List.of("USER_", "PARTNER_"),
             "product", List.of("PRODUCT_"),
-            "order", List.of("ORDER_", "PAYMENT_", "INVOICE_"),
+            "order", List.of("ORDER_", "PAYMENT_", "INVOICE_", "VOUCHER_"),
             "design", List.of("REQUEST_", "QUOTE_"),
             "complaint", List.of("COMPLAINT_")
     );

@@ -46,12 +46,14 @@
       const percent = hasDiscount ? Math.round((1 - p.discount_price / p.price) * 100) : 0
       const badgeText = { best: 'Bán chạy nhất', new: 'Mới', sale: `Tiết kiệm ${percent}%` }[p.badge]
       const detailUrl = FW.url(`shop/product-detail.html?id=${encodeURIComponent(p.id)}`)
+      const outOfStock = Number(p.stock_quantity) <= 0
 
       return `
         <article class="product-card">
           <a class="product-thumb d-block" href="${detailUrl}">
             <img src="${e(window.FW_API?.imageUrl ? window.FW_API.imageUrl(p.thumbnail_url) : p.thumbnail_url)}" alt="${e(p.name)}" loading="lazy">
             ${badgeText ? `<span class="product-badge ${e(p.badge)}">${badgeText}</span>` : ''}
+            ${outOfStock ? '<span class="product-badge sale">Hết mẫu hôm nay</span>' : ''}
             <span class="product-rating"><i class="fa-solid fa-star text-rose me-1"></i>${Number(p.rating).toFixed(1)}</span>
           </a>
           <div class="product-body">
@@ -67,7 +69,7 @@
                 ${hasDiscount ? `<span class="product-old-price">${FW.formatVnd(p.price)}</span>` : ''}
               </div>
               <button type="button" class="btn btn-cart" data-add-to-cart="${e(p.id)}"
-                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ">
+                      data-name="${e(p.name)}" aria-label="Thêm ${e(p.name)} vào giỏ" ${outOfStock ? 'disabled title="Sản phẩm đã hết mẫu trong ngày"' : ''}>
                 <i class="fa-solid fa-cart-plus"></i>
               </button>
             </div>
