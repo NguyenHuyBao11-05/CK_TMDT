@@ -1,6 +1,7 @@
 package com.flower.server.controller;
 
 import com.flower.server.dto.ProductApprovalItem;
+import com.flower.server.dto.HideForm;
 import com.flower.server.dto.RejectProductForm;
 import com.flower.server.entity.Role;
 import com.flower.server.service.AdminProductApprovalService;
@@ -40,5 +41,17 @@ public class AdminProductApprovalController {
                                       @Valid @RequestBody RejectProductForm form) {
         service.reject(currentUser.require(Role.MANAGER), productId, form);
         return Map.of("message", "Đã từ chối sản phẩm.");
+    }
+
+    @PostMapping("/{productId}/hide")
+    public Map<String, String> hide(@PathVariable Long productId, @Valid @RequestBody HideForm form) {
+        service.hide(currentUser.require(Role.MANAGER), productId, form);
+        return Map.of("message", "Đã ẩn sản phẩm.");
+    }
+
+    @PostMapping("/{productId}/show")
+    public Map<String, String> show(@PathVariable Long productId) {
+        service.show(currentUser.require(Role.MANAGER), productId);
+        return Map.of("message", "Đã hiển thị lại sản phẩm.");
     }
 }

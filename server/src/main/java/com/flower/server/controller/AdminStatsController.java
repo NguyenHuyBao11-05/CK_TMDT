@@ -1,5 +1,6 @@
 package com.flower.server.controller;
 
+import com.flower.server.dto.AdminCategoryStats;
 import com.flower.server.dto.AdminOrderStats;
 import com.flower.server.dto.AdminRevenueStats;
 import com.flower.server.entity.Role;
@@ -40,5 +41,13 @@ public class AdminStatsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         currentUser.require(Role.MANAGER);
         return service.revenue(from, to);
+    }
+
+    @GetMapping("/categories")
+    public AdminCategoryStats categories(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        currentUser.require(Role.ADMIN, Role.MANAGER);
+        return service.categories(from, to);
     }
 }
