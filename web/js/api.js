@@ -226,6 +226,21 @@ Object.assign(window.FW_API, {
       body: JSON.stringify({ reason }),
     })
   },
+  hidePartnerProduct(productId, reason) {
+    return callServer(`/api/admin/product-approvals/${productId}/hide`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  },
+  showPartnerProduct(productId) {
+    return callServer(`/api/admin/product-approvals/${productId}/show`, { method: 'POST' })
+  },
+  getAdminOrders() {
+    return callServer('/api/admin/orders')
+  },
+  cancelUnclaimedAdminOrder(orderId) {
+    return callServer(`/api/admin/orders/${orderId}/cancel-unclaimed`, { method: 'POST' })
+  },
 })
 
 // Bảo — Diễn đàn thiết kế riêng, quản trị tài khoản & nhật ký
