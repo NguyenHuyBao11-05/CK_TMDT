@@ -9,6 +9,8 @@
     { key: 'RECEIVED', label: 'Đã nhận', color: 'var(--fw-sage-soft)' },
     { key: 'CANCELLED', label: 'Đã huỷ', color: 'var(--fw-peach-dark)' },
   ]
+  const CATEGORY_COLORS = ['var(--fw-forest)', 'var(--fw-peach-dark)', 'var(--fw-sage)', 'var(--fw-rose)', 'var(--fw-peach)', 'var(--fw-forest-dark)']
+  let categoryStats = null
   const fromDate = document.getElementById('fromDate')
   const toDate = document.getElementById('toDate')
   const partnerFilter = document.getElementById('partnerFilter')
@@ -92,12 +94,64 @@
     }).join('') : emptyRow(4)
   }
 
+  function renderCategoryStats() {
+    const pie = document.getElementById('categoryPie')
+    const legend = document.getElementById('categoryLegend')
+    const byRevenue = document.querySelector('[name="categoryMetric"]:checked').value === 'revenue'
+    const valueOf = (item) => byRevenue ? Number(item.revenue) : Number(item.quantity)
+    const total = categoryStats ? (byRevenue ? Number(categoryStats.total_revenue) : categoryStats.total_quantity) : 0
+    if (!total) {
+      pie.innerHTML = ''
+      legend.innerHTML = '<p class="text-muted-fw mb-0">Chưa có đơn nào được nhận trong khoảng ngày này.</p>'
+      return
+    }
+
+    let offset = 0
+    const slices = categoryStats.categories.map((item, index) => {
+      const percent = valueOf(item) / total * 100
+      const slice = { item, percent, offset, color: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }
+      offset += percent
+      return slice
+    })
+    const centerValue = !byRevenue ? total
+      : total >= 1000000000 ? (total / 1000000000).toFixed(2).replace('.', ',') + ' tỷ'
+        : (total / 1000000).toFixed(1).replace('.', ',') + 'tr'
+    pie.innerHTML = `
+      <svg viewBox="0 0 42 42" role="img" aria-label="Biểu đồ tròn tỷ trọng theo loại sản phẩm" style="display:block;width:100%">
+        <circle cx="21" cy="21" r="15.9155" style="fill:none;stroke:var(--fw-cream-2);stroke-width:6"></circle>
+        ${slices.map((slice) => `
+          <circle cx="21" cy="21" r="15.9155" pathLength="100" transform="rotate(-90 21 21)"
+                  stroke-dasharray="${slice.percent} ${100 - slice.percent}" stroke-dashoffset="${-slice.offset}"
+                  style="fill:none;stroke:${slice.color};stroke-width:6">
+            <title>${FW.escapeHtml(slice.item.category)}: ${slice.percent.toFixed(1)}%</title>
+          </circle>`).join('')}
+        <text x="21" y="21" text-anchor="middle" style="font-size:5px;font-weight:600;fill:var(--fw-ink)">${centerValue}</text>
+        <text x="21" y="26" text-anchor="middle" style="font-size:2.6px;fill:var(--fw-muted)">${byRevenue ? 'doanh thu' : 'sản phẩm'}</text>
+      </svg>`
+
+    legend.innerHTML = slices.map((slice) => `
+      <div>
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="small fw-semibold"><span class="d-inline-block rounded-circle me-2" style="width:10px;height:10px;background:${slice.color}"></span>${FW.escapeHtml(slice.item.category)}</span>
+          <span class="small"><b>${slice.percent.toFixed(1)}%</b></span>
+        </div>
+        <div class="progress mb-1" style="height: 8px; border-radius: 999px;">
+          <div class="progress-bar" style="width: ${slice.percent}%; background: ${slice.color};"></div>
+        </div>
+        <div class="small text-muted-fw">${slice.item.quantity} sản phẩm · ${slice.item.order_count} đơn · ${FW.formatVnd(Number(slice.item.revenue))}</div>
+      </div>`).join('')
+  }
+
   async function load() {
     if (fromDate.value > toDate.value) {
       FW.toast('Ngày bắt đầu phải trước ngày kết thúc.')
       return
     }
     const params = { from: fromDate.value, to: toDate.value }
+    FW_API.getAdminCategoryStats(params)
+      .then((data) => { categoryStats = data })
+      .catch(() => { categoryStats = null })
+      .then(renderCategoryStats)
     try {
       if (document.body.dataset.role === 'manager') {
         renderRevenueStats(await FW_API.getAdminRevenueStats(params))
@@ -119,6 +173,7 @@
   document.getElementById('filterButton').addEventListener('click', load)
   document.addEventListener('change', (event) => {
     if (event.target.id === 'roleSwitch') setTimeout(load, 0)
+    if (event.target.name === 'categoryMetric') renderCategoryStats()
   })
   load()
 })()
