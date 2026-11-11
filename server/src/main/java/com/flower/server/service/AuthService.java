@@ -81,7 +81,6 @@ public class AuthService {
             }
             throw new IllegalArgumentException("Mã OTP không chính xác.");
         }
-
         if (userRepository.existsByEmailIgnoreCase(pending.email)) {
             session.removeAttribute(PENDING_KEY);
             throw new IllegalArgumentException("Email này đã được đăng ký.");

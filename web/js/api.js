@@ -432,9 +432,12 @@ Object.assign(window.FW_API, {
   updateProfile(data) {
     return callServer('/api/account/update-profile', {method: 'PUT', body: JSON.stringify(data)});
   },
-    changePassword(data) {
-      return callServer('/api/account/change-password', {method: 'POST', body: JSON.stringify(data)})
-    },
+  changePassword(data) {
+    return callServer('/api/account/change-password', {method: 'POST', body: JSON.stringify(data)})
+  },
+  dashboard() {
+    return callServer('/api/account/dashboard', {method: 'GET'})
+  },
 })
 
 async function loadAdminMenuCounts() {

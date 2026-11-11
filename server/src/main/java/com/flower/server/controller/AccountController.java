@@ -1,8 +1,6 @@
 package com.flower.server.controller;
 
-import com.flower.server.dto.Profile;
-import com.flower.server.dto.ProfileUpdateRequest;
-import com.flower.server.dto.UserChangePasswordRequest;
+import com.flower.server.dto.*;
 import com.flower.server.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +31,11 @@ public class AccountController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody UserChangePasswordRequest request) {
         accountService.changePassword(request);
         return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
+    }
+
+    @GetMapping("/dashboard")
+    public UserDashboard dashboard() {
+        System.out.println("123");
+        return accountService.getDashboard();
     }
 }
