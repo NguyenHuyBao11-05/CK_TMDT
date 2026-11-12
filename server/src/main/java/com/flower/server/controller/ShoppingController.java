@@ -6,6 +6,9 @@ import com.flower.server.service.CurrentUserService;
 import com.flower.server.service.RecommendationService;
 import com.flower.server.service.ShoppingService;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -68,8 +71,17 @@ public class ShoppingController {
     @PostMapping("/api/orders") public Map<String,Object> createOrder(@RequestBody Map<String,Object> body){
         return service.createOrder(currentUser.require(Role.CUSTOMER),body);
     }
-    @PostMapping("/api/orders/{code}/pay") public Map<String,Object> pay(@PathVariable String code){
-        return service.pay(currentUser.require(Role.CUSTOMER),code);
+    @PostMapping("/api/orders/{code}/cash") public Map<String,Object> cash(@PathVariable String code){
+        return service.placeCashOrder(currentUser.require(Role.CUSTOMER), code);
+    }
+    @PostMapping("/api/orders/{code}/vnpay") public Map<String,Object> vnpay(@PathVariable String code, HttpServletRequest request){
+        return service.startVnpayPayment(currentUser.require(Role.CUSTOMER), code, request.getRemoteAddr());
+    }
+    @GetMapping("/api/payments/vnpay/ipn") public Map<String,Object> vnpayIpn(@RequestParam Map<String,String> params){
+        return service.processVnpayIpn(params);
+    }
+    @GetMapping("/api/payments/vnpay/return") public ResponseEntity<Void> vnpayReturn(@RequestParam Map<String,String> params){
+        return ResponseEntity.status(302).header(HttpHeaders.LOCATION, service.vnpayReturnRedirect(params)).build();
     }
     @GetMapping("/api/orders/by-code/{code}") public Map<String,Object> order(@PathVariable String code){
         return service.orderByCode(code,currentUser.require(Role.CUSTOMER));
