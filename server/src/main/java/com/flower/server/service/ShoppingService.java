@@ -23,14 +23,16 @@ public class ShoppingService {
     private final NotificationService notifications;
     private final InvoiceMailService invoiceMail;
     private final TransactionTemplate transactionTemplate;
+    private final VnPayService vnPayService;
 
     public ShoppingService(JdbcTemplate jdbc, LogService logs, NotificationService notifications,
-                           InvoiceMailService invoiceMail, PlatformTransactionManager transactionManager) {
+                           InvoiceMailService invoiceMail, PlatformTransactionManager transactionManager, VnPayService vnPayService) {
         this.jdbc = jdbc;
         this.logs = logs;
         this.notifications = notifications;
         this.invoiceMail = invoiceMail;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
+        this.vnPayService = vnPayService;
     }
 
     public List<Map<String,Object>> products(String q, String materials, BigDecimal min, BigDecimal max, String sort, int page) {
@@ -279,9 +281,85 @@ public class ShoppingService {
         return Map.of("id",orderId,"code",code,"order_code",code,"subtotal",subtotal,"discount",discount,"shipping_fee",shipping,"total",total,"status","PENDING");
     }
 
+    public Map<String,Object> startVnpayPayment(User user, String code, String clientIp) {
+        Map<String,Object> order = findOrder(code, user);
+        if (!"PENDING".equals(order.get("status")) || "PAID".equals(order.get("payment_status")))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng không còn ở trạng thái chờ thanh toán.");
+        Long orderId = asLong(order.get("id"));
+        jdbc.update("UPDATE payments SET status='FAILED' WHERE order_id=? AND method='CASH' AND status='PENDING'", orderId);
+        jdbc.update("UPDATE orders SET payment_method='BANK_TRANSFER',payment_status='UNPAID' WHERE id=?", orderId);
+        Integer pending = jdbc.queryForObject("SELECT COUNT(*) FROM payments WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", Integer.class, orderId);
+        if (pending == null || pending == 0)
+            jdbc.update("INSERT INTO payments(order_id,method,amount,status) VALUES(?,'BANK_TRANSFER',?,'PENDING')", orderId, order.get("total_amount"));
+        String url = vnPayService.createPaymentUrl(code, money(order.get("total_amount")), clientIp, "Thanh toan don hang " + code);
+        return Map.of("code", code, "payment_url", url);
+    }
+
+    public Map<String,Object> processVnpayIpn(Map<String,String> params) {
+        if (!vnPayService.verifySignature(params)) return Map.of("RspCode", "97", "Message", "Invalid signature");
+        String code = vnPayService.getOrderCode(params);
+        if (code == null || code.isBlank()) return Map.of("RspCode", "01", "Message", "Order not found");
+        try {
+            return transactionTemplate.execute(status -> {
+                Map<String,Object> order = jdbc.query("SELECT * FROM orders WHERE order_code=? FOR UPDATE", rs -> rs.next() ? rowToMap(rs) : null, code);
+                if (order == null) return Map.of("RspCode", "01", "Message", "Order not found");
+                Long orderId = asLong(order.get("id"));
+                BigDecimal expected = money(order.get("total_amount")).multiply(new BigDecimal("100"));
+                BigDecimal received;
+                try { received = new BigDecimal(params.getOrDefault("vnp_Amount", "0")); }
+                catch (Exception ex) { return Map.of("RspCode", "04", "Message", "Invalid amount"); }
+                if (expected.compareTo(received) != 0) return Map.of("RspCode", "04", "Message", "Invalid amount");
+                if ("PAID".equals(order.get("payment_status"))) return Map.of("RspCode", "00", "Message", "Confirm Success");
+                if (!"PENDING".equals(order.get("status")) || !"BANK_TRANSFER".equals(order.get("payment_method")))
+                    return Map.of("RspCode", "01", "Message", "Order not pending for VNPAY");
+                Integer pendingPayment = jdbc.queryForObject("SELECT COUNT(*) FROM payments WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", Integer.class, orderId);
+                if (pendingPayment == null || pendingPayment == 0) return Map.of("RspCode", "01", "Message", "Payment not found");
+                if (!vnPayService.isPaymentSuccess(params)) {
+                    jdbc.update("UPDATE payments SET status='FAILED',gateway_transaction_ref=? WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", vnPayService.getTransactionNo(params), orderId);
+                    jdbc.update("UPDATE orders SET payment_status='FAILED',payment_method='BANK_TRANSFER' WHERE id=?", orderId);
+                    return Map.of("RspCode", "00", "Message", "Confirm Success");
+                }
+                Long customerId = asLong(order.get("customer_id"));
+                User customer = jdbc.query("SELECT * FROM users WHERE id=?", rs -> {
+                    if (!rs.next()) return null;
+                    User u = new User(); u.setId(rs.getLong("id")); u.setEmail(rs.getString("email")); u.setFullName(rs.getString("full_name"));
+                    return u;
+                }, customerId);
+                if (customer == null) return Map.of("RspCode", "01", "Message", "Customer not found");
+                payWithinTransaction(customer, code, "VNPAY-" + Objects.toString(vnPayService.getTransactionNo(params), "UNKNOWN"));
+                return Map.of("RspCode", "00", "Message", "Confirm Success");
+            });
+        } catch (ApiException ex) {
+            return Map.of("RspCode", "99", "Message", "Payment processing failed");
+        }
+    }
+
+    public String vnpayReturnRedirect(Map<String,String> params) {
+        // Return URL CHI chuyen huong trinh duyet ve frontend. KHONG cap nhat DB o day (IPN moi la nguon xac nhan).
+        String code = vnPayService.getOrderCode(params);
+        String result = vnPayService.verifySignature(params) && vnPayService.isPaymentSuccess(params) ? "pending" : "failed";
+        return vnPayService.buildResultRedirect(code, result);
+    }
+
+    public Map<String,Object> placeCashOrder(User user, String code) {
+        return transactionTemplate.execute(status -> {
+            Map<String,Object> order = jdbc.query("SELECT * FROM orders WHERE order_code=? AND customer_id=? FOR UPDATE", rs -> rs.next() ? rowToMap(rs) : null, code, user.getId());
+            if (order == null) throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng.");
+            if (!"PENDING".equals(order.get("status"))) throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng không còn ở trạng thái chờ xác nhận.");
+            Long orderId = asLong(order.get("id"));
+            jdbc.update("UPDATE payments SET status='FAILED' WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", orderId);
+            jdbc.update("UPDATE orders SET payment_method='CASH',payment_status='UNPAID' WHERE id=?", orderId);
+            Integer exists = jdbc.queryForObject("SELECT COUNT(*) FROM payments WHERE order_id=? AND method='CASH' AND status='PENDING'", Integer.class, orderId);
+            if (exists == null || exists == 0) jdbc.update("INSERT INTO payments(order_id,method,amount,status) VALUES(?,'CASH',?,'PENDING')", orderId, order.get("total_amount"));
+            if (order.get("design_request_id") == null) jdbc.update("DELETE FROM cart_items WHERE cart_id=(SELECT id FROM carts WHERE customer_id=?)", user.getId());
+            logs.write(user, "ORDER_CREATE", "orders", orderId, "Khách xác nhận đặt hàng thanh toán khi nhận hàng: " + code);
+            return orderByCode(code, user);
+        });
+    }
+
     public Map<String,Object> pay(User user,String code) {
         try {
-            return transactionTemplate.execute(status -> payWithinTransaction(user, code));
+            return transactionTemplate.execute(status -> payWithinTransaction(user, code, "SIM-" + UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase(Locale.ROOT)));
         } catch (ApiException ex) {
             if (ex.getStatus() == HttpStatus.CONFLICT &&
                     (ex.getMessage().contains("tồn kho") || ex.getMessage().contains("Voucher vừa hết lượt"))) {
@@ -291,7 +369,7 @@ public class ShoppingService {
         }
     }
 
-    private Map<String,Object> payWithinTransaction(User user,String code) {
+    private Map<String,Object> payWithinTransaction(User user,String code,String transactionRef) {
         Map<String,Object> order=jdbc.query(
                 "SELECT * FROM orders WHERE order_code=? AND customer_id=? FOR UPDATE",
                 rs -> rs.next() ? rowToMap(rs) : null, code, user.getId());
@@ -323,10 +401,9 @@ public class ShoppingService {
             if(used!=1) throw new ApiException(HttpStatus.CONFLICT,"Voucher vừa hết lượt hoặc hết hạn. Vui lòng tạo lại đơn hàng.");
         }
 
-        String transactionRef="SIM-"+UUID.randomUUID().toString().replace("-","").substring(0,20).toUpperCase(Locale.ROOT);
         jdbc.update("UPDATE orders SET payment_status='PAID',payment_method='BANK_TRANSFER' WHERE id=? AND payment_status<>'PAID'",orderId);
-        jdbc.update("INSERT INTO payments(order_id,method,amount,status,gateway_transaction_ref,paid_at) VALUES(?,'BANK_TRANSFER',?,'SUCCESS',?,NOW())",
-                orderId,order.get("total_amount"),transactionRef);
+        int updatedPayment = jdbc.update("UPDATE payments SET status='SUCCESS',gateway_transaction_ref=?,paid_at=NOW() WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", transactionRef, orderId);
+        if (updatedPayment == 0) jdbc.update("INSERT INTO payments(order_id,method,amount,status,gateway_transaction_ref,paid_at) VALUES(?,'BANK_TRANSFER',?,'SUCCESS',?,NOW())", orderId,order.get("total_amount"),transactionRef);
 
         if(order.get("design_request_id")==null) {
             Long cartId=ensureCart(user.getId());
@@ -340,7 +417,7 @@ public class ShoppingService {
         notifications.notify(user.getId(),"PAYMENT_SUCCESS","Thanh toán thành công","Đơn "+code+" đã được thanh toán thành công.","shop/payment-success.html?code="+code);
         Object partner=order.get("partner_id");
         if(partner!=null) notifications.notify(asLong(partner),"ORDER_PAID","Đơn hàng mới đã thanh toán","Đơn "+code+" đã được thanh toán.","partner/orders.html");
-        logs.write(user,"PAYMENT_SUCCESS","orders",orderId,"Thanh toán chuyển khoản mô phỏng thành công cho đơn "+code+". Mã giao dịch: "+transactionRef);
+        logs.write(user,"PAYMENT_SUCCESS","orders",orderId,"Thanh toán chuyển khoản thành công cho đơn "+code+". Mã giao dịch: "+transactionRef);
         return orderByCode(code,user);
     }
 
