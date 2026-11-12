@@ -150,12 +150,9 @@ public class ShoppingService {
         if (quantity < 1) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng phải từ 1 trở lên.");
         product(productId);
         Long cartId = ensureCart(user.getId());
-        Integer stock = jdbc.queryForObject("SELECT stock_quantity FROM products WHERE id=? AND status='APPROVED'", Integer.class, productId);
-        if (stock == null || stock <= 0) throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm đã hết mẫu trong ngày.");
         Integer current = jdbc.query("SELECT quantity FROM cart_items WHERE cart_id=? AND product_id=?", rs -> rs.next()?rs.getInt(1):null,cartId,productId);
         int nextQuantity = (current == null ? 0 : current) + quantity;
         if (nextQuantity > MAX_QUANTITY) throw new ApiException(HttpStatus.BAD_REQUEST,"Mỗi mẫu hoa đặt tối đa "+MAX_QUANTITY+" bó.");
-        if (nextQuantity > stock) throw new ApiException(HttpStatus.CONFLICT,"Số lượng vượt quá tồn kho hiện tại ("+stock+").");
         jdbc.update("INSERT INTO cart_items(cart_id,product_id,quantity,note) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity),note=VALUES(note)",cartId,productId,quantity,note == null || note.isBlank()?null:note.trim());
         return cartData(user.getId());
     }
@@ -165,9 +162,6 @@ public class ShoppingService {
         if (quantity < 1) throw new ApiException(HttpStatus.BAD_REQUEST,"Số lượng phải từ 1 trở lên.");
         product(productId);
         if(quantity>MAX_QUANTITY) throw new ApiException(HttpStatus.BAD_REQUEST,"Mỗi mẫu hoa đặt tối đa "+MAX_QUANTITY+" bó.");
-        Integer stock = jdbc.queryForObject("SELECT stock_quantity FROM products WHERE id=? AND status='APPROVED'", Integer.class, productId);
-        if (stock == null || stock <= 0) throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm đã hết mẫu trong ngày.");
-        if (quantity > stock) throw new ApiException(HttpStatus.CONFLICT,"Số lượng vượt quá tồn kho hiện tại ("+stock+").");
         Long cartId=ensureCart(user.getId());
         int changed=jdbc.update("UPDATE cart_items SET quantity=? WHERE cart_id=? AND product_id=?",quantity,cartId,productId);
         if(changed==0) throw new ApiException(HttpStatus.NOT_FOUND,"Sản phẩm không có trong giỏ hàng.");
@@ -249,13 +243,6 @@ public class ShoppingService {
         BigDecimal subtotal=BigDecimal.ZERO;
         for(Map<String,Object> line:lines) {
             BigDecimal unit=money(line.get("unit_price")); int qty=((Number)line.get("quantity")).intValue();
-            if (!quoteOrder && line.get("product_id") != null) {
-                Long productId = asLong(line.get("product_id"));
-                Integer stock = jdbc.query("SELECT stock_quantity FROM products WHERE id=? AND status='APPROVED'",
-                        rs -> rs.next() ? rs.getInt(1) : null, productId);
-                if (stock == null || stock < qty)
-                    throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm \""+line.get("name")+"\" không đủ tồn kho. Vui lòng cập nhật giỏ hàng.");
-            }
             subtotal=subtotal.add(unit.multiply(BigDecimal.valueOf(qty)));
         }
         BigDecimal discount=BigDecimal.ZERO; Long voucherId=null; String voucherCode=str(body,"voucher_code");
@@ -357,18 +344,6 @@ public class ShoppingService {
         });
     }
 
-    public Map<String,Object> pay(User user,String code) {
-        try {
-            return transactionTemplate.execute(status -> payWithinTransaction(user, code, "SIM-" + UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase(Locale.ROOT)));
-        } catch (ApiException ex) {
-            if (ex.getStatus() == HttpStatus.CONFLICT &&
-                    (ex.getMessage().contains("tồn kho") || ex.getMessage().contains("Voucher vừa hết lượt"))) {
-                markPaymentFailed(user, code, ex.getMessage());
-            }
-            throw ex;
-        }
-    }
-
     private Map<String,Object> payWithinTransaction(User user,String code,String transactionRef) {
         Map<String,Object> order=jdbc.query(
                 "SELECT * FROM orders WHERE order_code=? AND customer_id=? FOR UPDATE",
@@ -379,21 +354,7 @@ public class ShoppingService {
             throw new ApiException(HttpStatus.BAD_REQUEST,"Đơn hàng không còn ở trạng thái chờ thanh toán.");
 
         Long orderId=asLong(order.get("id"));
-        List<Map<String,Object>> items=jdbc.queryForList(
-                "SELECT product_id,quantity,item_name FROM order_items WHERE order_id=?",orderId);
-
-        // Trừ kho nguyên tử từng dòng. Nếu bất kỳ dòng nào thiếu hàng, transaction rollback toàn bộ.
-        for(Map<String,Object> item:items) {
-            Long productId=asLong(item.get("product_id"));
-            if(productId==null) continue; // Đơn từ báo giá không trừ kho sản phẩm mẫu.
-            int qty=((Number)item.get("quantity")).intValue();
-            int changed=jdbc.update("""
-                UPDATE products SET stock_quantity=stock_quantity-?
-                WHERE id=? AND status='APPROVED' AND stock_quantity>=?
-                """,qty,productId,qty);
-            if(changed!=1)
-                throw new ApiException(HttpStatus.CONFLICT,"Sản phẩm \""+item.get("item_name")+"\" không đủ tồn kho. Vui lòng quay lại giỏ hàng.");
-        }
+        // Cửa hàng làm hoa theo mẫu/theo đơn nên KHÔNG quản lý tồn kho: IPN hợp lệ luôn được ghi nhận.
 
         // Ghi nhận mã voucher đúng một lần; kiểm tra lại giới hạn trong transaction thanh toán.
         if(order.get("voucher_id")!=null) {
@@ -419,18 +380,6 @@ public class ShoppingService {
         if(partner!=null) notifications.notify(asLong(partner),"ORDER_PAID","Đơn hàng mới đã thanh toán","Đơn "+code+" đã được thanh toán.","partner/orders.html");
         logs.write(user,"PAYMENT_SUCCESS","orders",orderId,"Thanh toán chuyển khoản thành công cho đơn "+code+". Mã giao dịch: "+transactionRef);
         return orderByCode(code,user);
-    }
-
-    private void markPaymentFailed(User user, String code, String reason) {
-        List<Map<String,Object>> rows = jdbc.queryForList(
-                "SELECT id,total_amount,payment_status FROM orders WHERE order_code=? AND customer_id=?", code, user.getId());
-        if (rows.isEmpty() || "PAID".equals(rows.get(0).get("payment_status"))) return;
-        Long orderId = asLong(rows.get(0).get("id"));
-        String transactionRef = "SIM-FAILED-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase(Locale.ROOT);
-        jdbc.update("UPDATE orders SET payment_status='FAILED',payment_method='BANK_TRANSFER' WHERE id=? AND payment_status<>'PAID'", orderId);
-        jdbc.update("INSERT INTO payments(order_id,method,amount,status,gateway_transaction_ref) VALUES(?,'BANK_TRANSFER',?,'FAILED',?)",
-                orderId, rows.get(0).get("total_amount"), transactionRef);
-        logs.write(user, "PAYMENT_FAILED", "orders", orderId, "Thanh toán thất bại cho đơn " + code + ": " + reason);
     }
 
     private Map<String,Object> rowToMap(java.sql.ResultSet rs) throws java.sql.SQLException {
