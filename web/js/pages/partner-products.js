@@ -3,7 +3,7 @@
   'use strict'
 
   const e = FW.escapeHtml
-  const statusLabels = { APPROVED: 'Đang hiển thị', PENDING: 'Chờ duyệt', REJECTED: 'Bị từ chối' }
+  const statusLabels = { APPROVED: 'Đang hiển thị', PENDING: 'Chờ duyệt', HIDDEN: 'Đang ẩn', REJECTED: 'Bị từ chối' }
   const modalElement = document.getElementById('productModal')
   const modal = bootstrap.Modal.getOrCreateInstance(modalElement)
   const form = document.getElementById('productForm')
@@ -24,6 +24,7 @@
   function statusClass(status) {
     if (status === 'APPROVED') return 'active'
     if (status === 'PENDING') return 'pending'
+    if (status === 'HIDDEN') return 'reject'
     return 'reject'
   }
 
@@ -31,7 +32,7 @@
     const stats = [
       { label: 'Tổng sản phẩm', value: products.length, note: 'Trong danh mục của bạn', icon: 'fa-boxes-stacked', tone: 'forest' },
       { label: 'Đang bán trực tuyến', value: products.filter((product) => product.status === 'APPROVED').length, note: 'Đã được Quản lý duyệt', icon: 'fa-cart-shopping', tone: 'blue' },
-      { label: 'Bị từ chối', value: products.filter((product) => product.status === 'REJECTED').length, note: 'Sửa lại rồi gửi duyệt lại', icon: 'fa-circle-xmark', tone: 'gold' },
+      { label: 'Bị từ chối / ẩn', value: products.filter((product) => product.status === 'REJECTED' || product.status === 'HIDDEN').length, note: 'Xem lý do và chỉnh sửa để gửi duyệt lại', icon: 'fa-circle-xmark', tone: 'gold' },
       { label: 'Chờ kiểm duyệt', value: products.filter((product) => product.status === 'PENDING').length, note: 'Đang chờ phê duyệt', icon: 'fa-clipboard-check', tone: 'rose' },
     ]
     document.getElementById('productStats').innerHTML = stats.map((item) => `

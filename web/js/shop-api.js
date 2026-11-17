@@ -58,13 +58,13 @@
   };
 
   API.getProducts = async function ({
-    q = '',
-    materials = [],
-    min = 0,
-    max = Infinity,
-    sort = 'popular',
-    page = 0
-  } = {}) {
+                                      q = '',
+                                      materials = [],
+                                      min = 0,
+                                      max = Infinity,
+                                      sort = 'popular',
+                                      page = 0
+                                    } = {}) {
     const params = new URLSearchParams();
     if (q.trim()) params.set('q', q.trim());
     if (materials.length) params.set('materials', materials.join(','));
@@ -288,4 +288,18 @@
       // Header vẫn hoạt động khi khách chưa đăng nhập/backend chưa chạy.
     }
   });
+
+  // Nên - Xác nhận đơn hàng COD
+  API.placeCashOrder = async function (orderCode) {
+    return callServer(
+        '/api/orders/' + encodeURIComponent(orderCode) + '/cash',
+        { method: 'POST' }
+    );
+  };
+
+  // Thanh toan VNPAY Sandbox
+  API.startVnptPayment = async function (orderCode) {
+    return callServer('/api/orders/' + encodeURIComponent(orderCode) + '/vnpay', { method: 'POST' });
+  };
+
 })();

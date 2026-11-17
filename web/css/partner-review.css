@@ -255,6 +255,9 @@
 .review-profile-actions button { flex: 1; padding: 8px; border: 0; border-radius: 8px; font-size: 9px; font-weight: 700; }
 .review-profile-actions .approve { background: var(--fw-forest); color: #fff; }
 .review-profile-actions .reject { background: #fff0ec; color: var(--fw-rose); }
+.review-page-tabs { display: flex; gap: 6px; margin: 0 0 12px; padding: 5px; border: 1px solid var(--fw-line); border-radius: 12px; background: #fff; }
+.review-page-tabs button { padding: 9px 14px; border: 0; border-radius: 9px; background: transparent; color: var(--fw-muted); font-size: 11px; font-weight: 600; }
+.review-page-tabs button.active { background: var(--fw-sage-soft); color: var(--fw-forest); }
 
 @media (max-width: 1199.98px) {
   .review-title-row { align-items: flex-start; flex-direction: column; }
@@ -268,6 +271,7 @@
   .review-guidelines { align-items: flex-start; flex-wrap: wrap; }
   .review-guidelines strong { flex-basis: calc(100% - 30px); }
   .review-bottom-grid { grid-template-columns: 1fr; }
+  .review-page-tabs { align-items: stretch; flex-direction: column; }
   .review-export-actions { flex-wrap: wrap; }
   .review-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .review-application-row { grid-template-columns: 1fr 1fr; }

@@ -1,6 +1,7 @@
 package com.flower.server.service;
 
 import com.flower.server.common.ApiException;
+import com.flower.server.dto.AdminCategoryStats;
 import com.flower.server.dto.AdminOrderStats;
 import com.flower.server.dto.AdminRevenueStats;
 import org.springframework.http.HttpStatus;
@@ -113,6 +114,28 @@ public class AdminStatsService {
                 : total.divide(BigDecimal.valueOf(orderCount), 0, java.math.RoundingMode.HALF_UP);
         return new AdminRevenueStats(total == null ? BigDecimal.ZERO : total,
                 orderCount, average, daily, byPartner);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminCategoryStats categories(LocalDate from, LocalDate to) {
+        validateRange(from, to);
+        List<AdminCategoryStats.CategoryShare> categories = jdbc.query("""
+                        SELECT CASE WHEN oi.quote_id IS NOT NULL OR o.design_request_id IS NOT NULL THEN 'Thiết kế riêng'
+                                    ELSE COALESCE(NULLIF(oi.material, ''), 'Khác') END AS category,
+                               SUM(oi.quantity) AS quantity, COUNT(DISTINCT o.id) AS orders, SUM(oi.subtotal) AS revenue
+                        FROM orders o
+                        JOIN order_items oi ON oi.order_id = o.id
+                        WHERE o.status = 'RECEIVED' AND o.received_at >= ? AND o.received_at < ?
+                        GROUP BY category
+                        ORDER BY revenue DESC, category
+                        """,
+                (rs, row) -> new AdminCategoryStats.CategoryShare(rs.getString("category"), rs.getLong("quantity"),
+                        rs.getLong("orders"), rs.getBigDecimal("revenue")),
+                from, to.plusDays(1));
+        long quantity = categories.stream().mapToLong(AdminCategoryStats.CategoryShare::quantity).sum();
+        BigDecimal revenue = categories.stream().map(AdminCategoryStats.CategoryShare::revenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new AdminCategoryStats(quantity, revenue, categories);
     }
 
     private static Object[] orderParameters(LocalDate from, LocalDate to, Long partnerId) {

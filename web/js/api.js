@@ -25,11 +25,10 @@
 
   const fake = (data) => new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), 150))
 
-  const ALL_PRODUCTS = [...BEST_SELLERS, ...NEW_PRODUCTS]  // NÊN
-  //Nên: sau này thay = api backend
+  const ALL_PRODUCTS = [...BEST_SELLERS, ...NEW_PRODUCTS]
   const store = {
     get(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback } catch { return fallback } },
-    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)) } catch {  } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)) } catch {} },
   }
 
   const DEFAULT_VOUCHERS = [
@@ -47,7 +46,7 @@
   const SEED_COMMENTS = {
     1: [{ author: 'Minh Anh', content: 'Hoa tươi, giao đúng giờ, bó rất đẹp.', created_at: '2026-09-20' }],
   }
-  const SEED_REVIEWS = [  // Tâm làm phần đánh giá; ở đây chỉ là dữ liệu giả để hiển thị
+  const SEED_REVIEWS = [
     { author: 'Thu Hà', rating: 5, content: 'Đúng như hình, mình rất hài lòng.', created_at: '2026-09-18' },
     { author: 'Quốc Bảo', rating: 4, content: 'Hoa đẹp, giao hơi trễ một chút.', created_at: '2026-09-10' },
   ]
@@ -55,18 +54,15 @@
   window.FW_API = {
     MATERIALS,
 
-    // Sau này: return fetch('/api/products/best-sellers').then(r => r.json())
     getBestSellers() {
       return fake(BEST_SELLERS)
     },
 
-    // Sau này: return fetch('/api/products/new').then(r => r.json())
     getNewProducts() {
       return fake(NEW_PRODUCTS)
     },
 
-    //Nên — Luồng mua hàng (KH01–KH04, KH08–KH09)
-    // Sau này: fetch('/api/products?q=&material=&min=&max=&sort=')
+    // Nên — Luồng mua hàng (KH01–KH04, KH08–KH09)
     getProducts({ q = '', materials = [], min = 0, max = Infinity, sort = 'popular' } = {}) {
       const eff = (p) => p.discount_price ?? p.price
       const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -84,12 +80,10 @@
     getProductsByIds(ids) {
       return fake(ALL_PRODUCTS.filter((p) => ids.map(Number).includes(p.id)))
     },
-    // KH03 - Áp voucher. Sau này: fetch('/api/vouchers/validate', { method: 'POST', ... })
     validateVoucher(code, subtotal) {
       return fake(checkVoucher(code, subtotal))
     },
 
-    // Quản lý voucher (admin/vouchers.html). Sau này: GET/POST/PUT/DELETE /api/vouchers
     getVouchers() { return fake(loadVouchers()) },
     saveVoucher(v) {
       const list = loadVouchers()
@@ -108,8 +102,6 @@
       return fake({ ok: true })
     },
 
-    // KH04/KH09 - Tóm tắt giỏ hàng (checkout & payment dùng chung)
-    // Mỗi dòng: { product_id, quote_id, name, partner_name, thumbnail_url, unit_price, quantity }
     getCartSummary() {
       const lines = FW.cart.items().map((i) => {
         const p = ALL_PRODUCTS.find((x) => x.id === i.product_id)
@@ -118,7 +110,7 @@
       }).filter(Boolean)
       const subtotal = lines.reduce((s, l) => s + l.unit_price * l.quantity, 0)
       let code = null, discount = 0
-      try { code = localStorage.getItem('fw_voucher') } catch { /* bỏ qua */ }
+      try { code = localStorage.getItem('fw_voucher') } catch {}
       if (code) {
         const r = checkVoucher(code, subtotal)
         if (r.ok) discount = r.discount; else code = null
@@ -126,12 +118,10 @@
       return fake({ lines, subtotal, voucher_code: code, discount, total: subtotal - discount })
     },
 
-    // KH08 - Đơn từ báo giá của Bảo (1 dòng hàng có quote_id). Bảo thay bằng dữ liệu báo giá thật.
     getQuoteForPayment(quoteId) {
       return callServer('/api/design-requests/quotes/' + encodeURIComponent(quoteId) + '/payment')
     },
 
-    // KH09 - Tạo đơn sau khi khách báo đã chuyển khoản. Sau này: POST /api/orders
     newOrderCode() { return 'FW' + String(Date.now()).slice(-6) },
     createOrder({ code, lines, recipient, voucher_code, subtotal, discount, total }) {
       const orders = store.get('fw_orders', [])
@@ -146,13 +136,11 @@
     },
     getOrderByCode(code) { return fake(store.get('fw_orders', []).find((o) => o.code === code) || null) },
 
-    // Gui hoa don. Sau này: POST /api/orders/{code}/invoice
     sendInvoice(code, email) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) return fake({ ok: false, message: 'Email không hợp lệ.' })
       return fake({ ok: true })
     },
 
-    // Comment. Sau này: GET/POST /api/products/{id}/comments
     canComment(productId) { return fake(store.get('fw_purchased', []).includes(Number(productId))) },
     getComments(productId) {
       const mine = store.get('fw_comments', {})[productId] || []
@@ -164,7 +152,6 @@
       store.set('fw_comments', all)
       return fake({ ok: true })
     },
-    // đợi chuc nang danh gia cua Tam xong roi goi len day
     getReviews() { return fake(SEED_REVIEWS) },
 
     // Phong — Cổng Đối tác, kiểm duyệt & thống kê
@@ -226,6 +213,21 @@ Object.assign(window.FW_API, {
       body: JSON.stringify({ reason }),
     })
   },
+  hidePartnerProduct(productId, reason) {
+    return callServer(`/api/admin/product-approvals/${productId}/hide`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  },
+  showPartnerProduct(productId) {
+    return callServer(`/api/admin/product-approvals/${productId}/show`, { method: 'POST' })
+  },
+  getAdminOrders() {
+    return callServer('/api/admin/orders')
+  },
+  cancelUnclaimedAdminOrder(orderId) {
+    return callServer(`/api/admin/orders/${orderId}/cancel-unclaimed`, { method: 'POST' })
+  },
 })
 
 // Bảo — Diễn đàn thiết kế riêng, quản trị tài khoản & nhật ký
@@ -252,7 +254,6 @@ async function callServer(path, options = {}) {
       credentials: 'include',
       headers: {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-        // 'X-User-Id': mockUserId(),
         ...options.headers,
       },
     })
@@ -296,6 +297,10 @@ Object.assign(window.FW_API, {
   getAdminRevenueStats(params) {
     const query = new URLSearchParams(params)
     return callServer('/api/admin/stats/revenue?' + query)
+  },
+  getAdminCategoryStats(params) {
+    const query = new URLSearchParams(params)
+    return callServer('/api/admin/stats/categories?' + query)
   },
   getRecommendationModel() {
     return callServer('/api/admin/recommendations')
@@ -575,19 +580,19 @@ function renderNotifications(data) {
     badge.hidden = data.unread_count === 0
   })
   const header = '<div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">'
-    + '<strong class="small">Thông báo</strong>'
-    + (data.unread_count ? '<button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-notif-read-all>Đánh dấu đã đọc hết</button>' : '')
-    + '</div>'
+      + '<strong class="small">Thông báo</strong>'
+      + (data.unread_count ? '<button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-notif-read-all>Đánh dấu đã đọc hết</button>' : '')
+      + '</div>'
   const items = data.items.length
-    ? data.items.map(function (n) {
-      return '<button type="button" class="dropdown-item text-wrap py-2 border-bottom' + (n.read ? '' : ' fw-semibold') + '" data-notif-id="' + n.id + '" data-notif-link="' + e(n.link_url || '') + '"'
-        + (n.read ? '' : ' style="background: var(--fw-cream, #fdf8f3)"') + '>'
-        + '<div class="small">' + (n.read ? '' : '<i class="fa-solid fa-circle text-rose me-1" style="font-size: 7px; vertical-align: middle"></i>') + e(n.title) + '</div>'
-        + (n.content ? '<div class="small text-muted-fw fw-normal">' + e(n.content) + '</div>' : '')
-        + '<div class="text-muted-fw fw-normal" style="font-size: 11px">' + timeAgo(n.created_at) + '</div>'
-        + '</button>'
-    }).join('')
-    : '<div class="p-3 small text-muted-fw text-center">Chưa có thông báo nào.</div>'
+      ? data.items.map(function (n) {
+        return '<button type="button" class="dropdown-item text-wrap py-2 border-bottom' + (n.read ? '' : ' fw-semibold') + '" data-notif-id="' + n.id + '" data-notif-link="' + e(n.link_url || '') + '"'
+            + (n.read ? '' : ' style="background: var(--fw-cream, #fdf8f3)"') + '>'
+            + '<div class="small">' + (n.read ? '' : '<i class="fa-solid fa-circle text-rose me-1" style="font-size: 7px; vertical-align: middle"></i>') + e(n.title) + '</div>'
+            + (n.content ? '<div class="small text-muted-fw fw-normal">' + e(n.content) + '</div>' : '')
+            + '<div class="text-muted-fw fw-normal" style="font-size: 11px">' + timeAgo(n.created_at) + '</div>'
+            + '</button>'
+      }).join('')
+      : '<div class="p-3 small text-muted-fw text-center">Chưa có thông báo nào.</div>'
   document.querySelectorAll('[data-notif-menu]').forEach(function (menu) { menu.innerHTML = header + items })
 }
 
@@ -630,3 +635,38 @@ document.addEventListener('click', async function (event) {
 document.addEventListener('change', function (event) {
   if (event.target.id === 'roleSwitch') loadNotifications()
 })
+
+Object.assign(window.FW_API, {
+  async getVouchers() {
+    const rows = await callServer('/api/admin/vouchers');
+    return (rows || []).map((v) => ({
+      ...v,
+      type: v.discount_type,
+      value: Number(v.discount_value || 0),
+      min_order: Number(v.min_order_amount || 0),
+      is_active: v.status === 'ACTIVE',
+    }));
+  },
+  async saveVoucher(v) {
+    try {
+      const body = {
+        code: String(v.code || '').trim().toUpperCase(),
+        type: v.type === 'AMOUNT' ? 'FIXED' : v.type,
+        value: Number(v.value),
+        min_order: Number(v.min_order || 0),
+        max_discount: v.max_discount == null || v.max_discount === '' ? null : Number(v.max_discount),
+      };
+      const path = v.id ? '/api/admin/vouchers/' + encodeURIComponent(v.id) : '/api/admin/vouchers';
+      await callServer(path, { method: v.id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+      return { ok: true, message: v.id ? 'Đã cập nhật voucher.' : 'Đã thêm voucher.' };
+    } catch (error) {
+      return { ok: false, message: error.message || 'Không lưu được voucher.' };
+    }
+  },
+  async toggleVoucher(code) {
+    return callServer('/api/admin/vouchers/code/' + encodeURIComponent(code) + '/toggle', { method: 'POST' });
+  },
+  async deleteVoucher(code) {
+    return callServer('/api/admin/vouchers/code/' + encodeURIComponent(code), { method: 'DELETE' });
+  },
+});
