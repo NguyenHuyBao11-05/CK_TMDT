@@ -34,36 +34,36 @@
             <div class="right-texts">
                 <div class="left-box">
                     <span class="title">TỔNG ĐƠN NĂM NAY</span>
-                    <span class="number-unit">18 đơn</span>
+                    <span class="number-unit" id="totalOrders">0 đơn</span>
                 </div>
                 <div class="right-box">
-                    <span class="title">KÝ QUỸ ĐANG GIỮ</span>
-                    <span class="number-unit">3.320.000 đ</span>
+                    <span class="title">ĐƠN ĐÃ HOÀN THÀNH</span>
+                    <span class="number-unit" id="receivedOrders">0 đơn</span>
                 </div>
             </div>
         </div>
     </section>
     <section class="section-filter">
         <div class="list-filters">
-            <div class="filter all active">
+            <div class="filter all active" data-filter="all">
                 <a href="#">Tất cả</a>
-                <span>18</span>
+                <span id="countAll">0</span>
             </div>
-            <div class="filter is-doing">
-                <a href="#">Đang xử lý / Cắm hoa</a>
-                <span>1</span>
+            <div class="filter is-doing" data-filter="doing">
+                <a href="#">Đang xử lý</a>
+                <span id="countDoing">0</span>
             </div>
-            <div class="filter delivery">
+            <div class="filter delivery" data-filter="delivery">
                 <a href="#">Đang giao hàng</a>
-                <span>1</span>
+                <span id="countDelivery">0</span>
             </div>
-            <div class="filter finished">
+            <div class="filter finished" data-filter="finished">
                 <a href="#">Đã hoàn thành</a>
-                <span>15</span>
+                <span id="countFinished">0</span>
             </div>
-            <div class="filter cancelled">
-                <a href="#">Đã hủy / Khiếu nại</a>
-                <span>1</span>
+            <div class="filter cancelled" data-filter="cancelled">
+                <a href="#">Đã hủy</a>
+                <span id="countCancelled">0</span>
             </div>
         </div>
         <div class="search-box">
@@ -99,70 +99,17 @@
             </div>
         </div>
     </section>
-    <section class="section-list-orders">
-        <div class="order">
-            <div class="upper-texts">
-                <div class="left-texts">
-                    <span class="order-id">#ORD-9842</span>
-                    <span class="order-date">Đặt lúc 08:15 - Hôm nay, 16/05/2025</span>
-                    <span class="order-state">Đang giao hàng</span>
-                </div>
-                <span class="right-text"><i class="fa-solid fa-building-columns"></i>Chuyển khoản</span>
-            </div>
-            <div class="order-content">
-                <div class="order-image">
-                    <img src="../images/flowers/autumn-bowl.jpg" alt="">
-                </div>
-                <div class="right-box">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <h1 class="order-name">Bình Tulip Trắng Hà Lan Royal Classic (15 cành)</h1>
-                            <div class="left-down-texts">
-                                <span class="made-by"><i
-                                        class="fa-solid fa-fan"></i> Xưởng: Florist Thảo Điền Atelier</span>
-                                <span class="location">Quận 2, TP.HCM</span>
-                            </div>
-                        </div>
-                        <div class="right-texts">
-                            <span class="money-title">Tổng thanh toán</span>
-                            <span class="total-money">1.870.000 đ</span>
-                            <span class="paid-state">Đã thanh toán</span>
-                        </div>
-                    </div>
-                    <span class="order-description">Kèm bình thủy tinh trụ viền sương mù mờ, thiệp chúc mừng dập nổi thủ công kèm sáp niêm phong hoa oải hương.
-                        Người nhận: Chị Mai Lan (0908 123 456).
-                    </span>
-                    <div class="shipper-box">
-                        <div class="left-texts">
-                            <i class="fa-solid fa-truck"></i>
-                            <div class="shipper-state">
-                                <div class="upper-texts">
-                                    <span>Đơn hàng đang được giao</span>
-                                    <span class="status">Đang giao</span>
-                                </div>
-                                <span>Dự kiến giao lúc 11:30 hôm nay (còn khoảng 25 phút)</span>
-                            </div>
-                        </div>
-                        <span class="shipper-name">Tài xế Hoàng Long (5.0★)</span>
-                    </div>
-                    <div class="action-box">
-                        <button class="see-image-button"><i class="fa-solid fa-images"></i> Xem ảnh nghiệm thu (3 ảnh)
-                        </button>
-                        <button class="see-order-button"><i class="fa-regular fa-file-lines"></i> Xem chi tiết hóa đơn
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section class="section-list-orders" id="orderList">
+        <p class="text-center">Đang tải đơn hàng...</p>
     </section>
     <section class="section-paging">
-        <span class="total-pages">Hiển thị 4 trên tổng số 18 đơn hàng</span>
-        <div class="paging">
-            <button class="left-paging-button"><i class="fa-solid fa-arrow-left"></i></button>
-            <button class="number-button active">1</button>
-            <button class="number-button">2</button>
-            <button class="number-button">3</button>
-            <button class="right-paging-button"><i class="fa-solid fa-arrow-right"></i></button>
+        <span class="total-pages" id="totalPages">Đang tải danh sách...</span>
+        <div class="paging" id="paging">
+            <button class="left-paging-button" id="prevPage" type="button"><i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <span id="pageNumbers"></span>
+            <button class="right-paging-button" id="nextPage" type="button"><i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
     </section>
     <section class="section-complaints">
@@ -186,5 +133,6 @@
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
 <script src="../js/header-sidebar-ui.js"></script>
+<script src="../js/pages/user-orders.js"></script>
 </body>
 </html>

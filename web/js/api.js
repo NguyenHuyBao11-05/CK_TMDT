@@ -438,6 +438,22 @@ Object.assign(window.FW_API, {
   dashboard() {
     return callServer('/api/account/dashboard', {method: 'GET'})
   },
+  getMyOrders(status = "") {
+    const query = status ? `?status=${encodeURIComponent(status)}` : "";
+    return callServer(`/api/orders/mine${query}`, {method: "GET"});
+  },
+  getOrderDetail(id) {
+    return callServer(`/api/orders/${id}`, {method: "GET"});
+  },
+  cancelOrder(id, data) {
+    return callServer(`/api/orders/${id}/cancel`, {method: "POST", body: JSON.stringify(data)});
+  },
+  receivedOrder(id) {
+    return callServer(`/api/orders/${id}/received`, {method: "POST"});
+  },
+  createOrderReview(id, data) {
+    return callServer(`/api/orders/${id}/review`, {method: "POST", body: JSON.stringify(data)});
+  },
 })
 
 async function loadAdminMenuCounts() {
