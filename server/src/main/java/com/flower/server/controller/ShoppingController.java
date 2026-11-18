@@ -74,6 +74,9 @@ public class ShoppingController {
     @PostMapping("/api/orders/{code}/cash") public Map<String,Object> cash(@PathVariable String code){
         return service.placeCashOrder(currentUser.require(Role.CUSTOMER), code);
     }
+    @PostMapping("/api/orders/{code}/transfer") public Map<String,Object> transfer(@PathVariable String code){
+        return service.placeTransferOrder(currentUser.require(Role.CUSTOMER), code);
+    }
     @PostMapping("/api/orders/{code}/vnpay") public Map<String,Object> vnpay(@PathVariable String code, HttpServletRequest request){
         return service.startVnpayPayment(currentUser.require(Role.CUSTOMER), code, request.getRemoteAddr());
     }

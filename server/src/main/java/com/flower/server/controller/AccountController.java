@@ -35,7 +35,6 @@ public class AccountController {
 
     @GetMapping("/dashboard")
     public UserDashboard dashboard() {
-        System.out.println("123");
         return accountService.getDashboard();
     }
 }

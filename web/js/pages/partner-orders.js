@@ -107,7 +107,7 @@
       button.disabled = true
       try {
         await FW_API.acceptPartnerOrder(button.dataset.acceptOrder)
-        FW.toast('Đã nhận đơn. Đơn hàng đã chuyển sang trạng thái Đang chuẩn bị.')
+        FW.toast('Đã nhận đơn. Đơn chuyển khoản sẽ chờ khách thanh toán trước khi bắt đầu làm.')
       } catch (error) {
         FW.toast(error.message)
       }
@@ -120,7 +120,7 @@
       startButton.disabled = true
       try {
         await FW_API.startPartnerOrder(startButton.dataset.startOrder)
-        FW.toast('Đã bắt đầu thực hiện đơn thiết kế riêng.')
+        FW.toast('Đã bắt đầu thực hiện đơn.')
       } catch (error) {
         FW.toast(error.message)
       }

@@ -32,15 +32,12 @@
       $('pPrice').textContent = FW.formatVnd(discounted ? product.discount_price : product.price);
       $('pOld').textContent = discounted ? FW.formatVnd(product.price) : '';
       $('pDescription').textContent = product.description || 'Chưa có mô tả cho sản phẩm này.';
-      const stock = Math.max(0, Number(product.stock_quantity || 0));
-      $('pStock').textContent = stock > 0 ? `Còn ${stock} sản phẩm trong kho.` : 'Sản phẩm đã hết mẫu trong ngày.';
+      $('pStock').textContent = 'Shop Đối tác cắm hoa theo đơn, giao trong ngày.';
       $('detail').hidden = false;
       $('extra').hidden = false;
 
-      $('qtyPlus').disabled = stock <= 1;
+      $('qtyPlus').disabled = false;
       $('qtyMinus').disabled = true;
-      $('addBtn').disabled = stock <= 0;
-      $('buyBtn').disabled = stock <= 0;
 
       await Promise.allSettled([loadReviews(), loadComments(), loadRelated()]);
     } catch (error) {
@@ -94,14 +91,14 @@
     qty = Math.max(1, qty - 1);
     $('qtyVal').textContent = qty;
     $('qtyMinus').disabled = qty <= 1;
-    $('qtyPlus').disabled = !product || qty >= Math.min(50, Number(product.stock_quantity || 0));
+    $('qtyPlus').disabled = !product || qty >= 50;
   });
 
   $('qtyPlus').addEventListener('click', () => {
-    qty = Math.min(50, Number(product?.stock_quantity || 0), qty + 1);
+    qty = Math.min(50, qty + 1);
     $('qtyVal').textContent = qty;
     $('qtyMinus').disabled = qty <= 1;
-    $('qtyPlus').disabled = qty >= Math.min(50, Number(product?.stock_quantity || 0));
+    $('qtyPlus').disabled = qty >= 50;
   });
 
   async function addToCart(goToCart) {

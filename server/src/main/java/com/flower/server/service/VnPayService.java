@@ -38,7 +38,7 @@ public class VnPayService {
                 + enc(orderCode == null ? "" : orderCode) + "&payment=" + enc(result);
     }
 
-    public String createPaymentUrl(String orderCode, BigDecimal amount, String clientIp, String orderInfo) {
+    public String createPaymentUrl(String orderCode, BigDecimal amount, String clientIp, String orderInfo, LocalDateTime expireAt) {
         if (tmnCode.isBlank() || hashSecret.isBlank())
             throw new IllegalStateException("Chưa cấu hình VNPAY_TMN_CODE và VNPAY_HASH_SECRET.");
         Map<String,String> params = new TreeMap<>();
@@ -55,7 +55,9 @@ public class VnPayService {
         params.put("vnp_IpAddr", normalizeIp(clientIp));
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         params.put("vnp_CreateDate", now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
-        params.put("vnp_ExpireDate", now.plusMinutes(15).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        LocalDateTime expire = now.plusMinutes(15);
+        if (expireAt != null && expireAt.isBefore(expire)) expire = expireAt;
+        params.put("vnp_ExpireDate", expire.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         String hashData = buildQuery(params, false);
         params.put("vnp_SecureHash", hmacSha512(hashSecret, hashData));
         return PAYMENT_URL + "?" + buildQuery(params, true);

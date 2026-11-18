@@ -247,10 +247,6 @@
     });
   };
 
-  API.payOrder = async function (orderCode) {
-    return callServer('/api/orders/' + encodeURIComponent(orderCode) + '/pay', { method: 'POST' });
-  };
-
   API.getOrderByCode = async function (code) {
     return callServer('/api/orders/by-code/' + encodeURIComponent(code));
   };
@@ -295,6 +291,10 @@
         '/api/orders/' + encodeURIComponent(orderCode) + '/cash',
         { method: 'POST' }
     );
+  };
+
+  API.placeTransferOrder = async function (orderCode) {
+    return callServer('/api/orders/' + encodeURIComponent(orderCode) + '/transfer', { method: 'POST' });
   };
 
   // Thanh toan VNPAY Sandbox

@@ -19,7 +19,7 @@
     $('bankInfo').hidden = method !== 'BANK_TRANSFER';
     $('paidBtn').textContent = method === 'CASH'
         ? 'Xác nhận đặt hàng COD'
-        : 'Tiếp tục thanh toán VNPAY';
+        : quoteId ? 'Tiếp tục thanh toán VNPAY' : 'Đặt hàng, thanh toán sau khi shop nhận';
   }
 
   document.querySelectorAll('input[name="paymentMethod"]').forEach((radio) => {
@@ -54,6 +54,11 @@
       }
 
       $('payBody').hidden = false;
+      if (!quoteId) {
+        $('orderRules').hidden = false;
+        $('bankLabel').textContent = 'Chuyển khoản qua VNPAY (sau khi shop nhận đơn)';
+        $('bankText').textContent = 'Đơn được gửi tới các shop. Khi có shop nhận, bạn có 30 phút để thanh toán qua VNPAY. Trước đó bạn chưa bị trừ tiền.';
+      }
 
       $('orderLines').innerHTML = summary.lines.map((line) => `
         <div class="d-flex justify-content-between gap-2 small">
@@ -106,6 +111,20 @@
 
       if (method === 'CASH') {
         const result = await FW_API.placeCashOrder(pending.code);
+
+        localStorage.removeItem('fw_pending_order');
+        localStorage.removeItem('fw_voucher');
+        localStorage.removeItem('fw_checkout');
+        localStorage.removeItem('fw_cart_items');
+
+        location.href = FW.url(
+            'shop/payment-success.html?code=' + encodeURIComponent(pending.code)
+        );
+        return;
+      }
+
+      if (method === 'BANK_TRANSFER' && !quoteId) {
+        await FW_API.placeTransferOrder(pending.code);
 
         localStorage.removeItem('fw_pending_order');
         localStorage.removeItem('fw_voucher');

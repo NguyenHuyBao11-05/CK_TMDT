@@ -182,11 +182,10 @@ function renderOrderCard(order) {
     const createdAt = formatOrderDate(order.created_at);
     const totalAmount = formatOrderMoney(order.total_amount);
     const paymentButton = order.can_continue_payment ? `
-            <button class="see-order-button" type="button" disabled
-                title="Chức năng thanh toán tiếp sẽ được kết nối ở bước sau">
+            <a class="see-order-button" href="../shop/payment-success.html?code=${encodeURIComponent(order.order_code)}">
                 <i class="fa-solid fa-credit-card"></i>
                 Thanh toán tiếp
-            </button>
+            </a>
         ` : "";
 
     const orderClass = order.status === "CANCELLED" ? "order cancelled-order" : "order";
@@ -195,7 +194,7 @@ function renderOrderCard(order) {
         <div class="${orderClass}">
             <div class="upper-texts">
                 <div class="left-texts">
-                    <span class="order-id">#${escapeOrderHtml(order.orderCode || order.id)}</span>
+                    <span class="order-id">#${escapeOrderHtml(order.order_code || order.id)}</span>
                     <span class="order-date">Đặt lúc ${createdAt}</span>
                     <span class="order-state ${order.status === "CANCELLED" ? "cancelled-status" : ""}">${status}</span>
                 </div>

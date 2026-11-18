@@ -30,10 +30,13 @@ public class PartnerOrderService {
     private final LogService logService;
     private final NotificationService notificationService;
     private final Path uploadDir;
+    private final long paymentMinutes;
 
     public PartnerOrderService(JdbcTemplate jdbc, LogService logService, NotificationService notificationService,
-                               @Value("${app.upload-dir}") String uploadDir) {
+                               @Value("${app.upload-dir}") String uploadDir,
+                               @Value("${app.order-payment-minutes}") long paymentMinutes) {
         this.jdbc = jdbc;
+        this.paymentMinutes = paymentMinutes;
         this.logService = logService;
         this.notificationService = notificationService;
         this.uploadDir = Path.of(uploadDir).toAbsolutePath().normalize();
@@ -41,12 +44,12 @@ public class PartnerOrderService {
 
     @Transactional(readOnly = true)
     public List<PartnerOrderView> available(User partner) {
-        return queryOrders("v_available_orders o", """
+        return queryOrders("orders o", """
                 o.status = 'PENDING'
                 AND o.partner_id IS NULL
                 AND o.design_request_id IS NULL
-                AND (o.payment_method = 'CASH'
-                     OR (o.payment_method = 'BANK_TRANSFER' AND o.payment_status = 'PAID'))
+                AND o.payment_method IN ('CASH', 'BANK_TRANSFER')
+                AND o.payment_status <> 'FAILED'
                 """);
     }
 
@@ -81,12 +84,14 @@ public class PartnerOrderService {
             throw new ApiException(HttpStatus.CONFLICT, "Đơn đã có Đối tác khác nhận hoặc không còn khả dụng.");
         }
 
+        boolean waitPayment = "BANK_TRANSFER".equals(order.get("payment_method"))
+                && !"PAID".equals(order.get("payment_status"));
         int updated = jdbc.update("""
                 UPDATE orders
-                SET partner_id = ?, status = 'PROCESSING'
+                SET partner_id = ?, accepted_at = NOW(), status = ?
                 WHERE id = ? AND status = 'PENDING' AND partner_id IS NULL AND design_request_id IS NULL
-                  AND (payment_method = 'CASH' OR (payment_method = 'BANK_TRANSFER' AND payment_status = 'PAID'))
-                """, partner.getId(), orderId);
+                  AND payment_method IN ('CASH', 'BANK_TRANSFER') AND payment_status <> 'FAILED'
+                """, partner.getId(), waitPayment ? "PENDING" : "PROCESSING", orderId);
         if (updated == 0) {
             throw new ApiException(HttpStatus.CONFLICT, "Đơn đã có Đối tác khác nhận.");
         }
@@ -94,27 +99,32 @@ public class PartnerOrderService {
         Long customerId = ((Number) order.get("customer_id")).longValue();
         String orderCode = (String) order.get("order_code");
         logService.write(partner, "ORDER_ACCEPT", "orders", orderId, "Nhận đơn " + orderCode + ".");
-        notificationService.notify(customerId, "ORDER_ACCEPTED", "Đơn hàng đã được tiếp nhận",
-                "Đối tác " + partner.getFullName() + " đã nhận đơn " + orderCode + " và bắt đầu chuẩn bị hoa.",
-                "account/orders.html");
+        if (waitPayment) {
+            notificationService.notify(customerId, "ORDER_ACCEPTED", "Đơn hàng đã có Đối tác nhận, vui lòng thanh toán",
+                    "Đối tác " + partner.getFullName() + " đã nhận đơn " + orderCode + ". Bạn hãy thanh toán qua VNPAY trong "
+                            + paymentMinutes + " phút, quá hạn đơn sẽ tự huỷ.",
+                    "shop/payment-success.html?code=" + orderCode);
+        } else {
+            notificationService.notify(customerId, "ORDER_ACCEPTED", "Đơn hàng đã được tiếp nhận",
+                    "Đối tác " + partner.getFullName() + " đã nhận đơn " + orderCode + " và bắt đầu chuẩn bị hoa.",
+                    "account/orders.html");
+        }
     }
 
     @Transactional
     public void start(User partner, Long orderId) {
         Map<String, Object> order = findOrderForUpdate(orderId);
         if (!partner.getId().equals(nullableNumber(order.get("partner_id")))
-                || order.get("design_request_id") == null
                 || !"PENDING".equals(order.get("status"))
                 || !"PAID".equals(order.get("payment_status"))) {
             throw new ApiException(HttpStatus.CONFLICT,
-                    "Đơn thiết kế riêng chưa được thanh toán, không thuộc bạn hoặc không còn chờ bắt đầu.");
+                    "Đơn chưa được thanh toán, không thuộc bạn hoặc không còn chờ bắt đầu.");
         }
 
         int updated = jdbc.update("""
                 UPDATE orders
                 SET status = 'PROCESSING'
-                WHERE id = ? AND partner_id = ? AND design_request_id IS NOT NULL
-                  AND status = 'PENDING' AND payment_status = 'PAID'
+                WHERE id = ? AND partner_id = ? AND status = 'PENDING' AND payment_status = 'PAID'
                 """, orderId, partner.getId());
         if (updated == 0) {
             throw new ApiException(HttpStatus.CONFLICT, "Đơn không còn ở trạng thái chờ bắt đầu.");
@@ -258,8 +268,7 @@ public class PartnerOrderService {
     }
 
     private static boolean isAvailablePayment(Object method, Object paymentStatus) {
-        return "CASH".equals(method)
-                || ("BANK_TRANSFER".equals(method) && "PAID".equals(paymentStatus));
+        return ("CASH".equals(method) || "BANK_TRANSFER".equals(method)) && !"FAILED".equals(paymentStatus);
     }
 
     private static final class OrderBuilder {

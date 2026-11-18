@@ -43,7 +43,7 @@
               <input type="radio" name="paymentMethod" value="BANK_TRANSFER">
               <span>
                 <i class="fa-solid fa-building-columns me-2 text-forest"></i>
-                Chuyển khoản ngân hàng qua VNPAY
+                <span id="bankLabel">Chuyển khoản ngân hàng qua VNPAY</span>
               </span>
             </label>
           </div>
@@ -57,10 +57,18 @@
 
           <div id="bankInfo" class="p-4 bg-white border rounded-4 mb-3" hidden>
             <h2 class="h5 font-serif mb-2">Chuyển khoản qua VNPAY</h2>
-            <p class="text-muted-fw mb-0">
-              Sau khi hệ thống được cấu hình thông tin kết nối VNPAY Sandbox,
-              bạn sẽ được chuyển đến trang thanh toán của VNPAY.
+            <p class="text-muted-fw mb-0" id="bankText">
+              Bạn sẽ được chuyển đến trang thanh toán của VNPAY.
             </p>
+          </div>
+
+          <div id="orderRules" class="p-4 border rounded-4 mb-3" style="background: var(--fw-cream);" hidden>
+            <h2 class="h6 mb-2"><i class="fa-solid fa-circle-info me-2 text-forest"></i>Quy định đặt mẫu hoa có sẵn</h2>
+            <ul class="small mb-0 ps-3">
+              <li>Đơn được gửi tới các shop Đối tác, shop nhận trước sẽ thực hiện.</li>
+              <li>Sau <strong>2 giờ</strong> chưa có shop nào nhận, đơn tự huỷ.</li>
+              <li>Chọn chuyển khoản: bạn chỉ thanh toán sau khi shop nhận đơn, trong vòng <strong>30 phút</strong>. Quá hạn đơn tự huỷ, bạn không bị trừ tiền.</li>
+            </ul>
           </div>
 
           <div class="p-4 bg-white border rounded-4">
