@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -45,209 +44,74 @@
                            placeholder="Tìm mã khiếu nại, mã đơn hàng...">
                 </div>
                 <div class="list-filters">
-                    <span class="filter all">Tất cả (4)</span>
-                    <span class="filter important">Cần phản hồi (2)</span>
-                    <span class="filter delivery">Đang hòa giải (1)</span>
-                    <span class="filter resolved">Đã giải quyết (1)</span>
+                    <span class="filter all active" data-filter="ALL">Tất cả (<span id="countAll">0</span>)</span>
+                    <span class="filter important" data-filter="NEED_REPLY">Cần phản hồi (<span
+                            id="countNeedReply">0</span>)</span>
+                    <span class="filter delivery" data-filter="PENDING_REVIEW">Chờ Quản lý (<span
+                            id="countReview">0</span>)</span>
+                    <span class="filter resolved" data-filter="RESOLVED">Đã giải quyết (<span
+                            id="countResolved">0</span>)</span>
                 </div>
             </div>
-            <div class="list-complaints">
-                <div class="complaint-item important">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7702</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9842</span>
-                        </div>
-                        <span class="complaint-status important">
-                            Cần phản hồi
-                        </span>
-                    </div>
-                    <span class="complaint-title">Hoa bị dập gãy cánh và sai tone màu cam đào</span>
-                    <div class="complaint-info-box">
-                        <span class="user"><i class="fa-solid fa-user"></i> Khách: Chị Trần Thanh Hà</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 1.650.000 đ</span>
-                        <span class="time"><i class="fa-regular fa-clock"></i> Còn 1 giờ 15 phút</span>
-                    </div>
-                </div>
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7703</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9850</span>
-                        </div>
-                        <span class="complaint-status late-delivery">Chậm giao</span>
-                    </div>
-                    <span class="complaint-title">Đơn hoa giao trễ 1 giờ so với thời gian đã cam kết</span>
-                    <div class="complaint-info-box">
-                        <span class="user"><i class="fa-solid fa-user"></i> Khách: Anh Nguyễn Minh Khang</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i>920.000 đ</span>
-                        <span class="time"><i class="fa-regular fa-clock"></i>30 phút trước</span>
-                    </div>
-                </div>
-
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7704</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9861</span>
-                        </div>
-                        <span class="complaint-status mediation">Đang hòa giải</span>
-                    </div>
-                    <span class="complaint-title">Khách hàng phản ánh sản phẩm không giống mẫu đã đặt</span>
-                    <div class="complaint-info-box">
-                        <span class="user"><i class="fa-solid fa-user"></i> Khách: Chị Lê Ngọc Mai</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 1.250.000 đ</span>
-                        <span class="time"><i class="fa-regular fa-clock"></i> 2 giờ trước</span>
-                    </div>
-                </div>
-
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7698</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9810</span>
-                        </div>
-                        <span class="complaint-status resolved">Đã giải quyết</span>
-                    </div>
-                    <span class="complaint-title">Thiếu thiệp chúc mừng trong đơn hàng</span>
-                    <div class="complaint-info-box">
-                        <span class="user"><i class="fa-solid fa-user"></i> Khách: Anh Phạm Quốc Bảo</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 450.000 đ</span>
-                        <span class="time"><i class="fa-regular fa-clock"></i> Đã hoàn tất</span>
-                    </div>
-                </div>
+            <div class="list-complaints" id="complaintsList">
+                <div class="text-center py-4">Đang tải danh sách khiếu nại...</div>
             </div>
         </div>
         <div class="right-container">
             <div class="start-header">
                 <div class="left-texts">
                     <div class="upper-texts">
-                        <span class="complaint-status important">Cần phản hồi</span>
-                        <span class="complaint-id">Mã khiếu nại: #KN-7702</span>
+                        <span class="complaint-status important" id="detailStatus">Cần phản hồi</span>
+                        <span class="complaint-id" id="detailComplaintId">Mã khiếu nại: #KN-7702</span>
                     </div>
-                    <h1>Đơn #ORD-9842 • Khiếu nại hư hỏng hoa và sai mẫu</h1>
-                    <span class="deadline"><i class="fa-regular fa-clock"></i> Hạn phản hồi: 22/10/2026, 16:00</span>
+                    <h1 id="detailTitle">Chọn một khiếu nại để xem chi tiết</h1>
+                    <span class="deadline" id="deadline"><i class="fa-regular fa-clock"></i> Hạn phản hồi: ...</span>
                 </div>
-
                 <div class="right-box">
                     <i class="fa-solid fa-lock"></i>
                     <div class="flex-horizontal-box">
                         <span class="label">Giá trị đơn hàng</span>
-                        <span class="red-text">1.650.000 đ</span>
+                        <span class="red-text" id="detailOrderTotal">0 đ</span>
                         <span class="sub-label">Chờ xử lý khiếu nại</span>
                     </div>
                 </div>
             </div>
-
             <div class="user-box">
                 <img class="avatar" src="../images/favicon.svg" alt="">
                 <div class="flex-horizontal-box">
                     <div class="side">KHÁCH HÀNG KHIẾU NẠI</div>
-                    <div class="user-name">Chị Trần Thanh Hà</div>
-                    <div class="more-info">Mã đơn: #ORD-9842</div>
+                    <div class="user-name" id="detailCustomerName">—</div>
+                    <div class="more-info" id="detailOrderCode">Mã đơn: —</div>
                 </div>
             </div>
-
-
             <div class="order-box">
-                <div class="left-box">
-                    <img src="../images/flowers/autumn-bowl.jpg" alt="Bình hoa Tulip">
-                    <div class="inner-texts">
-                        <span class="order-id">THÔNG TIN SẢN PHẨM</span>
-                        <h2 class="order-name">Bình Tulip Trắng Hà Lan Royal Classic</h2>
-                        <div class="down-texts">
-                            <span class="florist-label"><i class="fa-solid fa-box"></i> Sản phẩm đã giao</span>
-                            <span class="florist-name">Số lượng: 1 bình</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="right-box">
-                    <span class="label">Tổng giá trị đơn</span>
-                    <span class="status">1.650.000 đ</span>
+                <div class="left-box" id="detailProducts"></div>
+                <div class="down-texts">
+                    <span class="florist-name" id="detailProductQuantity">Số lượng: —</span>
                 </div>
             </div>
             <div class="reason-box">
                 <span class="reason-label"><i class="fa-solid fa-circle-exclamation"></i>NỘI DUNG KHIẾU NẠI TỪ KHÁCH HÀNG</span>
-                <span class="reason-description">“Hoa bị dập nát 4 cánh tulip khi vận chuyển, không đúng cam kết độ tươi 100%. Bình giao trễ 20 phút và nước cắm bị đổ lem ra thiệp chúc mừng.”</span>
+                <span class="reason-description" id="detailDescription">Chọn một khiếu nại trong danh sách để xem nội dung.</span>
                 <div class="complaint-info-box">
-                    <span><i class="fa-regular fa-calendar"></i> Gửi lúc: 24/10/2025, 16:30</span>
+                    <i class="fa-regular fa-calendar"></i>
+                    <span id="detailCreatedAt"> Gửi lúc: ...</span>
                 </div>
             </div>
-            <div class="compare-image-box">
+            <div id="previousPartnerResponse" class="reason-box" style="display: none;">
+                <span class="reason-label"><i class="fa-solid fa-reply"></i>PHẢN HỒI TRƯỚC ĐÓ CỦA ĐỐI TÁC</span>
+                <span id="previousPartnerResponseContent"></span>
+            </div>
+            <div class="compare-image-box" id="detailEvidenceBox" style="display: none;">
                 <div class="upper-title">
-                    <span><i class="fa-regular fa-images"></i> Đối chiếu bằng chứng</span>
-                    <span class="image-state">3 hình ảnh • 1 video mở hộp</span>
+                    <span><i class="fa-regular fa-images"></i> Bằng chứng từ khách hàng</span>
                 </div>
-
                 <div class="comparing-images">
-                    <div class="left image">
-                        <div class="upper-texts">
-                            <span class="check"><i class="fa-solid fa-check-circle"></i> Bằng chứng từ Đối tác</span>
-                            <span>Trước khi giao</span>
-                        </div>
-                        <img src="../images/flowers/autumn-bowl.jpg" alt="">
-                        <span class="description">Ảnh sản phẩm tại xưởng trước khi đóng gói, thể hiện tình trạng hoa và quy cách bảo vệ khi bàn giao cho đơn vị vận chuyển.</span>
-                    </div>
                     <div class="right image">
-                        <div class="upper-texts">
-                            <span class="bad"><i class="fa-solid fa-triangle-exclamation"></i> Bằng chứng từ Khách hàng</span>
-                            <span>Sau khi nhận</span>
-                        </div>
-                        <img src="../images/flowers/autumn-bowl.jpg" alt="Ảnh hoa sau khi nhận">
-                        <span class="description">Khách hàng phản ánh cánh hoa bị dập, thân hoa gãy và bao bì bị biến dạng. Cần đối chiếu để xác định nguyên nhân.
-                        </span>
+                        <img id="detailEvidenceImage" src="" alt="Bằng chứng khiếu nại">
                     </div>
                 </div>
             </div>
-            <div class="steps-box">
-                <div class="upper-texts">
-                    <span class="step-label">Lịch sử xử lý khiếu nại</span>
-                    <span class="step-date">Mã vụ việc: #KN-7702</span>
-                </div>
-                <div class="list-steps">
-                    <div class="step-1">
-                        <span class="icon"><i class="fa-solid fa-check"></i></span>
-                        <div class="step-content">
-                            <div class="upper-texts">
-                                <span class="step-title">Bước 1: Khách hàng gửi khiếu nại</span>
-                                <span class="step-date">16:30 • Đã hoàn thành</span>
-                            </div>
-                            <span class="step-description">Hệ thống đã tiếp nhận nội dung khiếu nại và bằng chứng do khách hàng cung cấp.</span>
-                        </div>
-                    </div>
-                    <div class="step-2">
-                        <span class="icon"><i class="fa-solid fa-ellipsis"></i></span>
-                        <div class="step-content">
-                            <div class="upper-texts">
-                                <span class="step-title">Bước 2: Đối tác kiểm tra và phản hồi</span>
-                            </div>
-                            <span class="step-description">Vui lòng kiểm tra ảnh trước khi giao, thông tin đóng gói và quá trình bàn giao cho đơn vị vận chuyển.</span>
-                        </div>
-                    </div>
-                    <div class="step-3">
-                        <span class="icon"><i class="fa-solid fa-scale-balanced"></i></span>
-                        <div class="step-content">
-                            <div class="upper-texts">
-                                <span class="step-title">Bước 3: Quản lý Fw12 hòa giải</span>
-                            </div>
-                            <span class="step-description">Nếu hai bên chưa thống nhất phương án, hồ sơ sẽ được chuyển đến Quản lý Fw12 để xem xét và đưa ra kết quả.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="response-box">
                 <div class="upper-title">
                     <span><i class="fa-solid fa-reply"></i> Phản hồi khiếu nại</span>
@@ -258,11 +122,9 @@
                         <label for="responseType">Hướng xử lý đề xuất</label>
                         <select id="responseType" name="responseType" required>
                             <option value="">-- Chọn phương án xử lý --</option>
-                            <option value="explain">Giải trình và cung cấp thông tin</option>
-                            <option value="partial-refund">Đề xuất hoàn tiền một phần</option>
-                            <option value="full-refund">Đề xuất hoàn tiền toàn bộ</option>
-                            <option value="replacement">Đề xuất đổi sản phẩm mới</option>
-                            <option value="other">Phương án khác</option>
+                            <option value="PARTIAL_REFUND">Hoàn tiền một phần</option>
+                            <option value="REMAKE">Làm lại sản phẩm</option>
+                            <option value="EXPLANATION">Giải thích</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -270,28 +132,19 @@
                         <textarea id="responseContent" name="responseContent" rows="5" maxlength="2000"
                                   placeholder="Trình bày kết quả kiểm tra, nguyên nhân sự cố và phương án giải quyết..."
                                   required></textarea>
+                        <small id="responseContentCount">0/2000 ký tự</small>
                     </div>
-
-                    <div class="form-group">
-                        <label for="partnerEvidence">Bổ sung bằng chứng (nếu có)</label>
-                        <label class="upload-box" for="partnerEvidence">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Chọn hình ảnh hoặc video Tải lên bằng chứng đóng gói, bàn giao hoặc trao đổi với đơn vị vận chuyển.</span>
-                        </label>
-                        <input id="partnerEvidence" name="partnerEvidence" type="file" accept="image/*,video/*"
-                               multiple>
-                    </div>
-
                     <div class="response-note">
                         <i class="fa-solid fa-circle-info"></i>
-                        <span>Phản hồi sẽ được gửi đến khách hàng và lưu trong hồ sơ khiếu nại. Nếu không đạt được thỏa thuận, Quản lý Fw12 sẽ tiếp tục hòa giải.</span>
+                        <span>Phản hồi sẽ được gửi đến khách hàng và Admin để xem xét.</span>
                     </div>
-
+                    <div id="responseError" class="text-danger mb-2"></div>
                     <div class="actions-box">
-                        <button type="button" class="see-history-button"><i class="fa-solid fa-arrow-left"></i> Quay lại
+                        <button type="button" class="see-history-button" id="backToListBtn"><i
+                                class="fa-solid fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="submit" class="submit-response-button"><i class="fa-solid fa-paper-plane"></i> Gửi
-                            phản hồi
+                        <button type="submit" class="submit-response-button" id="submitResponseBtn"><i
+                                class="fa-solid fa-paper-plane"></i> Gửi phản hồi
                         </button>
                     </div>
                 </form>
@@ -305,5 +158,6 @@
 <script src="../js/pages/partner-navigation.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/pages/partner-complaint.js"></script>
 </body>
 </html>

@@ -38,7 +38,7 @@
                     <i class="fa-solid fa-circle"></i>
                     <div class="flex-vertical-box">
                         <span class="label">Cần giải quyết</span>
-                        <span class="content">5 Khiếu nại</span>
+                        <span class="content" id="pendingComplaintCount">0 Khiếu nại</span>
                     </div>
                 </div>
             </div>
@@ -49,89 +49,31 @@
             <div class="search-box">
                 <div class="search-bar">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <label for="searchInput"></label><input id="searchInput" name="searchInput" class="form-text-input" placeholder="Tìm theo mã khiếu nại, tên khách...">
+                    <label for="searchInput"></label><input id="searchInput" name="searchInput" class="form-text-input"
+                                                            placeholder="Tìm theo mã khiếu nại, tên khách...">
                 </div>
                 <div class="list-filters">
-                    <span class="filter all">Tất cả (5)</span>
+                    <span class="filter all active" data-filter="ALL" id="allComplaintsFilter">Tất cả (0)</span>
                 </div>
             </div>
-            <div class="list-complaints">
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7702</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9842</span>
-                        </div>
-                        <span class="complaint-status question">Thắc mắc</span>
-                    </div>
-                    <span class="complaint-title">Hoa nhận bị dập gãy cánh và sai tone màu cam đào sang màu hồng nhạt</span>
-                    <div class="complaint-info-box">
-                        <span class="user">Khách: Chị Trần Thanh Hà</span>
-                        <i class="fa-solid fa-circle"></i>
-                        <span class="florist">Đối tác: Thảo Điền Atelier</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 1.650.000 đ</span>
-                        <span class="time">45 phút trước</span>
-                    </div>
-                </div>
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7702</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9842</span>
-                        </div>
-                        <span class="complaint-status late-delivery">Chậm giao</span>
-                    </div>
-                    <span class="complaint-title">Giao trễ hẹn 1 giờ 30 phút so với giờ khai mạc</span>
-                    <div class="complaint-info-box">
-                        <span class="user">Khách: Chị Trần Thanh Hà</span>
-                        <i class="fa-solid fa-circle"></i>
-                        <span class="florist">Đối tác: Thảo Điền Atelier</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 1.650.000 đ</span>
-                        <span class="time">45 phút trước</span>
-                    </div>
-                </div>
-                <div class="complaint-item">
-                    <div class="upper-texts">
-                        <div class="left-texts">
-                            <span class="complaint-id">#KN-7702</span>
-                            <i class="fa-solid fa-circle"></i>
-                            <span class="order-id">#ORD-9842</span>
-                        </div>
-                        <span class="complaint-status question">Thắc mắc</span>
-                    </div>
-                    <span class="complaint-title">Thiếu thiệp chúc mừng thiết kế viết tay đi…</span>
-                    <div class="complaint-info-box">
-                        <span class="user">Khách: Chị Trần Thanh Hà</span>
-                        <i class="fa-solid fa-circle"></i>
-                        <span class="florist">Đối tác: Thảo Điền Atelier</span>
-                    </div>
-                    <div class="down-texts">
-                        <span class="money"><i class="fa-solid fa-wallet"></i> 1.650.000 đ</span>
-                        <span class="time">45 phút trước</span>
-                    </div>
-                </div>
+            <div class="list-complaints" id="complaintsList">
+                <div class="text-center py-4">Đang tải danh sách khiếu nại...</div>
             </div>
         </div>
         <div class="right-container">
             <div class="start-header">
                 <div class="left-texts">
                     <div class="upper-texts">
-                        <span class="complaint-status">Thắc mắc</span>
-                        <span class="complaint-id">Mã Khiếu nại: #KN-7702</span>
+                        <span class="complaint-status" id="detailStatus">Chưa chọn</span>
+                        <span class="complaint-id" id="detailComplaintId">Mã khiếu nại: —</span>
                     </div>
-                    <h1>Đơn #ORD-9842 • Tranh chấp hư hỏng hoa tươi & Sai mẫu cam đào</h1>
+                    <h1 id="detailTitle">Chọn một khiếu nại để xem chi tiết</h1>
                 </div>
                 <div class="right-box">
                     <i class="fa-solid fa-dollar-sign"></i>
                     <div class="flex-vertical-box">
-                        <span class="label">Ký quỹ bảo chứng</span>
-                        <span class="green-text">1.650.000 đ</span>
+                        <span class="label">Giá trị đơn hàng</span>
+                        <span class="green-text" id="detailOrderTotal">—</span>
                     </div>
                 </div>
             </div>
@@ -140,54 +82,52 @@
                     <img class="avatar" src="../images/favicon.svg" alt="">
                     <div class="flex-vertical-box">
                         <div class="side">NGƯỜI KHIẾU NẠI (KHÁCH HÀNG)</div>
-                        <div class="user-name">Chị Trần Thanh Hà</div>
-                        <div class="more-info">0908.223.***</div>
+                        <div class="user-name" id="detailCustomerName">—</div>
                     </div>
                 </div>
+
                 <div class="florist-box">
                     <img class="avatar" src="../images/favicon.svg" alt="">
                     <div class="flex-vertical-box">
-                        <div class="side">BÊN BỊ KHIẾU NẠI (FLORIST ATELIER)</div>
-                        <div class="user-name">Florist Thảo Điền Atelier</div>
-                        <div class="more-info">Đánh giá 4.9★ • Tỷ lệ hoàn tất đơn: 98.4%</div>
+                        <div class="side">BÊN BỊ KHIẾU NẠI (ĐỐI TÁC)</div>
+                        <div class="user-name" id="detailPartnerName">—</div>
                     </div>
                 </div>
             </div>
             <div class="compare-image-box">
                 <div class="upper-title">
-                    <span><i class="fa-regular fa-images"></i> Đối Chiếu Bằng Chứng Ảnh Thực Tế (Visual Proof Comparison)</span>
+                    <span><i class="fa-regular fa-images"></i>Bằng chứng ảnh khiếu nại</span>
                 </div>
                 <div class="comparing-images">
-                    <div class="left image">
-                        <div class="upper-texts">
-                            <span class="check"><i class="fa-regular fa-circle-check"></i> Ảnh Đối tác chụp khi giao (Tại xưởng 14:15)</span>
-                            <span>Tem niêm phong OK</span>
-                        </div>
-                        <img src="../images/flowers/autumn-bowl.jpg" alt="">
-                        <span class="description">Hoa đúng tone cam đào ấm, cánh hoa căng mọng, có bọc xốp chống va đập nguyên khối.</span>
-                    </div>
                     <div class="right image">
                         <div class="upper-texts">
-                            <span class="bad"><i class="fa-solid fa-triangle-exclamation"></i> Ảnh Khách hàng chụp khi nhận (Lúc 15:45)</span>
-                            <span>Tổn hại 40%</span>
+                            <span class="bad"><i class="fa-solid fa-triangle-exclamation"></i>Ảnh khách hàng cung cấp</span>
                         </div>
-                        <img src="../images/flowers/autumn-bowl.jpg" alt="">
-                        <span class="description">3 cành hoa chính gãy lìa thân, giấy lụa rách, hộp hoa có vết đè nén mạnh góc nghiêng.</span>
+                        <img id="detailEvidenceImage" src="" alt="Ảnh minh chứng khiếu nại" style="display: none">
+                        <span class="description" id="noEvidence">Khách hàng không gửi ảnh minh chứng.</span>
                     </div>
                 </div>
+
                 <div class="florist-answer-box">
                     <span class="upper-title">Phản hồi của Đối tác</span>
-                    <span class="description">Phản hồi của Đối tác</span>
+                    <span class="description" id="detailPartnerResponse">Chưa có phản hồi.</span>
                 </div>
                 <div class="decision-box">
-                    <span class="upper-title"><i class="fa-solid fa-scale-balanced"></i> Biên bản Phán quyết & Giải phóng Tiền ký quỹ Escrow</span>
-                    <span class="upper-label">Căn cứ & Diễn giải phán quyết của Ban Quản Trị:</span>
-                    <span class="description">Xác nhận hoa bị dập gãy do đơn vị vận chuyển đối tác liên kết Fw12 Express. Căn cứ Chính sách Bảo chứng Fw12: Hoàn tiền 100% (1.650.000đ) cho Khách hàng từ quỹ Escrow; Fw12 kích hoạt quỹ bồi hoàn 70% giá trị gốc cho Florist Thảo Điền Atelier theo gói bảo hiểm hàng dễ vỡ.</span>
-                    <div class="buttons-box">
-                        <button class="req-partner-fix-button">Yêu cầu Đối tác xử lý lại</button>
-                        <button class="close-complaint-button">Đóng khiếu nại</button>
+                    <span class="upper-title"><i
+                            class="fa-solid fa-scale-balanced"></i>Biên bản kiểm duyệt khiếu nại</span>
+                    <span class="upper-label">Nội dung khiếu nại của khách hàng:</span>
+                    <span class="description" id="detailDescription">Chưa chọn khiếu nại.</span>
+                    <div class="moderation-note-box">
+                        <label for="moderationNote" class="upper-label">Ghi chú yêu cầu đối tác xử lý lại:</label>
+                        <textarea id="moderationNote" class="form-text-input" rows="5"
+                                  placeholder="Nhập lý do và yêu cầu đối tác xử lý lại..."></textarea>
+                        <span id="moderationNoteError" class="text-danger"></span>
                     </div>
-                    <button class="punish-partner-button"><i class="fa-solid fa-flag"></i> Phạt Đối tác / Trừ điểm uy tín</button>
+                    <div class="buttons-box">
+                        <button class="req-partner-fix-button" id="reworkComplaintBtn">Yêu cầu Đối tác xử lý lại
+                        </button>
+                        <button class="close-complaint-button" id="resolveComplaintBtn">Đóng khiếu nại</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,5 +144,6 @@
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
 <script src="../js/admin.js"></script>
+<script src="../js/pages/admin-complaint.js"></script>
 </body>
 </html>

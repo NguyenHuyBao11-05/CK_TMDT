@@ -125,6 +125,47 @@
         </div>
         <button class="send-complaint-button"><i class="fa-solid fa-shield-halved"></i> Gửi khiếu nại</button>
     </section>
+    <div class="modal fade" id="createComplaintModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file-shield me-2"></i>Tạo yêu cầu khiếu nại</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Chọn đơn hàng <span class="text-danger">*</span></label>
+                        <select id="complaintOrderId" class="form-select"><option value="">Đang tải đơn hàng...</option></select>
+                        <small id="complaintOrderError" class="text-danger"></small>
+                        <small class="text-muted d-block mt-1">Chỉ chọn được đơn hàng có đối tác và đang giao hoặc đã nhận.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mô tả vấn đề <span class="text-danger">*</span></label>
+                        <textarea id="complaintDescription" class="form-control" rows="5" maxlength="2000"
+                                  placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."></textarea>
+                        <div class="d-flex justify-content-between">
+                            <small id="complaintDescriptionError" class="text-danger"></small>
+                            <small class="text-muted"><span id="complaintDescriptionCount">0</span>/2000</small>
+                        </div>
+                        <small class="text-muted">Mô tả cần tối thiểu 20 ký tự.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ảnh minh chứng (không bắt buộc)</label>
+                        <input type="file" id="complaintImage" class="form-control" accept="image/jpeg,image/png">
+                        <small class="text-muted">Chỉ hỗ trợ ảnh JPG và PNG.</small>
+                    </div>
+                    <div id="createComplaintError" class="text-danger small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="submitComplaintBtn">
+                        <i class="fa-solid fa-paper-plane me-1"></i>Gửi khiếu nại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <div id="site-footer"></div>
@@ -133,6 +174,7 @@
 <script src="../js/common.js"></script>
 <script src="../js/api.js"></script>
 <script src="../js/header-sidebar-ui.js"></script>
+<script src="../js/pages/user-complaint.js"></script>
 <script src="../js/pages/user-orders.js"></script>
 </body>
 </html>

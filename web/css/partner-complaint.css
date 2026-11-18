@@ -291,6 +291,7 @@ section {
     color: var(--fw-forest-dark);
     font-size: 13px;
     font-weight: 700;
+    overflow: hidden;
 }
 
 .section-main .complaint-info-box {
@@ -486,9 +487,9 @@ section {
 
 .section-main .order-box {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     padding: 16px;
     border: 1px solid var(--fw-line);
     border-radius: 12px;
@@ -497,13 +498,24 @@ section {
 
 .section-main .order-box .left-box {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 14px;
+    width: 100%;
 }
 
-.section-main .order-box .left-box > img {
+.section-main .order-box .product-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+.section-main .order-box .left-box > img,
+.section-main .order-box .product-item > img {
     width: 100px;
     height: 100px;
+    flex-shrink: 0;
     object-fit: cover;
     border-radius: 10px;
     background: var(--fw-cream);
@@ -513,6 +525,7 @@ section {
     display: flex;
     flex-direction: column;
     gap: 7px;
+    min-width: 0;
 }
 
 .section-main .order-box .order-id {
@@ -526,6 +539,7 @@ section {
     color: var(--fw-ink);
     font-size: 14px;
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .section-main .order-box .down-texts {
@@ -533,6 +547,8 @@ section {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--fw-line);
 }
 
 .section-main .order-box .florist-label,
@@ -591,10 +607,13 @@ section {
     font-size: 15px;
 }
 
-.section-main .reason-description {
+.section-main .reason-description, #previousPartnerResponseContent {
     color: var(--fw-ink);
     font-size: 12px;
     line-height: 1.8;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .section-main .reason-box .complaint-info-box {

@@ -240,6 +240,12 @@ section {
     background: var(--fw-cream-2);
 }
 
+.reason-box > p {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 .reason-box .reason-label {
     font-size: 12px;
     font-weight: 800;
@@ -299,11 +305,16 @@ section {
 
 .your-req-box {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     padding: 16px;
     background: var(--fw-sage-soft);
     border-radius: 12px;
+}
+
+.your-req-box > p {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .your-req-box .left-texts {
@@ -603,4 +614,10 @@ section {
 
 .link-box .link:hover {
     color: var(--fw-forest);
+}
+
+#complaintsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }

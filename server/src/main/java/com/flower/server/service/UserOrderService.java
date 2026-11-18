@@ -263,7 +263,7 @@ public class UserOrderService {
         if (order.partnerId() != null) {
             notificationService.notify(order.partnerId(), "ORDER_CANCEL",
                     "Đơn hàng đã bị huỷ", "Đơn hàng " + orderId + " đã được khách hàng huỷ. Lý do: " + reason,
-                    "/partner/orders/" + orderId);
+                    "CK_TMDT/web/partner/orders/" + orderId);
         }
 
         String refundMessage = null;
@@ -370,7 +370,7 @@ public class UserOrderService {
         }
 
         logService.write(null, "ORDER_AUTO_RECEIVED", "orders", orderId, "Hệ thống tự động xác nhận khách hàng đã nhận đơn hàng.");
-        notificationService.notify(order.customerId(), "ORDER_AUTO_RECEIVED", "Đơn hàng đã hoàn thành", "Đơn hàng #" + orderId + " đã được tự động xác nhận hoàn thành.", "/customer/order-detail.html?id=" + orderId);
+        notificationService.notify(order.customerId(), "ORDER_AUTO_RECEIVED", "Đơn hàng đã hoàn thành", "Đơn hàng #" + orderId + " đã được tự động xác nhận hoàn thành.", "CK_TMDT/web/customer/order-detail.html?id=" + orderId);
     }
 
     @Transactional
