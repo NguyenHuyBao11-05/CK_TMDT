@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tên trang — Fw12 Floral</title>
+    <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/order-detail.css">
+    <link rel="stylesheet" href="../css/portal.css">
+    <link rel="stylesheet" href="../css/order.css">
+</head>
+<body data-nav="">
+
+<div id="site-header"></div>
+<div id="sidebar"></div>
+
+<main class="container py-4 order-detail-page">
+    <div class="mb-4">
+        <a href="orders.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Quay lại lịch sử đơn hàng
+        </a>
+    </div>
+    <div id="loadingOrder" class="text-center py-5">
+        Đang tải thông tin đơn hàng...
+    </div>
+    <div id="orderError" class="alert alert-danger d-none"></div>
+    <div id="orderDetailContent" class="d-none">
+        <section class="detail-section">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <div>
+                    <h4>Chi tiết đơn hàng</h4>
+                    <p class="text-muted mb-1">Mã đơn hàng: <strong id="orderCode"></strong></p>
+                    <p class="text-muted mb-0" id="createdAt"></p>
+                </div>
+                <span id="orderStatus" class="order-status"></span>
+            </div>
+        </section>
+        <section class="detail-section">
+            <h5>Thông tin người nhận</h5>
+            <p><strong>Họ tên:</strong> <span id="recipientName"></span></p>
+            <p><strong>Số điện thoại:</strong> <span id="recipientPhone"></span></p>
+            <p><strong>Địa chỉ:</strong> <span id="deliveryAddress"></span></p>
+            <p class="mb-0"><strong>Ghi chú:</strong> <span id="deliveryNote"></span></p>
+        </section>
+        <section class="detail-section">
+            <h5>Sản phẩm trong đơn</h5>
+            <div id="orderItems"></div>
+        </section>
+        <section class="detail-section">
+            <h5>Thông tin thanh toán</h5>
+            <div class="price-row">
+                <span>Tạm tính</span>
+                <span id="subtotalAmount"></span>
+            </div>
+            <div class="price-row">
+                <span>Phí vận chuyển</span>
+                <span id="shippingFee"></span>
+            </div>
+            <div class="price-row">
+                <span>Giảm giá</span>
+                <span id="discountAmount"></span>
+            </div>
+            <hr>
+            <div class="price-row total-row">
+                <strong>Tổng thanh toán</strong>
+                <strong id="totalAmount"></strong>
+            </div>
+            <div class="mt-3">
+                <p><strong>Phương thức:</strong> <span id="paymentMethod"></span></p>
+                <p class="mb-0"><strong>Trạng thái thanh toán:</strong><span id="paymentStatus"></span></p>
+            </div>
+        </section>
+        <section class="detail-section">
+            <h5>Trạng thái giao hàng</h5>
+            <p><strong>Ngày gửi hàng:</strong> <span id="shippedAt"></span></p>
+            <p class="mb-0"><strong>Ngày nhận hàng:</strong> <span id="receivedAt"></span></p>
+        </section>
+        <section class="detail-section">
+            <h5>Thao tác</h5>
+            <button type="button" id="cancelOrderBtn" class="btn btn-outline-danger d-none">Huỷ đơn hàng</button>
+            <button type="button" id="receivedOrderBtn" class="btn btn-success d-none"><i
+                    class="fa-solid fa-check me-1"></i>Đã nhận được hàng
+            </button>
+            <button type="button" id="reviewOrderBtn" class="btn d-none"><i
+                    class="fa-solid fa-star me-1"></i>Đánh giá đơn hàng
+            </button>
+        </section>
+    </div>
+    <!-- CANCEL -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1"
+         aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel"><i
+                            class="fa-solid fa-circle-exclamation text-danger me-2"></i>Huỷ đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn huỷ đơn hàng này không?</p>
+                    <label for="cancelReason" class="form-label">Lý do huỷ đơn <span
+                            class="text-danger">*</span></label>
+                    <textarea id="cancelReason" class="form-control" rows="4" maxlength="300"
+                              placeholder="Nhập lý do bạn muốn huỷ đơn hàng..."></textarea>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-danger d-none" id="cancelReasonError"></small>
+                        <small class="text-muted ms-auto"><span id="cancelReasonCount">0</span>/300 ký tự</small>
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        Sau khi huỷ, đơn hàng sẽ không thể tiếp tục xử lý.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Quay lại</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelOrderBtn">Xác nhận huỷ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- REVIEW -->
+    <div class="modal fade" id="reviewOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đánh giá đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Số sao <span class="text-danger">*</span></label>
+                        <select id="reviewRating" class="form-select">
+                            <option value="">-- Chọn số sao --</option>
+                            <option value="5">5 sao - Rất hài lòng</option>
+                            <option value="4">4 sao - Hài lòng</option>
+                            <option value="3">3 sao - Bình thường</option>
+                            <option value="2">2 sao - Chưa hài lòng</option>
+                            <option value="1">1 sao - Không hài lòng</option>
+                        </select>
+                        <small id="reviewRatingError" class="text-danger"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nhận xét</label>
+                        <textarea id="reviewComment" class="form-control" rows="4" maxlength="1000"
+                                  placeholder="Chia sẻ cảm nhận của bạn về đơn hàng..."></textarea>
+                        <div class="text-end">
+                            <small class="text-muted"><span id="reviewCommentCount">0</span>/1000</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Hình ảnh (không bắt buộc)</label>
+                        <input type="file" id="reviewImage" class="form-control" accept="image/*">
+                    </div>
+                    <small id="reviewError" class="text-danger"></small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" id="submitReviewBtn" class="btn btn-primary">Gửi đánh giá</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/header-sidebar-ui.js"></script>
+<script src="../js/pages/order-detail.js"></script>
+</body>
+</html>

@@ -703,3 +703,24 @@ section {
     border: none;
     background: var(--fw-forest);
 }
+
+.order.cancelled-order {
+    border: 1px solid var(--fw-peach-dark);
+}
+
+.order.cancelled-order .order-id {
+    color: var(--fw-red);
+}
+
+.order.cancelled-order .order-state {
+    color: var(--fw-red);
+    border: 1px solid var(--fw-peach-dark);
+    background: var(--fw-peach);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-weight: 600;
+}
+
+.order.cancelled-order .total-money {
+    color: var(--fw-red);
+}
