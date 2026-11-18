@@ -43,7 +43,9 @@ public class UserOrderService {
                     o.status,
                     o.payment_status,
                     o.payment_method,
-                    o.total_amount
+                    o.total_amount,
+                    (o.status = 'PENDING' AND o.payment_method = 'BANK_TRANSFER' AND o.payment_status <> 'PAID'
+                        AND o.design_request_id IS NULL AND o.accepted_at IS NOT NULL) AS can_pay
                 FROM orders o
                 WHERE o.customer_id = ?
                 """);
@@ -66,7 +68,8 @@ public class UserOrderService {
                         rs.getString("status"),
                         rs.getString("payment_status"),
                         rs.getString("payment_method"),
-                        rs.getBigDecimal("total_amount")
+                        rs.getBigDecimal("total_amount"),
+                        rs.getBoolean("can_pay")
                 ), params.toArray()
         );
 
@@ -105,7 +108,6 @@ public class UserOrderService {
         );
 
         return rows.stream().map(order -> {
-            boolean canContinuePayment = "PENDING".equals(order.status()) && "UNPAID".equals(order.paymentStatus());
             return new UserOrderItem(
                     order.id(),
                     order.orderCode(),
@@ -116,7 +118,7 @@ public class UserOrderService {
                     order.totalAmount(),
                     itemsByOrder.getOrDefault(order.id(), List.of()),
                     imagesByOrder.get(order.id()),
-                    canContinuePayment
+                    order.canPay()
             );
         }).toList();
     }
@@ -218,19 +220,20 @@ public class UserOrderService {
     @Transactional
     public UserOrderCancelResponse cancelOrder(Long orderId, UserOrderCancelRequest request) {
         User user = currentUser.require(Role.CUSTOMER);
-        String reason = request.reason().trim();
+        String reason = request.reason() == null ? "" : request.reason().trim();
         if (reason.isEmpty() || reason.length() > 300) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lý do huỷ phải có từ 1 đến 300 ký tự");
         }
 
         String orderSql = """
-                SELECT id, status, payment_method, payment_status, partner_id
+                SELECT id, order_code, status, payment_method, payment_status, partner_id
                 FROM orders
                 WHERE id = ? AND customer_id = ?
                 FOR UPDATE
                 """;
         List<OrderCancelInfo> orders = jdbcTemplate.query(orderSql, (rs, rowNum) -> new OrderCancelInfo(
                         rs.getLong("id"),
+                        rs.getString("order_code"),
                         rs.getString("status"),
                         rs.getString("payment_method"),
                         rs.getString("payment_status"),
@@ -244,8 +247,11 @@ public class UserOrderService {
         if (!"PENDING".equals(order.status())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ đơn hàng đang chờ xử lý");
         }
+        if ("PAID".equals(order.paymentStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Đơn hàng đã thanh toán, vui lòng gửi khiếu nại để được hỗ trợ huỷ và hoàn tiền");
+        }
 
-        restoreOrderStock(orderId);
         String updateSql = """
                 UPDATE orders
                 SET status = 'CANCELLED',
@@ -258,34 +264,16 @@ public class UserOrderService {
         if (updated != 1) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hàng đã được cập nhật, vui lòng tải lại");
         }
+        jdbcTemplate.update("UPDATE payments SET status = 'FAILED' WHERE order_id = ? AND status = 'PENDING'", orderId);
 
-        logService.write(user, "ORDER_CANCEL", "users", user.getId(), "Người dùng hủy đơn hàng.");
+        logService.write(user, "ORDER_CANCEL", "orders", orderId, "Khách hàng huỷ đơn hàng " + order.orderCode() + ".");
         if (order.partnerId() != null) {
             notificationService.notify(order.partnerId(), "ORDER_CANCEL",
-                    "Đơn hàng đã bị huỷ", "Đơn hàng " + orderId + " đã được khách hàng huỷ. Lý do: " + reason,
-                    "/partner/orders/" + orderId);
+                    "Đơn hàng đã bị huỷ", "Đơn hàng " + order.orderCode() + " đã được khách hàng huỷ. Lý do: " + reason,
+                    "partner/orders.html");
         }
 
-        String refundMessage = null;
-        if ("BANK_TRANSFER".equals(order.paymentMethod()) && "PAID".equals(order.paymentStatus())) {
-            refundMessage = "Fw12 sẽ liên hệ hoàn tiền";
-        }
-        return new UserOrderCancelResponse(orderId, "CANCELLED", refundMessage, "Huỷ đơn hàng thành công");
-    }
-
-    private void restoreOrderStock(Long orderId) {
-        String sql = """
-                UPDATE products p
-                JOIN (
-                    SELECT product_id, SUM(quantity) AS total_quantity
-                    FROM order_items
-                    WHERE order_id = ?
-                      AND product_id IS NOT NULL
-                    GROUP BY product_id
-                ) oi ON oi.product_id = p.id
-                SET p.stock_quantity = p.stock_quantity + oi.total_quantity
-                """;
-        jdbcTemplate.update(sql, orderId);
+        return new UserOrderCancelResponse(orderId, "CANCELLED", null, "Huỷ đơn hàng thành công");
     }
 
     @Transactional
@@ -370,7 +358,7 @@ public class UserOrderService {
         }
 
         logService.write(null, "ORDER_AUTO_RECEIVED", "orders", orderId, "Hệ thống tự động xác nhận khách hàng đã nhận đơn hàng.");
-        notificationService.notify(order.customerId(), "ORDER_AUTO_RECEIVED", "Đơn hàng đã hoàn thành", "Đơn hàng #" + orderId + " đã được tự động xác nhận hoàn thành.", "/customer/order-detail.html?id=" + orderId);
+        notificationService.notify(order.customerId(), "ORDER_AUTO_RECEIVED", "Đơn hàng đã hoàn thành", "Đơn hàng #" + orderId + " đã được tự động xác nhận hoàn thành.", "account/order-detail.html?id=" + orderId);
     }
 
     @Transactional
@@ -392,6 +380,10 @@ public class UserOrderService {
         Map<String, Object> order = orders.get(0);
         if (!"RECEIVED".equals(order.get("status"))) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Chỉ đơn hàng đã nhận mới được đánh giá.");
+        }
+        Integer reviewed = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reviews WHERE order_id = ?", Integer.class, orderId);
+        if (reviewed != null && reviewed > 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn hàng này đã được đánh giá.");
         }
         String productSql = """
                 SELECT
@@ -467,6 +459,7 @@ public class UserOrderService {
 
     private record OrderCancelInfo(
             Long id,
+            String orderCode,
             String status,
             String paymentMethod,
             String paymentStatus,
@@ -481,7 +474,8 @@ public class UserOrderService {
             String status,
             String paymentStatus,
             String paymentMethod,
-            BigDecimal totalAmount
+            BigDecimal totalAmount,
+            boolean canPay
     ) {
     }
 }
