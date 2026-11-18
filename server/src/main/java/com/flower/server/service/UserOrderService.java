@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -164,7 +163,7 @@ public class UserOrderService {
         );
 
         if (result.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
         }
         OrderDetail order = result.getFirst();
         String itemSql = """
@@ -222,7 +221,7 @@ public class UserOrderService {
         User user = currentUser.require(Role.CUSTOMER);
         String reason = request.reason() == null ? "" : request.reason().trim();
         if (reason.isEmpty() || reason.length() > 300) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lý do huỷ phải có từ 1 đến 300 ký tự");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Lý do huỷ phải có từ 1 đến 300 ký tự");
         }
 
         String orderSql = """
@@ -241,14 +240,14 @@ public class UserOrderService {
                 ), orderId, user.getId()
         );
         if (orders.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
         }
         OrderCancelInfo order = orders.getFirst();
         if (!"PENDING".equals(order.status())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ đơn hàng đang chờ xử lý");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ đơn hàng đang chờ xử lý");
         }
         if ("PAID".equals(order.paymentStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ApiException(HttpStatus.BAD_REQUEST,
                     "Đơn hàng đã thanh toán, vui lòng gửi khiếu nại để được hỗ trợ huỷ và hoàn tiền");
         }
 
@@ -262,7 +261,7 @@ public class UserOrderService {
 
         int updated = jdbcTemplate.update(updateSql, reason, orderId, user.getId());
         if (updated != 1) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hàng đã được cập nhật, vui lòng tải lại");
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn hàng đã được cập nhật, vui lòng tải lại");
         }
         jdbcTemplate.update("UPDATE payments SET status = 'FAILED' WHERE order_id = ? AND status = 'PENDING'", orderId);
 
@@ -291,11 +290,11 @@ public class UserOrderService {
                 rs.getString("payment_method")), orderId, customer.getId()
         );
         if (result.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
         }
         OrderReceiveInfo order = result.getFirst();
         if (!"SHIPPING".equals(order.status())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể xác nhận đơn hàng đang giao");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Chỉ có thể xác nhận đơn hàng đang giao");
         }
         String updateSql = """
                 UPDATE orders
@@ -312,7 +311,7 @@ public class UserOrderService {
                 """;
         int updated = jdbcTemplate.update(updateSql, orderId, customer.getId());
         if (updated != 1) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hàng đã được cập nhật, vui lòng tải lại");
+            throw new ApiException(HttpStatus.CONFLICT, "Đơn hàng đã được cập nhật, vui lòng tải lại");
         }
         logService.write(customer, "ORDER_RECEIVED", "users", customer.getId(), "Khách hàng xác nhận đã nhận đơn hàng.");
         return new UserOrderReceiveResponse(orderId, "RECEIVED", "Xác nhận đã nhận hàng thành công");
