@@ -2,6 +2,7 @@ package com.flower.server.service;
 
 import com.flower.server.common.ApiException;
 import com.flower.server.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,9 +25,15 @@ public class ShoppingService {
     private final InvoiceMailService invoiceMail;
     private final TransactionTemplate transactionTemplate;
     private final VnPayService vnPayService;
+    private final long claimMinutes;
+    private final long paymentMinutes;
 
     public ShoppingService(JdbcTemplate jdbc, LogService logs, NotificationService notifications,
-                           InvoiceMailService invoiceMail, PlatformTransactionManager transactionManager, VnPayService vnPayService) {
+                           InvoiceMailService invoiceMail, PlatformTransactionManager transactionManager, VnPayService vnPayService,
+                           @Value("${app.order-claim-minutes}") long claimMinutes,
+                           @Value("${app.order-payment-minutes}") long paymentMinutes) {
+        this.claimMinutes = claimMinutes;
+        this.paymentMinutes = paymentMinutes;
         this.jdbc = jdbc;
         this.logs = logs;
         this.notifications = notifications;
@@ -272,13 +279,26 @@ public class ShoppingService {
         Map<String,Object> order = findOrder(code, user);
         if (!"PENDING".equals(order.get("status")) || "PAID".equals(order.get("payment_status")))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng không còn ở trạng thái chờ thanh toán.");
+        LocalDateTime deadline = null;
+        if (order.get("design_request_id") == null) {
+            if (order.get("partner_id") == null || !"BANK_TRANSFER".equals(order.get("payment_method")))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Bạn chỉ thanh toán sau khi có Đối tác nhận đơn.");
+            deadline = paymentDeadline(order);
+            if (deadline == null || !deadline.isAfter(LocalDateTime.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Đã quá thời hạn thanh toán của đơn hàng.");
+        }
         Long orderId = asLong(order.get("id"));
         jdbc.update("UPDATE payments SET status='FAILED' WHERE order_id=? AND method='CASH' AND status='PENDING'", orderId);
         jdbc.update("UPDATE orders SET payment_method='BANK_TRANSFER',payment_status='UNPAID' WHERE id=?", orderId);
         Integer pending = jdbc.queryForObject("SELECT COUNT(*) FROM payments WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", Integer.class, orderId);
         if (pending == null || pending == 0)
             jdbc.update("INSERT INTO payments(order_id,method,amount,status) VALUES(?,'BANK_TRANSFER',?,'PENDING')", orderId, order.get("total_amount"));
-        String url = vnPayService.createPaymentUrl(code, money(order.get("total_amount")), clientIp, "Thanh toan don hang " + code);
+        String url;
+        try {
+            url = vnPayService.createPaymentUrl(code, money(order.get("total_amount")), clientIp, "Thanh toan don hang " + code, deadline);
+        } catch (IllegalStateException ex) {
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Máy chủ chưa cấu hình VNPAY, vui lòng thử lại sau.");
+        }
         return Map.of("code", code, "payment_url", url);
     }
 
@@ -333,15 +353,57 @@ public class ShoppingService {
             Map<String,Object> order = jdbc.query("SELECT * FROM orders WHERE order_code=? AND customer_id=? FOR UPDATE", rs -> rs.next() ? rowToMap(rs) : null, code, user.getId());
             if (order == null) throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng.");
             if (!"PENDING".equals(order.get("status"))) throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng không còn ở trạng thái chờ xác nhận.");
+            boolean readyMade = order.get("design_request_id") == null;
+            if (readyMade && order.get("partner_id") != null)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng đã có Đối tác nhận, không đổi được phương thức thanh toán.");
             Long orderId = asLong(order.get("id"));
             jdbc.update("UPDATE payments SET status='FAILED' WHERE order_id=? AND method='BANK_TRANSFER' AND status='PENDING'", orderId);
             jdbc.update("UPDATE orders SET payment_method='CASH',payment_status='UNPAID' WHERE id=?", orderId);
+            if (readyMade && order.get("payment_method") == null) jdbc.update("UPDATE orders SET created_at=NOW() WHERE id=?", orderId);
             Integer exists = jdbc.queryForObject("SELECT COUNT(*) FROM payments WHERE order_id=? AND method='CASH' AND status='PENDING'", Integer.class, orderId);
             if (exists == null || exists == 0) jdbc.update("INSERT INTO payments(order_id,method,amount,status) VALUES(?,'CASH',?,'PENDING')", orderId, order.get("total_amount"));
             if (order.get("design_request_id") == null) jdbc.update("DELETE FROM cart_items WHERE cart_id=(SELECT id FROM carts WHERE customer_id=?)", user.getId());
             logs.write(user, "ORDER_CREATE", "orders", orderId, "Khách xác nhận đặt hàng thanh toán khi nhận hàng: " + code);
             return orderByCode(code, user);
         });
+    }
+
+    public Map<String,Object> placeTransferOrder(User user, String code) {
+        return transactionTemplate.execute(status -> {
+            Map<String,Object> order = jdbc.query("SELECT * FROM orders WHERE order_code=? AND customer_id=? FOR UPDATE", rs -> rs.next() ? rowToMap(rs) : null, code, user.getId());
+            if (order == null) throw new ApiException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng.");
+            if (order.get("design_request_id") != null)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn thiết kế riêng được thanh toán ngay qua VNPAY.");
+            if (!"PENDING".equals(order.get("status")) || order.get("partner_id") != null)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Đơn hàng không còn ở trạng thái chờ đặt.");
+            if ("BANK_TRANSFER".equals(order.get("payment_method"))) return orderByCode(code, user);
+            Long orderId = asLong(order.get("id"));
+            jdbc.update("UPDATE payments SET status='FAILED' WHERE order_id=? AND method='CASH' AND status='PENDING'", orderId);
+            jdbc.update("UPDATE orders SET payment_method='BANK_TRANSFER',payment_status='UNPAID'" + (order.get("payment_method") == null ? ",created_at=NOW()" : "") + " WHERE id=?", orderId);
+            jdbc.update("DELETE FROM cart_items WHERE cart_id=(SELECT id FROM carts WHERE customer_id=?)", user.getId());
+            logs.write(user, "ORDER_CREATE", "orders", orderId, "Khách đặt đơn chuyển khoản, chờ Đối tác nhận rồi mới thanh toán: " + code);
+            return orderByCode(code, user);
+        });
+    }
+
+    private LocalDateTime claimDeadline(Map<String,Object> order) {
+        if (order.get("design_request_id") != null || order.get("partner_id") != null || order.get("payment_method") == null
+                || !"PENDING".equals(order.get("status")) || "PAID".equals(order.get("payment_status"))) return null;
+        LocalDateTime createdAt = time(order.get("created_at"));
+        return createdAt == null ? null : createdAt.plusMinutes(claimMinutes);
+    }
+
+    private LocalDateTime paymentDeadline(Map<String,Object> order) {
+        if (order.get("design_request_id") != null || order.get("partner_id") == null || !"BANK_TRANSFER".equals(order.get("payment_method"))
+                || !"PENDING".equals(order.get("status")) || "PAID".equals(order.get("payment_status"))) return null;
+        LocalDateTime acceptedAt = time(order.get("accepted_at"));
+        return acceptedAt == null ? null : acceptedAt.plusMinutes(paymentMinutes);
+    }
+
+    private static LocalDateTime time(Object value) {
+        if (value instanceof LocalDateTime t) return t;
+        if (value instanceof Timestamp t) return t.toLocalDateTime();
+        return null;
     }
 
     private Map<String,Object> payWithinTransaction(User user,String code,String transactionRef) {
@@ -354,8 +416,6 @@ public class ShoppingService {
             throw new ApiException(HttpStatus.BAD_REQUEST,"Đơn hàng không còn ở trạng thái chờ thanh toán.");
 
         Long orderId=asLong(order.get("id"));
-        // Cửa hàng làm hoa theo mẫu/theo đơn nên KHÔNG quản lý tồn kho: IPN hợp lệ luôn được ghi nhận.
-
         // Ghi nhận mã voucher đúng một lần; kiểm tra lại giới hạn trong transaction thanh toán.
         if(order.get("voucher_id")!=null) {
             int used=jdbc.update("UPDATE vouchers SET used_count=used_count+1 WHERE id=? AND status='ACTIVE' AND (usage_limit IS NULL OR used_count<usage_limit) AND valid_from<=NOW() AND valid_to>=NOW()",order.get("voucher_id"));
@@ -392,6 +452,9 @@ public class ShoppingService {
     public Map<String,Object> orderByCode(String code,User user) {
         Map<String,Object> order=findOrder(code,user);
         Map<String,Object> result=new LinkedHashMap<>(order);
+        result.put("partner_name",order.get("partner_id")==null?null:jdbc.query("SELECT full_name FROM users WHERE id=?",rs->rs.next()?rs.getString(1):null,order.get("partner_id")));
+        result.put("claim_deadline",claimDeadline(order));
+        result.put("payment_deadline",paymentDeadline(order));
         result.put("lines",jdbc.queryForList("SELECT item_name,quantity,unit_price,subtotal,material,product_id,quote_id FROM order_items WHERE order_id=? ORDER BY id",order.get("id")));
         return result;
     }

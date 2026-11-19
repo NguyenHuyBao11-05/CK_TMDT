@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import com.flower.server.common.ApiException;
 
 import java.util.List;
 
@@ -58,18 +58,18 @@ public class AccountService {
     public void changePassword(@Valid UserChangePasswordRequest request) {
         User user = currentUserService.get();
         if (user.getAuthProvider() != AuthProvider.LOCAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản Google không hỗ trợ đổi mật khẩu.");
+            throw new ApiException(HttpStatus.FORBIDDEN, "Tài khoản Google không hỗ trợ đổi mật khẩu.");
         }
 
         if (!passwordEncoder.matches(request.getCurrentpass(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không chính xác.");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không chính xác.");
         }
         String newPassword = request.getNewpass();
         if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu mới phải khác mật khẩu hiện tại.");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Mật khẩu mới phải khác mật khẩu hiện tại.");
         }
         if (!newPassword.matches("^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ và số.");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ và số.");
         }
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);

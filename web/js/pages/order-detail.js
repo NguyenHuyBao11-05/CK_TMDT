@@ -58,7 +58,7 @@ function renderOrderDetail(order) {
     renderOrderItems(order.items || []);
 
     const cancelButton = document.getElementById("cancelOrderBtn");
-    if (order.status === "PENDING") {
+    if (order.status === "PENDING" && order.payment_status !== "PAID") {
         cancelButton.classList.remove("d-none");
     } else {
         cancelButton.classList.add("d-none");
