@@ -459,6 +459,30 @@ Object.assign(window.FW_API, {
   createOrderReview(id, data) {
     return callServer(`/api/orders/${id}/review`, {method: "POST", body: JSON.stringify(data)});
   },
+  getCanComplaintOrders() {
+    return callServer("/api/complaints/can-complaint-orders", {method: "GET"});
+  },
+  createComplaint(data) {
+    return callServer("/api/complaints", {method: "POST", body: JSON.stringify(data)});
+  },
+  getMyComplaints() {
+    return callServer("/api/complaints/mine", {method: "GET"});
+  },
+  getPartnerComplaints() {
+    return callServer("/api/partner/complaints", {method: "GET"});
+  },
+  respondToComplaint(id, data) {
+    return callServer(`/api/partner/complaints/${id}/respond`, {method: "POST", body: JSON.stringify(data)});
+  },
+  getAdminComplaints() {
+    return callServer("/api/admin/complaints", {method: "GET"});
+  },
+  resolveComplaint(id, data) {
+    return callServer(`/api/admin/complaints/${id}/resolve`, {method: "POST", body: JSON.stringify(data)});
+  },
+  reworkComplaint(id, data) {
+    return callServer(`/api/admin/complaints/${id}/rework`, {method: "POST", body: JSON.stringify(data)});
+  },
 })
 
 async function loadAdminMenuCounts() {

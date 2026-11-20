@@ -583,6 +583,9 @@ section {
     padding: 16px;
     border-radius: 16px;
     font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .section-main .decision-box {
@@ -619,6 +622,9 @@ section {
     padding: 16px;
     border-radius: 16px;
     font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .section-main .decision-box .buttons-box {
@@ -667,4 +673,16 @@ section {
     background: none;
     color: var(--fw-rose);
     cursor: pointer;
+}
+
+.moderation-note-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#moderationNote {
+    border-radius: 12px;
+    border: none;
+    padding: 16px;
 }

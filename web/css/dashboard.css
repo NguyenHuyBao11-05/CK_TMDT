@@ -204,6 +204,7 @@ section {
     align-items: center;
     gap: 7px;
     font-weight: 700;
+    overflow: hidden;
 }
 
 .section-recent-orders .list-orders .lists .list-item.normal-design .order-id {

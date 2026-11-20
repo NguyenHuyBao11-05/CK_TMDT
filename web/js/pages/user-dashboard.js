@@ -82,7 +82,7 @@ function renderRecentOrders(orders) {
             </div>
             <div class="product-statutes">${status_html}</div>
             <div class="action-buttons">
-                <button class="detail-button"><i class="fa-solid fa-eye"></i> Chi tiết</button>
+                <button class="detail-button" data-id="${order.id}"><i class="fa-solid fa-eye"></i> Chi tiết</button>
             </div>
         </div>`;}).join("");
 }
@@ -212,6 +212,14 @@ async function loadDesignRequests() {
         console.error("Lỗi tải yêu cầu thiết kế:", error);
     }
 }
+
+document.addEventListener("click", function (e) {
+    const button = e.target.closest(".detail-button");
+    if (!button) return;
+    const orderId = button.dataset.id;
+    if (!orderId) return;
+    window.location.href = `order-detail.html?id=${encodeURIComponent(orderId)}`;
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     loadDashboard().then();
